@@ -9,9 +9,16 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
+
+import com.google.common.io.ByteArrayDataOutput;
+import com.google.common.io.ByteStreams;
+import com.mcmiddleearth.connect.Channel;
+import com.mcmiddleearth.connect.bungee.ConnectBungeePlugin;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.md_5.bungee.protocol.packet.PlayerListHeaderFooter;
 import net.md_5.bungee.protocol.packet.PlayerListItem;
 
 /**
@@ -20,8 +27,26 @@ import net.md_5.bungee.protocol.packet.PlayerListItem;
  */
 public class GlobalTabView implements ITabView {
 
-    Set<UUID> viewers = new HashSet<>();
-    
+    private Set<UUID> viewers = new HashSet<>();
+
+    private SimpleHeaderFooter headerFooter = new SimpleHeaderFooter("§eWelcome to §6§lMCME §f{Player}\"",
+                                                   "§eTime: §a{Time} §4| §eNode: §a{Server}\n§ePing: {Ping} §4| §eTPS: {TPS_1}");
+
+    public GlobalTabView() {
+//Logger.getLogger(GlobalTabView.class.getSimpleName()).info("GlobalTabView constructor");
+        ProxyServer.getInstance().getScheduler().schedule(ConnectBungeePlugin.getInstance(), () -> {
+//Logger.getLogger(GlobalTabView.class.getSimpleName()).info("HeaderFooter Update "+viewers.size());
+            viewers.forEach(viewer -> {
+                ProxiedPlayer player = ProxyServer.getInstance().getPlayer(viewer);
+//Logger.getLogger(GlobalTabView.class.getSimpleName()).info("send to "+viewer);
+                if(player!=null) {
+                    headerFooter.send(player);
+                }
+            });
+        }, 2, 1 , TimeUnit.SECONDS);
+
+    }
+
     @Override
     public void handleAddPlayer(ProxiedPlayer triggerPlayer, Set<TabViewPlayerItem> tabViewItems) {
         if(tabViewItems.isEmpty()) {
@@ -131,6 +156,10 @@ public class GlobalTabView implements ITabView {
         packet.setAction(PlayerListItem.Action.REMOVE_PLAYER);
 
         sendToViewers(packet);
+    }
+
+    @Override
+    public void handleHeaderFooter(ProxiedPlayer player, PlayerListHeaderFooter packet) {
     }
 
     @Override

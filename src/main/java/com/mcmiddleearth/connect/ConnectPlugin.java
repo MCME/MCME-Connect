@@ -26,6 +26,7 @@ import com.mcmiddleearth.connect.statistics.StatisticDBConnector;
 import com.mcmiddleearth.connect.statistics.StatisticListener;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
 /**
@@ -43,6 +44,8 @@ public class ConnectPlugin extends JavaPlugin {
     private BukkitTask statisticUpdater;
     
     private static RestartScheduler restartScheduler;
+
+    private static BukkitTask serverinfoScheduler;
     
     @Override
     public void onEnable() {
@@ -62,6 +65,7 @@ public class ConnectPlugin extends JavaPlugin {
         Bukkit.getServer().getMessenger()
                 .registerIncomingPluginChannel(this, Channel.MAIN, new ConnectPluginListener());
         restartScheduler = new RestartScheduler();
+        serverinfoScheduler = new ServerInfoUpdater().runTaskTimer(this,600, 20);
         getCommand("restart").setExecutor(new RestartCommand());
         getCommand("stop").setExecutor(new StopCommand());
     }
@@ -75,6 +79,7 @@ public class ConnectPlugin extends JavaPlugin {
         }
         ConnectPlugin.getStatisticStorage().disconnect();
         restartScheduler.cancel();
+        serverinfoScheduler.cancel();
     }
 
     public static JavaPlugin getInstance() {
@@ -92,4 +97,5 @@ public class ConnectPlugin extends JavaPlugin {
     public static RestartScheduler getRestartScheduler() {
         return restartScheduler;
     }
-}
+
+ }

@@ -38,5 +38,7 @@ public class Channel {
     public static final String LEGACY      = "legacy";
     public static final String RESTART     = "restart";
     public static final String JOIN     = "join";
+    public static final String SERVER_INFO  = "server_info";
+
 }
 

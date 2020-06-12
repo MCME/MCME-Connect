@@ -27,7 +27,10 @@ import com.mcmiddleearth.connect.bungee.Handler.RestartHandler;
 import com.mcmiddleearth.connect.bungee.Handler.TitleHandler;
 import com.mcmiddleearth.connect.bungee.warp.MyWarpDBConnector;
 import java.util.logging.Logger;
+
+import net.md_5.bungee.ServerConnection;
 import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PluginMessageEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
@@ -107,6 +110,10 @@ public class PluginMessageListener implements Listener {
                     String player = in.readUTF();
                     String[] servers = in.readUTF().split(" ");
                     RestartHandler.handle(ProxyServer.getInstance().getPlayer(player), servers, shutdown);
+                    break;
+                case Channel.SERVER_INFO:
+                    String server = ((ServerConnection)event.getSender()).getInfo().getName();
+                    ConnectBungeePlugin.getInstance().getServerInformation(server).updateFromPluginMessage(in);
                     break;
                 default:
                     break;

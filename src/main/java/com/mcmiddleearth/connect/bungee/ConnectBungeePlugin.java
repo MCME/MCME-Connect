@@ -28,6 +28,7 @@ import com.mcmiddleearth.connect.bungee.Handler.TpahereHandler;
 import com.mcmiddleearth.connect.bungee.listener.CommandListener;
 import com.mcmiddleearth.connect.bungee.listener.ConnectionListener;
 import com.mcmiddleearth.connect.bungee.listener.PluginMessageListener;
+import com.mcmiddleearth.connect.bungee.tabList.TabViewManager;
 import com.mcmiddleearth.connect.bungee.vanish.VanishHandler;
 import com.mcmiddleearth.connect.bungee.vanish.VanishListener;
 import com.mcmiddleearth.connect.bungee.warp.MyWarpDBConnector;
@@ -37,10 +38,7 @@ import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.api.scheduler.ScheduledTask;
 
 import java.io.*;
-import java.util.HashSet;
-import java.util.Scanner;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -69,6 +67,8 @@ public class ConnectBungeePlugin extends Plugin {
     private RestartScheduler restartScheduler;
     private ScheduledTask tpaCleanupScheduler;
     private ScheduledTask tpahereCleanupScheduler;
+
+    private Map<String,ServerInformation> serverInformation = new HashMap<>();
     
     @Override
     public void onEnable() {
@@ -101,6 +101,7 @@ public class ConnectBungeePlugin extends Plugin {
         getProxy().getPluginManager().registerListener(this, new CommandListener());
         getProxy().getPluginManager().registerListener(this, 
                          new ConnectionListener());
+        getProxy().getPluginManager().registerListener(this, new TabViewManager());
     }
     
     @Override
@@ -248,5 +249,14 @@ public class ConnectBungeePlugin extends Plugin {
 
     public static boolean isMyWarpEnabled() {
         return myWarpEnabled;
+    }
+
+    public ServerInformation getServerInformation(String name) {
+        ServerInformation info =  serverInformation.get(name);
+        if(info==null) {
+            info = new ServerInformation(name);
+            serverInformation.put(name,info);
+        }
+        return info;
     }
 }

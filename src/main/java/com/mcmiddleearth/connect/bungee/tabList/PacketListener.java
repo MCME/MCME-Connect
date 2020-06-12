@@ -8,6 +8,7 @@ import java.util.logging.Logger;
 import net.md_5.bungee.ServerConnection;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.protocol.PacketWrapper;
+import net.md_5.bungee.protocol.packet.PlayerListHeaderFooter;
 import net.md_5.bungee.protocol.packet.PlayerListItem;
 
 public class PacketListener extends MessageToMessageDecoder<PacketWrapper> {
@@ -51,6 +52,9 @@ public class PacketListener extends MessageToMessageDecoder<PacketWrapper> {
 //Logger.getGlobal().info("send");
 //                            player.unsafe().sendPacket(packetWrapper.packet);
 //                        }
+                        return;
+                    } else if(packetWrapper.packet instanceof PlayerListHeaderFooter) {
+                        TabViewManager.handleHeaderFooter(player,(PlayerListHeaderFooter)packetWrapper.packet);
                         return;
                     }
                 }

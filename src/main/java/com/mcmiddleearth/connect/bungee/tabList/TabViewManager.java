@@ -14,6 +14,7 @@ import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 import net.md_5.bungee.netty.ChannelWrapper;
 import net.md_5.bungee.netty.PipelineUtils;
+import net.md_5.bungee.protocol.packet.PlayerListHeaderFooter;
 import net.md_5.bungee.protocol.packet.PlayerListItem;
 
 public class TabViewManager implements Listener {
@@ -26,7 +27,7 @@ public class TabViewManager implements Listener {
     static {
         tabViews.put(defaultView, new GlobalTabView());
     }
-    
+
     @EventHandler
     public void onServerConnected(ServerSwitchEvent event) {
         try {
@@ -86,6 +87,10 @@ Logger.getGlobal().info("remove player 1");
     public static void handleRemovePlayerPacket(ProxiedPlayer player, PlayerListItem packet) {
         Set<TabViewPlayerItem> items = PlayerItemManager.removePlayerItems(player, packet);
         tabViews.forEach((identfier,tabView) -> tabView.handleRemovePlayer(player,items));
+    }
+
+    public static void handleHeaderFooter(ProxiedPlayer player, PlayerListHeaderFooter packet) {
+        tabViews.forEach((identfier,tabView) -> tabView.handleHeaderFooter(player,packet));
     }
 
     private static void addToTabView(String viewName, ProxiedPlayer player) {

@@ -7,6 +7,7 @@ package com.mcmiddleearth.connect.bungee.tabList;
 
 import java.util.Set;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.md_5.bungee.protocol.packet.PlayerListHeaderFooter;
 
 /**
  *
@@ -14,20 +15,21 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
  */
 public interface ITabView {
     
-    public void handleAddPlayer(ProxiedPlayer player, Set<TabViewPlayerItem> items);
+    void handleAddPlayer(ProxiedPlayer player, Set<TabViewPlayerItem> items);
     
-    public void handleUpdateGamemode(ProxiedPlayer player, Set<TabViewPlayerItem> items);
+    void handleUpdateGamemode(ProxiedPlayer player, Set<TabViewPlayerItem> items);
     
-    public void handleUpdateLatency(ProxiedPlayer player, Set<TabViewPlayerItem> items);
+    void handleUpdateLatency(ProxiedPlayer player, Set<TabViewPlayerItem> items);
     
-    public void handleUpdateDisplayName(ProxiedPlayer player, Set<TabViewPlayerItem> items);
+    void handleUpdateDisplayName(ProxiedPlayer player, Set<TabViewPlayerItem> items);
     
-    public void handleRemovePlayer(ProxiedPlayer player, Set<TabViewPlayerItem> items);
+    void handleRemovePlayer(ProxiedPlayer player, Set<TabViewPlayerItem> items);
 
-    public void addViewer(ProxiedPlayer player);
+    void addViewer(ProxiedPlayer player);
     
-    public void removeViewer(ProxiedPlayer player);
+    void removeViewer(ProxiedPlayer player);
     
-    public boolean isViewer(ProxiedPlayer player);
-    
+    boolean isViewer(ProxiedPlayer player);
+
+    void handleHeaderFooter(ProxiedPlayer player, PlayerListHeaderFooter packet);
 }
