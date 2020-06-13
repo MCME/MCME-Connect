@@ -1,9 +1,6 @@
 package com.mcmiddleearth.connect.bungee.tabList;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.md_5.bungee.ServerConnection;
@@ -36,12 +33,12 @@ public class TabViewManager implements Listener {
             ChannelWrapper wrapper = server.getCh();
             PacketListener packetListener = new PacketListener(server, player);
             //packetHandler.onServerSwitch();
-Logger.getGlobal().info("addView 1");
+//Logger.getGlobal().info("addView 1");
             if(getTabView(player)==null) {
-Logger.getGlobal().info("addView 2");
+//Logger.getGlobal().info("addView 2");
                 addToTabView(defaultView, player);
             }
-Logger.getGlobal().info("inject");
+//Logger.getGlobal().info("inject");
             wrapper.getHandle().pipeline().addBefore(PipelineUtils.BOSS_HANDLER, "mcme-connect-packet-listener", packetListener);
         } catch (Exception ex) {
             Logger.getLogger(TabViewManager.class.getName()).log(Level.SEVERE, "Failed to inject packet listener", ex);
@@ -51,9 +48,9 @@ Logger.getGlobal().info("inject");
     @EventHandler
     public void onPlayerDisconnect(PlayerDisconnectEvent event) {
         ITabView tabView = getTabView(event.getPlayer());
-Logger.getGlobal().info("disconnect");
+//Logger.getGlobal().info("disconnect");
         if(tabView!=null) {
-Logger.getGlobal().info("remove player 1");
+//Logger.getGlobal().info("remove player 1");
             tabView.removeViewer(event.getPlayer());
         }
         PlayerListItem packet = new PlayerListItem();
@@ -63,7 +60,12 @@ Logger.getGlobal().info("remove player 1");
         packet.setItems(new PlayerListItem.Item[]{item});
         handleRemovePlayerPacket(event.getPlayer(),packet);
     }
-    
+
+    public static void handleUpdateAfk(ProxiedPlayer player, boolean afk) {
+        Set<TabViewPlayerItem> items = PlayerItemManager.updateAfk(player.getUniqueId(),afk);
+        tabViews.forEach((identfier, tabView) -> tabView.handleUpdateDisplayName(player, items));
+    }
+
     public static void handleAddPlayerPacket(ProxiedPlayer player, PlayerListItem packet) {
         Set<TabViewPlayerItem> items = PlayerItemManager.addPlayerItems(player, packet);
         tabViews.forEach((identfier,tabView) -> tabView.handleAddPlayer(player,items));
@@ -94,15 +96,15 @@ Logger.getGlobal().info("remove player 1");
     }
 
     private static void addToTabView(String viewName, ProxiedPlayer player) {
-Logger.getGlobal().info("addToTabView  1");
+//Logger.getGlobal().info("addToTabView  1");
         ITabView nextView = getTabView(viewName); 
         ITabView lastView = getTabView(player);
         if(nextView!=null) {
             if(lastView != null) {
-Logger.getGlobal().info("removeTabView  1");
+//Logger.getGlobal().info("removeTabView  1");
                 lastView.removeViewer(player);
             }
-Logger.getGlobal().info("addView  2");
+//Logger.getGlobal().info("addView  2");
             nextView.addViewer(player);
         } else if(lastView==null) {
             ITabView defaultViewObject = getTabView(defaultView);

@@ -24,6 +24,7 @@ import com.mcmiddleearth.connect.restart.RestartHandler;
 import com.mcmiddleearth.connect.restart.RestartScheduler;
 import com.mcmiddleearth.connect.statistics.StatisticDBConnector;
 import com.mcmiddleearth.connect.statistics.StatisticListener;
+import com.mcmiddleearth.connect.tabList.AfkListener;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -62,6 +63,7 @@ public class ConnectPlugin extends JavaPlugin {
         Bukkit.getServer().getMessenger()
                 .registerOutgoingPluginChannel(this, Channel.MAIN);
         Bukkit.getPluginManager().registerEvents(new PlayerListener(), this);
+        Bukkit.getPluginManager().registerEvents(new AfkListener(), this);
         Bukkit.getServer().getMessenger()
                 .registerIncomingPluginChannel(this, Channel.MAIN, new ConnectPluginListener());
         restartScheduler = new RestartScheduler();

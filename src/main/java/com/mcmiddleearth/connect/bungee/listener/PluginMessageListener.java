@@ -25,7 +25,11 @@ import com.mcmiddleearth.connect.bungee.ConnectBungeePlugin;
 import com.mcmiddleearth.connect.bungee.Handler.ChatMessageHandler;
 import com.mcmiddleearth.connect.bungee.Handler.RestartHandler;
 import com.mcmiddleearth.connect.bungee.Handler.TitleHandler;
+import com.mcmiddleearth.connect.bungee.tabList.PlayerItemManager;
+import com.mcmiddleearth.connect.bungee.tabList.TabViewManager;
 import com.mcmiddleearth.connect.bungee.warp.MyWarpDBConnector;
+
+import java.util.UUID;
 import java.util.logging.Logger;
 
 import net.md_5.bungee.ServerConnection;
@@ -114,6 +118,14 @@ public class PluginMessageListener implements Listener {
                 case Channel.SERVER_INFO:
                     String server = ((ServerConnection)event.getSender()).getInfo().getName();
                     ConnectBungeePlugin.getInstance().getServerInformation(server).updateFromPluginMessage(in);
+                    break;
+                case Channel.AFK:
+                    String uuid = in.readUTF();
+                    boolean afk = in.readBoolean();
+                    ProxiedPlayer afkPlayer = ProxyServer.getInstance().getPlayer(UUID.fromString(uuid));
+                    if(afkPlayer!=null) {
+                        TabViewManager.handleUpdateAfk(afkPlayer, afk);
+                    }
                     break;
                 default:
                     break;

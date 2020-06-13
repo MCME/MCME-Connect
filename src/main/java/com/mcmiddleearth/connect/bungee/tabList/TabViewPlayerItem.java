@@ -23,6 +23,7 @@ public class TabViewPlayerItem {
     private int gamemode;
     private String[][] properties;
     private int ping;
+    private boolean afk;
     
     public TabViewPlayerItem(PlayerListItem.Item item) {
         uuid = item.getUuid();
@@ -35,6 +36,7 @@ public class TabViewPlayerItem {
         } else {
             properties = null;
         }
+        afk = false;
     }
     
     public boolean sameData(TabViewPlayerItem other) {
@@ -90,6 +92,10 @@ Logger.getLogger(TabViewPlayerItem.class.getName()).info("displayname: "+ping+" 
     public void setPing(int ping) {
         this.ping = ping;
     }
+
+    public boolean getAfk() { return this.afk; }
+
+    public void setAfk(boolean afk) { this.afk = afk; }
 
     @Override
     public boolean equals(Object other) {

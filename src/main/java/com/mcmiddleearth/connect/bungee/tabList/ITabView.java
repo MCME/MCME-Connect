@@ -14,7 +14,8 @@ import net.md_5.bungee.protocol.packet.PlayerListHeaderFooter;
  * @author Eriol_Eandur
  */
 public interface ITabView {
-    
+
+
     void handleAddPlayer(ProxiedPlayer player, Set<TabViewPlayerItem> items);
     
     void handleUpdateGamemode(ProxiedPlayer player, Set<TabViewPlayerItem> items);

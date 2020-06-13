@@ -28,6 +28,7 @@ public class PacketListener extends MessageToMessageDecoder<PacketWrapper> {
             if (!connection.isObsolete()) {
                 if (packetWrapper.packet != null) {
                     if (packetWrapper.packet instanceof PlayerListItem) {
+printListItemPacket(((PlayerListItem) packetWrapper.packet));
                         PlayerListItem playerListPacket = (PlayerListItem)packetWrapper.packet;
                         switch(playerListPacket.getAction()) {
                             case ADD_PLAYER:
@@ -40,6 +41,7 @@ public class PacketListener extends MessageToMessageDecoder<PacketWrapper> {
                                 TabViewManager.handleUpdateLatencyPacket(player,playerListPacket);
                                 break;
                             case UPDATE_DISPLAY_NAME:
+//Logger.getGlobal().info("Update Displayname: "+playerListPacket.getItems().length+" "+playerListPacket.getItems()[0].getDisplayName());
                                 TabViewManager.handleUpdateDisplayNamePacket(player,playerListPacket);
                                 break;
                             case REMOVE_PLAYER:
@@ -66,6 +68,26 @@ public class PacketListener extends MessageToMessageDecoder<PacketWrapper> {
         } finally {
             if (shouldRelease) {
                 packetWrapper.trySingleRelease();
+            }
+        }
+    }
+
+    private void printListItemPacket(PlayerListItem packet) {
+        Logger.getGlobal().info("PacketType: PlayerListItem  - "+packet.getAction().name());
+        Logger.getGlobal().info("Item ("+packet.getItems().length+"):");
+        for(int i = 0; i< packet.getItems().length;i++) {
+            PlayerListItem.Item item = packet.getItems()[i];
+            Logger.getGlobal().info("-" + i + ": " + packet.getItems()[i].getUuid().toString());
+            Logger.getGlobal().info("------ username: " + item.getUsername());
+            Logger.getGlobal().info("------ displayn: " + item.getDisplayName());
+            Logger.getGlobal().info("------ gamemode: " + item.getGamemode());
+            Logger.getGlobal().info("------ pingpong: " + item.getPing());
+            if (item.getProperties() != null) {
+                Logger.getGlobal().info("Properties: " + item.getProperties().length);
+                for (String[] propertie : item.getProperties()) {
+                    Logger.getGlobal().info("------Name: " + propertie[0]);
+                    Logger.getGlobal().info("------Value: " + propertie[1]);
+                }
             }
         }
     }

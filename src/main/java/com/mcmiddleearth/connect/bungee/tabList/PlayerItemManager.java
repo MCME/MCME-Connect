@@ -22,24 +22,35 @@ import net.md_5.bungee.protocol.packet.PlayerListItem.Item;
 public class PlayerItemManager {
     
     private final static Map<String,Map<UUID,TabViewPlayerItem>> playerItems =  new HashMap<>();
-    
+
+    public static synchronized Set<TabViewPlayerItem> updateAfk(UUID uuid, boolean afk) {
+        Set<TabViewPlayerItem> result = new HashSet<>();
+        TabViewPlayerItem item = getPlayerItem(uuid);
+Logger.getLogger(PlayerItemManager.class.getName()).info("Afk: "+afk);
+        if(item != null && item.getAfk() != afk) {
+            item.setAfk(afk);
+            result.add(item);
+        }
+        return result;
+    }
+
     public static synchronized Set<TabViewPlayerItem> addPlayerItems(ProxiedPlayer player, PlayerListItem packet) {
-Logger.getLogger(PlayerItemManager.class.getName()).info("AddPlayer recipient: "+player.getName());
+//Logger.getLogger(PlayerItemManager.class.getName()).info("AddPlayer recipient: "+player.getName());
         Map<UUID,TabViewPlayerItem> items = getPlayerItems(player.getServer().getInfo().getName());
         if(items==null) {
-Logger.getLogger(PlayerItemManager.class.getName()).info("Create Map: "+player.getServer().getInfo().getName());
+//Logger.getLogger(PlayerItemManager.class.getName()).info("Create Map: "+player.getServer().getInfo().getName());
             items =  new HashMap<>();
             playerItems.put(player.getServer().getInfo().getName(), items);
         }
         Set<TabViewPlayerItem> updates = new HashSet<>();
-Logger.getLogger(PlayerItemManager.class.getName()).info("Items: "+packet.getItems().length);
+//Logger.getLogger(PlayerItemManager.class.getName()).info("Items: "+packet.getItems().length);
         for(Item packetItem: packet.getItems()) {
-Logger.getLogger(PlayerItemManager.class.getName()).info("uuid: "+packetItem.getUuid());
+//Logger.getLogger(PlayerItemManager.class.getName()).info("uuid: "+packetItem.getUuid());
             TabViewPlayerItem item = new TabViewPlayerItem(packetItem);
-Logger.getLogger(PlayerItemManager.class.getName()).info("contains: "+items.containsKey(item.getUuid()));
+//Logger.getLogger(PlayerItemManager.class.getName()).info("contains: "+items.containsKey(item.getUuid()));
             if(   !items.containsKey(item.getUuid())
                || !items.get(item.getUuid()).sameData(item)) {
-Logger.getLogger(PlayerItemManager.class.getName()).info("update");
+//Logger.getLogger(PlayerItemManager.class.getName()).info("update");
                 items.put(item.getUuid(),item);
                 updates.add(item);
             }
@@ -107,7 +118,16 @@ Logger.getLogger(PlayerItemManager.class.getName()).info("update");
         }
         return updates;
     }
-    
+
+    public static synchronized TabViewPlayerItem getPlayerItem(UUID uuid) {
+        for(Map<UUID,TabViewPlayerItem> itemMap: playerItems.values()) {
+            TabViewPlayerItem item = itemMap.get(uuid);
+            if(item!=null) {
+                return item;
+            }
+        }
+        return null;
+    }
     /*public TabViewPlayerItem getPlayerItem(ProxiedPlayer player) {
         Server server = player.getServer();
         if(server==null) {
