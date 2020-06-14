@@ -9,6 +9,11 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.logging.Logger;
+
+import com.google.common.io.ByteArrayDataOutput;
+import com.google.common.io.ByteStreams;
+import com.mcmiddleearth.connect.Channel;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.protocol.packet.PlayerListItem;
 
 /**
@@ -28,6 +33,9 @@ public class TabViewPlayerItem {
     public TabViewPlayerItem(PlayerListItem.Item item) {
         uuid = item.getUuid();
         username = item.getUsername();
+        if(username==null) {
+            username = ProxyServer.getInstance().getPlayer(uuid).getName();
+        }
         displayname = item.getDisplayName();
         gamemode = item.getGamemode();
         ping = item.getPing();
@@ -55,6 +63,24 @@ Logger.getLogger(TabViewPlayerItem.class.getName()).info("displayname: "+ping+" 
             
         }
         return result;
+    }
+
+    public byte[] toByteArray(boolean remove) {
+        ByteArrayDataOutput out = ByteStreams.newDataOutput();
+        out.writeUTF(Channel.PLAYER);
+        out.writeBoolean(remove);
+        out.writeUTF(getUuid().toString());
+        String name = getUsername();
+        if(name==null) {
+            name = ProxyServer.getInstance().getPlayer(getUuid()).getName();
+        }
+        out.writeUTF(name);
+        String display = getDisplayname();
+        if(display==null) {
+            display = name;
+        }
+        out.writeUTF(display);
+        return out.toByteArray();
     }
     
     public UUID getUuid() {

@@ -63,8 +63,8 @@ printListItemPacket(((PlayerListItem) packetWrapper.packet));
             }
             out.add(packetWrapper);
             shouldRelease = false;
-        } catch (Throwable th) {
-            Logger.getLogger(PacketListener.class.getName()).log(Level.SEVERE, "Failed to inject packet listener", th);
+        //} catch (Throwable th) {
+        //    Logger.getLogger(PacketListener.class.getName()).log(Level.SEVERE, "Failed to inject packet listener", th.printStackTrace());
         } finally {
             if (shouldRelease) {
                 packetWrapper.trySingleRelease();

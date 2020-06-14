@@ -27,7 +27,7 @@ public class GlobalTabView implements ITabView {
 
     private Set<UUID> viewers = new HashSet<>();
 
-    private SimpleHeaderFooter headerFooter = new SimpleHeaderFooter("§eWelcome to §6§lMCME §f{Player}\"",
+    private SimpleHeaderFooter headerFooter = new SimpleHeaderFooter("§eWelcome to §6§lMCME §f{Player}",
                                                    "§6Time: §e{Time} §4| §6Node: §e{Server}\n§6Ping: {Ping} §4| {TPS_1} tps");
 
     public GlobalTabView() {
@@ -269,31 +269,48 @@ public class GlobalTabView implements ITabView {
 
     private String getDisplayName(TabViewPlayerItem item) {
         ProxiedPlayer player = ProxyServer.getInstance().getPlayer(item.getUuid());
-        String roleColor = getRankColor(player).replace("&","§");
-        String prefix = "";
-        int prefixLength = 0;
-        int suffixLength = 0;
-        if(player.hasPermission("group.badge_moderator")) {
-            prefix = "§6M";
-            prefixLength = 1;
+        if(player!=null) {
+            String roleColor = getRankColor(player).replace("&", "§");
+            String prefix = "";
+            int prefixLength = 0;
+            int suffixLength = 0;
+            if (player.hasPermission("group.badge_moderator")) {
+                prefix = "§6M";
+                prefixLength = lengthWithoutFormatting(prefix);
+            }
+            String suffix = "";
+            if (player.hasPermission("group.badge_minigames")
+                    || player.hasPermission("group.badge_tours")
+                    || player.hasPermission("group.badge_animations")
+                    || player.hasPermission("group.badge_worldeditfull")
+                    || player.hasPermission("group.badge_worldeditlimited")
+                    || player.hasPermission("group.badge_voxel")) {
+                suffix = "~";
+                suffixLength = lengthWithoutFormatting(suffix);
+            }
+            if (item.getAfk()) {
+                suffix = suffix + "§8AFK";
+                suffixLength = lengthWithoutFormatting(suffix);
+            }
+            String tempPlayername = player.getName();//+"1234567890";
+            String username = tempPlayername.substring(0, Math.min(tempPlayername.length(), 20 - prefixLength - suffixLength));
+            return "\" " + prefix + roleColor + username + suffix + "\"";
         }
-        String suffix = "";
-        if(player.hasPermission("group.badge_minigames")
-                || player.hasPermission("group.badge_tours")
-                || player.hasPermission("group.badge_animations")
-                || player.hasPermission("group.badge_worldeditfull")
-                || player.hasPermission("group.badge_worldeditlimited")
-                || player.hasPermission("group.badge_voxel")) {
-            suffix = "~";
-            suffixLength = 1;
+        return "null player";
+    }
+
+    private int lengthWithoutFormatting(String formatted) {
+        int length = 0;
+        int position = 0;
+        while(position < formatted.length()) {
+            if(formatted.charAt(position) == '§') {
+                position += 2;
+            } else {
+                length++;
+                position++;
+            }
         }
-        if(item != null && item.getAfk()) {
-            suffixLength = suffixLength + 3;
-            suffix = suffix + "§8AFK";
-        }
-        String tempPlayername = player.getName();//+"1234567890";
-        String username = tempPlayername.substring(0,Math.min(tempPlayername.length(),20-prefixLength-suffixLength));
-        return "\" "+prefix+roleColor+username+suffix+"\"";
+        return length;
     }
 
     private String getRankColor(ProxiedPlayer player) {

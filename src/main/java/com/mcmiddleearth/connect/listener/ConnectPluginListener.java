@@ -23,12 +23,15 @@ import com.mcmiddleearth.connect.Channel;
 import com.mcmiddleearth.connect.ConnectPlugin;
 import com.mcmiddleearth.connect.events.PlayerConnectEvent;
 import com.mcmiddleearth.connect.restart.RestartHandler;
+import com.mcmiddleearth.connect.tabList.ConnectedPlayer;
+import com.mcmiddleearth.connect.tabList.PlayerList;
 import com.onarandombox.MultiverseCore.MultiverseCore;
 import github.scarsz.discordsrv.DiscordSRV;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.TextChannel;
 import github.scarsz.discordsrv.util.DiscordUtil;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 import org.bukkit.ChatColor;
@@ -58,7 +61,7 @@ public class ConnectPluginListener implements PluginMessageListener {
         }
         ByteArrayDataInput in = ByteStreams.newDataInput(message);
         String subchannel = in.readUTF();
-//Logger.getGlobal().info("Pugin Message! "+player+" channel "+subchannel);
+Logger.getGlobal().info("Pugin Message! "+player+" channel "+subchannel);
         if (subchannel.equals(Channel.TPPOS)) {
             String playerData = in.readUTF();
             String worldData = in.readUTF();
@@ -193,6 +196,19 @@ public class ConnectPluginListener implements PluginMessageListener {
                 Bukkit.getServer().getPluginManager()
                       .callEvent(new PlayerConnectEvent(arrivingPlayer,PlayerConnectEvent.ConnectReason.valueOf(reason)));
             });
+        } else if(subchannel.equals(Channel.PLAYER)) {
+            boolean remove = in.readBoolean();
+            UUID uuid = UUID.fromString(in.readUTF());
+            String name = in.readUTF();
+            String displayName = in.readUTF();
+            ConnectedPlayer connectedPlayer = new ConnectedPlayer(uuid,name);
+            connectedPlayer.setDisplayName(displayName);
+Logger.getGlobal().info("Add player: "+remove);
+            if(!remove) {
+                PlayerList.addPlayer(connectedPlayer);
+            } else {
+                PlayerList.removePlayer(connectedPlayer);
+            }
         }
     }
     

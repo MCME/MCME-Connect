@@ -18,13 +18,17 @@ package com.mcmiddleearth.connect.listener;
 
 import com.mcmiddleearth.connect.ConnectPlugin;
 import com.mcmiddleearth.connect.statistics.FirstJoinDateUpdater;
+import com.mcmiddleearth.connect.tabList.PlayerList;
 import com.mcmiddleearth.connect.util.ConnectUtil;
+import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import java.util.logging.Logger;
 
 /**
  *
@@ -44,6 +48,10 @@ public class PlayerListener implements Listener {
                                           event.getPlayer().getWorld().getName());
             }
         }.runTaskLater(ConnectPlugin.getInstance(), 50);
+        if(Bukkit.getOnlinePlayers().size()==1) {
+Logger.getGlobal().info("request Player list");
+            PlayerList.requestPlayerList(event.getPlayer());
+        }
     }
 
     @EventHandler(priority=EventPriority.NORMAL)

@@ -34,6 +34,7 @@ import java.util.logging.Logger;
 
 import net.md_5.bungee.ServerConnection;
 import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PluginMessageEvent;
 import net.md_5.bungee.api.plugin.Listener;
@@ -53,7 +54,7 @@ public class PluginMessageListener implements Listener {
         //if(event.getTag().equals("BungeeCord")) return;
 //Logger.getGlobal().info("Plugin Message! "+event.getTag());
         if(event.getTag().equals(Channel.MAIN)) {
-//Logger.getGlobal().info("Plugin Connect Message!");
+Logger.getGlobal().info("Plugin Connect Message!");
             ByteArrayDataInput in = ByteStreams.newDataInput(event.getData());
             String subchannel = in.readUTF();
             switch (subchannel) {
@@ -127,6 +128,10 @@ public class PluginMessageListener implements Listener {
                         TabViewManager.handleUpdateAfk(afkPlayer, afk);
                     }
                     break;
+                case Channel.PLAYER:
+Logger.getGlobal().info("subchannel player!");
+                    ServerInfo info = ((ProxiedPlayer)event.getReceiver()).getServer().getInfo();
+                    PlayerItemManager.sendAllPlayerList(info);
                 default:
                     break;
             }

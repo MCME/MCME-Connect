@@ -11,6 +11,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Logger;
+
+import com.google.common.io.ByteArrayDataOutput;
+import com.google.common.io.ByteStreams;
+import com.mcmiddleearth.connect.Channel;
+import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.protocol.packet.PlayerListItem;
 import net.md_5.bungee.protocol.packet.PlayerListItem.Item;
@@ -46,13 +52,16 @@ Logger.getLogger(PlayerItemManager.class.getName()).info("Afk: "+afk);
 //Logger.getLogger(PlayerItemManager.class.getName()).info("Items: "+packet.getItems().length);
         for(Item packetItem: packet.getItems()) {
 //Logger.getLogger(PlayerItemManager.class.getName()).info("uuid: "+packetItem.getUuid());
-            TabViewPlayerItem item = new TabViewPlayerItem(packetItem);
+            if(packetItem.getUuid()!=null) {
+                TabViewPlayerItem item = new TabViewPlayerItem(packetItem);
 //Logger.getLogger(PlayerItemManager.class.getName()).info("contains: "+items.containsKey(item.getUuid()));
-            if(   !items.containsKey(item.getUuid())
-               || !items.get(item.getUuid()).sameData(item)) {
+                if (!items.containsKey(item.getUuid())
+                        || items.get(item.getUuid()).sameData(item)) {
 //Logger.getLogger(PlayerItemManager.class.getName()).info("update");
-                items.put(item.getUuid(),item);
-                updates.add(item);
+                    items.put(item.getUuid(), item);
+                    sendPlayerListUpdate(item, false);
+                    updates.add(item);
+                }
             }
         }
         return updates;
@@ -83,6 +92,7 @@ Logger.getLogger(PlayerItemManager.class.getName()).info("Afk: "+afk);
                         case UPDATE_DISPLAY_NAME:
                             update = storedItem.getDisplayname()==null || storedItem.getDisplayname().equals(item.getDisplayname());
                             storedItem.setDisplayname(item.getDisplayname());
+                            sendPlayerListUpdate(storedItem,false);
                             break;
                     }
                     if(update) {
@@ -113,10 +123,21 @@ Logger.getLogger(PlayerItemManager.class.getName()).info("Afk: "+afk);
             TabViewPlayerItem item = new TabViewPlayerItem(packetItem);
             if(items.containsKey(item.getUuid())) {
                 items.remove(item.getUuid());
+                sendPlayerListUpdate(item,true);
                 updates.add(item);
             }
         }
         return updates;
+    }
+
+    private static void sendPlayerListUpdate(TabViewPlayerItem item, boolean remove) {
+Logger.getGlobal().info("send Player List update: "+item.getUuid()+" "+remove);
+        ProxyServer.getInstance().getServers().forEach((name, info) -> info.sendData(Channel.MAIN, item.toByteArray(remove)));
+    }
+
+    public static void sendAllPlayerList(ServerInfo info) {
+Logger.getGlobal().info("send Player List update to server: "+info.getName());
+        getPlayerItems().forEach(item -> info.sendData(Channel.MAIN, item.toByteArray(false)));
     }
 
     public static synchronized TabViewPlayerItem getPlayerItem(UUID uuid) {
