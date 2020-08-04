@@ -28,6 +28,7 @@ public class PacketListener extends MessageToMessageDecoder<PacketWrapper> {
             if (!connection.isObsolete()) {
                 if (packetWrapper.packet != null) {
                     if (packetWrapper.packet instanceof PlayerListItem) {
+Logger.getGlobal().info("1");
 printListItemPacket(((PlayerListItem) packetWrapper.packet));
                         PlayerListItem playerListPacket = (PlayerListItem)packetWrapper.packet;
                         switch(playerListPacket.getAction()) {
@@ -45,6 +46,8 @@ printListItemPacket(((PlayerListItem) packetWrapper.packet));
                                 TabViewManager.handleUpdateDisplayNamePacket(player,playerListPacket);
                                 break;
                             case REMOVE_PLAYER:
+Logger.getGlobal().info("2");
+printListItemPacket(playerListPacket);
                                 TabViewManager.handleRemovePlayerPacket(player,playerListPacket);
                                 break;
                         }
@@ -72,7 +75,7 @@ printListItemPacket(((PlayerListItem) packetWrapper.packet));
         }
     }
 
-    private void printListItemPacket(PlayerListItem packet) {
+    public static void printListItemPacket(PlayerListItem packet) {
         Logger.getGlobal().info("PacketType: PlayerListItem  - "+packet.getAction().name());
         Logger.getGlobal().info("Item ("+packet.getItems().length+"):");
         for(int i = 0; i< packet.getItems().length;i++) {

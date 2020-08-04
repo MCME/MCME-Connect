@@ -150,6 +150,7 @@ public class GlobalTabView implements ITabView {
         if(tabViewItems.isEmpty()) {
             return;
         }
+Logger.getGlobal().info("7 handleREmove!!");
         PlayerListItem packet = new PlayerListItem();
         PlayerListItem.Item[] items = new PlayerListItem.Item[tabViewItems.size()];
         Iterator<TabViewPlayerItem> iterator = tabViewItems.iterator();
@@ -238,7 +239,8 @@ public class GlobalTabView implements ITabView {
 
     private synchronized void sendToViewers(PlayerListItem packet) {
         if(packet.getAction().equals(PlayerListItem.Action.ADD_PLAYER)
-           || packet.getAction().equals(PlayerListItem.Action.UPDATE_DISPLAY_NAME)) {
+           || packet.getAction().equals(PlayerListItem.Action.UPDATE_DISPLAY_NAME)
+           || packet.getAction().equals(PlayerListItem.Action.REMOVE_PLAYER)) {
             Logger.getLogger(GlobalTabView.class.getSimpleName()).info("Sending packet!");
             Logger.getLogger(GlobalTabView.class.getSimpleName()).info("action: "+packet.getAction().name());
             for(PlayerListItem.Item item : packet.getItems()) {

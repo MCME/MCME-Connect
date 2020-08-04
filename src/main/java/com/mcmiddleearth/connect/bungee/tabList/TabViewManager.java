@@ -1,6 +1,7 @@
 package com.mcmiddleearth.connect.bungee.tabList;
 
 import java.util.*;
+import java.util.function.BiConsumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.md_5.bungee.ServerConnection;
@@ -88,8 +89,10 @@ public class TabViewManager implements Listener {
     }
     
     public static void handleRemovePlayerPacket(ProxiedPlayer player, PlayerListItem packet) {
+Logger.getGlobal().info("3");
+PacketListener.printListItemPacket(packet);
         Set<TabViewPlayerItem> items = PlayerItemManager.removePlayerItems(player, packet);
-        tabViews.forEach((identfier,tabView) -> tabView.handleRemovePlayer(player,items));
+        tabViews.forEach((identfier, tabView) -> tabView.handleRemovePlayer(player, items));
     }
 
     public static void handleHeaderFooter(ProxiedPlayer player, PlayerListHeaderFooter packet) {

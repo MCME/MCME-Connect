@@ -33,9 +33,9 @@ public class TabViewPlayerItem {
     public TabViewPlayerItem(PlayerListItem.Item item) {
         uuid = item.getUuid();
         username = item.getUsername();
-        if(username==null) {
+        /*if(username==null) { //unsafe: Possibly access a player who just left!!! Makes other players get kicked from bungee
             username = ProxyServer.getInstance().getPlayer(uuid).getName();
-        }
+        }*/
         displayname = item.getDisplayName();
         gamemode = item.getGamemode();
         ping = item.getPing();
@@ -72,7 +72,7 @@ Logger.getLogger(TabViewPlayerItem.class.getName()).info("displayname: "+ping+" 
         out.writeUTF(getUuid().toString());
         String name = getUsername();
         if(name==null) {
-            name = ProxyServer.getInstance().getPlayer(getUuid()).getName();
+            name = "null player";//ProxyServer.getInstance().getPlayer(getUuid()).getName();
         }
         out.writeUTF(name);
         String display = getDisplayname();

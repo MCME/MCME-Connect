@@ -54,7 +54,7 @@ public class PluginMessageListener implements Listener {
         //if(event.getTag().equals("BungeeCord")) return;
 //Logger.getGlobal().info("Plugin Message! "+event.getTag());
         if(event.getTag().equals(Channel.MAIN)) {
-Logger.getGlobal().info("Plugin Connect Message!");
+//Logger.getGlobal().info("Plugin Connect Message!");
             ByteArrayDataInput in = ByteStreams.newDataInput(event.getData());
             String subchannel = in.readUTF();
             switch (subchannel) {

@@ -3,7 +3,7 @@ main: com.mcmiddleearth.connect.ConnectPlugin
 version: ${project.version}
 description: Connecting MCME servers in a BungeeCord
 load: POSTWORLD
-api-version: 1.15
+api-version: 1.16
 softdepend: [PremiumVanish, DiscordSRV]
 
 commands:
