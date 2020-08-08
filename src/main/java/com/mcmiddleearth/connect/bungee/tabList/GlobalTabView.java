@@ -269,7 +269,7 @@ Logger.getGlobal().info("7 handleREmove!!");
         });
     }
 
-    private String getDisplayName(TabViewPlayerItem item) {
+    private static String getDisplayName(TabViewPlayerItem item) {
         ProxiedPlayer player = ProxyServer.getInstance().getPlayer(item.getUuid());
         if(player!=null) {
             String roleColor = getRankColor(player).replace("&", "§");
@@ -301,7 +301,7 @@ Logger.getGlobal().info("7 handleREmove!!");
         return "null player";
     }
 
-    private int lengthWithoutFormatting(String formatted) {
+    private static int lengthWithoutFormatting(String formatted) {
         int length = 0;
         int position = 0;
         while(position < formatted.length()) {
@@ -315,7 +315,7 @@ Logger.getGlobal().info("7 handleREmove!!");
         return length;
     }
 
-    private String getRankColor(ProxiedPlayer player) {
+    private static String getRankColor(ProxiedPlayer player) {
         if(player==null) {
             return "null Player";
         }

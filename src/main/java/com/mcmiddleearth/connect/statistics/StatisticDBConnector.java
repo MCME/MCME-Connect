@@ -462,7 +462,7 @@ public class StatisticDBConnector {
             selectPlayerStats.setString(1, player.getUniqueId().toString());
             ResultSet result = selectPlayerStats.executeQuery();
             if (result.next()) {
-                updateStats(player);
+                updateStats(player, result);
             } else {
                 insertStats(player);
             }
@@ -488,11 +488,13 @@ public class StatisticDBConnector {
         }, p);
     }
 
-    private synchronized void updateStats(Player player) throws SQLException {
+    private synchronized void updateStats(Player player, ResultSet result) throws SQLException {
         int i = 1;
         for (Statistic stat : Statistic.values()) {
             if (stat.getType().equals(Statistic.Type.UNTYPED)) {
-                updatePlayerStats.setInt(i, player.getStatistic(stat));
+                int saved = result.getInt(stat.name());
+                int current = player.getStatistic(stat);
+                updatePlayerStats.setInt(i, Math.max(saved, current) );
                 i++;
             }
         }
@@ -520,7 +522,10 @@ public class StatisticDBConnector {
                 selectPlayerMatStats.setString(2, mat.name());
                 ResultSet result = selectPlayerMatStats.executeQuery();
                 if (result.next()) {
-                    updateMatStat(id, stat, mat, value);
+                    int saved = result.getInt(getName(stat));
+                    if(saved < value) {
+                        updateMatStat(id, stat, mat, value);
+                    }
                 } else {
                     insertMatStat(id, stat, mat, value);
                 }
