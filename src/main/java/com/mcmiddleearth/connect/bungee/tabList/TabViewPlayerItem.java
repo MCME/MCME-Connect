@@ -13,6 +13,7 @@ import java.util.logging.Logger;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import com.mcmiddleearth.connect.Channel;
+import com.mcmiddleearth.connect.log.Log;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.protocol.packet.PlayerListItem;
 
@@ -44,6 +45,7 @@ public class TabViewPlayerItem {
         } else {
             properties = null;
         }
+        Log.info("ViewItem",item.getUsername()+" ");
         afk = false;
     }
     
@@ -51,17 +53,17 @@ public class TabViewPlayerItem {
         boolean result =  equals(other) 
                 && username.equals(other.username)
                 && ((displayname==null && other.displayname==null)
-                     || displayname.equals(other.displayname))
+                     || (displayname!=null && displayname.equals(other.displayname)))
                 && gamemode == other.gamemode
                 && ping == other.ping;
-        if(!result) {
-Logger.getLogger(TabViewPlayerItem.class.getName()).info("uuuid: "+uuid+" "+other.uuid);
+//        if(!result) {
+/*Logger.getLogger(TabViewPlayerItem.class.getName()).info("uuuid: "+uuid+" "+other.uuid);
 Logger.getLogger(TabViewPlayerItem.class.getName()).info("username: "+username+" "+other.username);
 Logger.getLogger(TabViewPlayerItem.class.getName()).info("displayname: "+displayname+" "+other.displayname);
 Logger.getLogger(TabViewPlayerItem.class.getName()).info("displayname: "+gamemode+" "+other.gamemode);
-Logger.getLogger(TabViewPlayerItem.class.getName()).info("displayname: "+ping+" "+other.ping);
+Logger.getLogger(TabViewPlayerItem.class.getName()).info("displayname: "+ping+" "+other.ping);*/
             
-        }
+//        }
         return result;
     }
 

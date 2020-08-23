@@ -1,13 +1,13 @@
 package com.mcmiddleearth.connect.bungee.tabList;
 
 import java.util.*;
-import java.util.function.BiConsumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import com.mcmiddleearth.connect.log.Log;
 import net.md_5.bungee.ServerConnection;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PlayerDisconnectEvent;
-import net.md_5.bungee.api.event.ServerConnectEvent;
 import net.md_5.bungee.api.event.ServerSwitchEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
@@ -41,6 +41,7 @@ public class TabViewManager implements Listener {
                 addToTabView(defaultView, player);
             }
 //Logger.getGlobal().info("inject");
+            Log.info("tab_packet","inject listener for "+player.getName());
             wrapper.getHandle().pipeline().addBefore(PipelineUtils.BOSS_HANDLER, "mcme-connect-packet-listener", packetListener);
         } catch (Exception ex) {
             Logger.getLogger(TabViewManager.class.getName()).log(Level.SEVERE, "Failed to inject packet listener", ex);
@@ -89,8 +90,7 @@ public class TabViewManager implements Listener {
     }
     
     public static void handleRemovePlayerPacket(ProxiedPlayer player, PlayerListItem packet) {
-Logger.getGlobal().info("3");
-PacketListener.printListItemPacket(packet);
+        //PacketListener.printListItemPacket(packet);
         Set<TabViewPlayerItem> items = PlayerItemManager.removePlayerItems(player, packet);
         tabViews.forEach((identfier, tabView) -> tabView.handleRemovePlayer(player, items));
     }

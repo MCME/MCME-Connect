@@ -6,6 +6,8 @@
 package com.mcmiddleearth.connect.bungee.tabList;
 
 import com.mcmiddleearth.connect.bungee.ConnectBungeePlugin;
+import com.mcmiddleearth.connect.log.Log;
+import com.mcmiddleearth.connect.tabList.PlayerList;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
 import net.luckperms.api.model.user.User;
@@ -150,7 +152,7 @@ public class GlobalTabView implements ITabView {
         if(tabViewItems.isEmpty()) {
             return;
         }
-Logger.getGlobal().info("7 handleREmove!!");
+//Logger.getGlobal().info("7 handleREmove!!");
         PlayerListItem packet = new PlayerListItem();
         PlayerListItem.Item[] items = new PlayerListItem.Item[tabViewItems.size()];
         Iterator<TabViewPlayerItem> iterator = tabViewItems.iterator();
@@ -238,26 +240,23 @@ Logger.getGlobal().info("7 handleREmove!!");
     }
 
     private synchronized void sendToViewers(PlayerListItem packet) {
-        if(packet.getAction().equals(PlayerListItem.Action.ADD_PLAYER)
-           || packet.getAction().equals(PlayerListItem.Action.UPDATE_DISPLAY_NAME)
-           || packet.getAction().equals(PlayerListItem.Action.REMOVE_PLAYER)) {
-            Logger.getLogger(GlobalTabView.class.getSimpleName()).info("Sending packet!");
-            Logger.getLogger(GlobalTabView.class.getSimpleName()).info("action: "+packet.getAction().name());
-            for(PlayerListItem.Item item : packet.getItems()) {
-                Logger.getLogger(GlobalTabView.class.getSimpleName()).info("Items: "+packet.getItems().length);
-                Logger.getLogger(GlobalTabView.class.getSimpleName()).info("uuid: "+item.getUuid());
-                Logger.getLogger(GlobalTabView.class.getSimpleName()).info("username: "+item.getUsername());
-                Logger.getLogger(GlobalTabView.class.getSimpleName()).info("displayName: "+item.getDisplayName());
-                Logger.getLogger(GlobalTabView.class.getSimpleName()).info("ping: "+item.getPing());
-                Logger.getLogger(GlobalTabView.class.getSimpleName()).info("gamemode: "+item.getGamemode());
-                if(item.getProperties()!=null) {
-                    Logger.getLogger(GlobalTabView.class.getSimpleName()).info("Properties: "+item.getProperties().length);
-                    for (String[] propertie : item.getProperties()) {
-                        Logger.getLogger(GlobalTabView.class.getSimpleName()).info("Name: " + propertie[0]);
-                        Logger.getLogger(GlobalTabView.class.getSimpleName()).info("Value: " + propertie[1]);
-                    }
-                }
-            }
+        String component = "tab.out";
+        switch(packet.getAction()) {
+            case ADD_PLAYER:
+                logPacketOut(component + ".add", packet);
+                break;
+            case UPDATE_DISPLAY_NAME:
+                logPacketOut(component + ".display", packet);
+                break;
+            case REMOVE_PLAYER:
+                logPacketOut(component + ".remove", packet);
+                break;
+            case UPDATE_GAMEMODE:
+                logPacketOut(component + ".gamemode", packet);
+                break;
+            case UPDATE_LATENCY:
+                logPacketOut(component + ".latency", packet);
+                break;
         }
 //Logger.getLogger(GlobalTabView.class.getSimpleName()).info("Viewers: " + viewers.size());
         viewers.forEach(uuid -> {
@@ -269,6 +268,26 @@ Logger.getGlobal().info("7 handleREmove!!");
         });
     }
 
+    private void logPacketOut(String component, PlayerListItem packet) {
+        Log.LogLevel level = Log.LogLevel.VERBOSE;
+        Log.log(component, Log.LogLevel.INFO,"Sending: "+packet.getAction().name());
+        for(PlayerListItem.Item item : packet.getItems()) {
+            Log.log(component,level,"Items: "+packet.getItems().length);
+            Log.log(component,level,"uuid: "+item.getUuid());
+            Log.log(component,level,"username: "+item.getUsername());
+            Log.log(component,level,"displayName: "+item.getDisplayName());
+            Log.log(component,level,"ping: "+item.getPing());
+            Log.log(component,level,"gamemode: "+item.getGamemode());
+            level = Log.LogLevel.FREQUENT;
+            if(item.getProperties()!=null) {
+                Log.log(component,level,"Properties: "+item.getProperties().length);
+                for (String[] propertie : item.getProperties()) {
+                    Log.log(component,level,"Name: " + propertie[0]);
+                    Log.log(component,level,"Value: " + propertie[1]);
+                }
+            }
+        }
+    }
     private static String getDisplayName(TabViewPlayerItem item) {
         ProxiedPlayer player = ProxyServer.getInstance().getPlayer(item.getUuid());
         if(player!=null) {

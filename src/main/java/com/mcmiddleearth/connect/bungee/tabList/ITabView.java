@@ -33,4 +33,5 @@ public interface ITabView {
     boolean isViewer(ProxiedPlayer player);
 
     void handleHeaderFooter(ProxiedPlayer player, PlayerListHeaderFooter packet);
+
 }

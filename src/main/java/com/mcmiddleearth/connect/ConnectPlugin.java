@@ -18,6 +18,7 @@ package com.mcmiddleearth.connect;
 
 import com.mcmiddleearth.connect.listener.ConnectPluginListener;
 import com.mcmiddleearth.connect.listener.PlayerListener;
+import com.mcmiddleearth.connect.log.SpigotLog;
 import com.mcmiddleearth.connect.restart.RestartCommand;
 import com.mcmiddleearth.connect.restart.StopCommand;
 import com.mcmiddleearth.connect.restart.RestartHandler;
@@ -25,9 +26,9 @@ import com.mcmiddleearth.connect.restart.RestartScheduler;
 import com.mcmiddleearth.connect.statistics.StatisticDBConnector;
 import com.mcmiddleearth.connect.statistics.StatisticListener;
 import com.mcmiddleearth.connect.tabList.AfkListener;
+import com.mcmiddleearth.connect.log.Log;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
 /**
@@ -47,7 +48,8 @@ public class ConnectPlugin extends JavaPlugin {
     private static RestartScheduler restartScheduler;
 
     private static BukkitTask serverinfoScheduler;
-    
+
+    private static Log logger;
     @Override
     public void onEnable() {
         instance = this;
@@ -70,6 +72,7 @@ public class ConnectPlugin extends JavaPlugin {
         serverinfoScheduler = new ServerInfoUpdater().runTaskTimer(this,600, 20);
         getCommand("restart").setExecutor(new RestartCommand());
         getCommand("stop").setExecutor(new StopCommand());
+        logger = new SpigotLog();
     }
     
     @Override
@@ -82,6 +85,7 @@ public class ConnectPlugin extends JavaPlugin {
         ConnectPlugin.getStatisticStorage().disconnect();
         restartScheduler.cancel();
         serverinfoScheduler.cancel();
+        logger.disable();
     }
 
     public static JavaPlugin getInstance() {
