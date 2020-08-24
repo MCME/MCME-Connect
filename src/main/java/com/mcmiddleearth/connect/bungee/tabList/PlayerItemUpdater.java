@@ -40,7 +40,7 @@ public class PlayerItemUpdater {
                     }
                     PlayerListItem packet = new PlayerListItem();
                     packet.setItems(removal.toArray(new PlayerListItem.Item[0]));
-                    PlayerItemManager.removePlayerItems(sender, packet);
+                    TabViewManager.handleRemovePlayerPacket(sender, packet);
 
                     PlayerListItem.Item[] items = new PlayerListItem.Item[server.getValue().getPlayers().size()];
                     int i = 0;
@@ -60,7 +60,7 @@ public class PlayerItemUpdater {
                     }
                     packet = new PlayerListItem();
                     packet.setItems(items);
-                    PlayerItemManager.addPlayerItems(sender, packet);
+                    TabViewManager.handleAddPlayerPacket(sender, packet);
                 }
             }
         }, 10, ConnectBungeePlugin.getConfig().getInt("TabListUpdateSeconds",2), TimeUnit.SECONDS);
