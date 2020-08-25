@@ -5,6 +5,7 @@
  */
 package com.mcmiddleearth.connect.bungee.tabList;
 
+import com.google.common.collect.Sets;
 import com.mcmiddleearth.connect.bungee.ConnectBungeePlugin;
 import com.mcmiddleearth.connect.log.Log;
 import com.mcmiddleearth.connect.tabList.PlayerList;
@@ -25,7 +26,7 @@ import java.util.logging.Logger;
  *
  * @author Eriol_Eandur
  */
-public class GlobalTabView implements ITabView {
+public class GlobalTabView extends VanishSupportTabView {
 
     private Set<UUID> viewers = new HashSet<>();
 
@@ -51,12 +52,12 @@ public class GlobalTabView implements ITabView {
                     handleUpdateDisplayName(player,PlayerItemManager.getPlayerItems());
                 }
             });
-        }, 20, 20 , TimeUnit.SECONDS);
+        }, 20, 2 , TimeUnit.SECONDS);
 
     }
 
     @Override
-    public void handleAddPlayer(ProxiedPlayer triggerPlayer, Set<TabViewPlayerItem> tabViewItems) {
+    public void handleAddPlayer(ProxiedPlayer vanillaRecipient, Set<TabViewPlayerItem> tabViewItems) {
         if(tabViewItems.isEmpty()) {
             return;
         }
@@ -80,11 +81,11 @@ public class GlobalTabView implements ITabView {
         packet.setItems(items);
         packet.setAction(PlayerListItem.Action.ADD_PLAYER);
 
-        sendToViewers(packet);
+        sendToViewers(viewers, packet);
     }
 
     @Override
-    public void handleUpdateGamemode(ProxiedPlayer player, Set<TabViewPlayerItem> tabViewItems) {
+    public void handleUpdateGamemode(ProxiedPlayer vanillaRecipient, Set<TabViewPlayerItem> tabViewItems) {
         if(tabViewItems.isEmpty()) {
             return;
         }
@@ -101,11 +102,11 @@ public class GlobalTabView implements ITabView {
         packet.setItems(items);
         packet.setAction(PlayerListItem.Action.UPDATE_GAMEMODE);
 
-        sendToViewers(packet);
+        sendToViewers(viewers, packet);
     }
 
     @Override
-    public void handleUpdateLatency(ProxiedPlayer player, Set<TabViewPlayerItem> tabViewItems) {
+    public void handleUpdateLatency(ProxiedPlayer vanillaRecipient, Set<TabViewPlayerItem> tabViewItems) {
         if(tabViewItems.isEmpty()) {
             return;
         }
@@ -122,11 +123,11 @@ public class GlobalTabView implements ITabView {
         packet.setItems(items);
         packet.setAction(PlayerListItem.Action.UPDATE_LATENCY);
 
-        sendToViewers(packet);
+        sendToViewers(viewers, packet);
     }
 
     @Override
-    public void handleUpdateDisplayName(ProxiedPlayer player, Set<TabViewPlayerItem> tabViewItems) {
+    public void handleUpdateDisplayName(ProxiedPlayer vanillaRecipient, Set<TabViewPlayerItem> tabViewItems) {
         if(tabViewItems.isEmpty()) {
             return;
         }
@@ -144,11 +145,11 @@ public class GlobalTabView implements ITabView {
         packet.setItems(items);
         packet.setAction(PlayerListItem.Action.UPDATE_DISPLAY_NAME);
 
-        sendToViewers(packet);
+        sendToViewers(viewers, packet);
     }
 
     @Override
-    public void handleRemovePlayer(ProxiedPlayer player, Set<TabViewPlayerItem> tabViewItems) {
+    public void handleRemovePlayer(ProxiedPlayer vanillaRecipient, Set<TabViewPlayerItem> tabViewItems) {
         if(tabViewItems.isEmpty()) {
             return;
         }
@@ -165,11 +166,43 @@ public class GlobalTabView implements ITabView {
         packet.setItems(items);
         packet.setAction(PlayerListItem.Action.REMOVE_PLAYER);
 
-        sendToViewers(packet);
+        sendToViewers(viewers, packet);
     }
 
     @Override
-    public void handleHeaderFooter(ProxiedPlayer player, PlayerListHeaderFooter packet) {
+    public void handleVanishPlayer(TabViewPlayerItem tabViewItem) {
+        PlayerListItem packet = new PlayerListItem();
+        PlayerListItem.Item[] items = new PlayerListItem.Item[1];
+        PlayerListItem.Item item = new PlayerListItem.Item();
+        item.setUuid(tabViewItem.getUuid());
+        items[0] = item;
+        packet.setItems(items);
+        packet.setAction(PlayerListItem.Action.REMOVE_PLAYER);
+        sendVanishFakeToViewers(viewers, packet);
+    }
+
+    @Override
+    public void handleUnvanishPlayer(TabViewPlayerItem tabViewItem) {
+        PlayerListItem packet = new PlayerListItem();
+        PlayerListItem.Item[] items = new PlayerListItem.Item[1];
+        PlayerListItem.Item item = new PlayerListItem.Item();
+        item.setUuid(tabViewItem.getUuid());
+        item.setUsername(tabViewItem.getUsername());
+        item.setDisplayName(getDisplayName(tabViewItem));
+        item.setGamemode(tabViewItem.getGamemode());
+        String[][] prop = tabViewItem.getProperties();
+        if(prop != null) {
+            item.setProperties(prop.clone());
+        }
+        item.setPing(tabViewItem.getPing());
+        items[0] = item;
+        packet.setItems(items);
+        packet.setAction(PlayerListItem.Action.ADD_PLAYER);
+        sendVanishFakeToViewers(viewers, packet);
+    }
+
+    @Override
+    public void handleHeaderFooter(ProxiedPlayer vanillaRecipient, PlayerListHeaderFooter packet) {
         //do nothing!
     }
 
@@ -202,7 +235,7 @@ public class GlobalTabView implements ITabView {
                 packet.setItems(items);
                 packet.setAction(PlayerListItem.Action.ADD_PLAYER);
 
-                player.unsafe().sendPacket(packet);
+                sendToViewers(Sets.newHashSet(player.getUniqueId()), packet);
             }
         }
     }
@@ -229,7 +262,7 @@ public class GlobalTabView implements ITabView {
                 packet.setItems(items);
                 packet.setAction(PlayerListItem.Action.REMOVE_PLAYER);
 
-                player.unsafe().sendPacket(packet);
+                sendToViewers(Sets.newHashSet(player.getUniqueId()), packet);
             }
         }
     }
@@ -239,55 +272,6 @@ public class GlobalTabView implements ITabView {
         return viewers.contains(player.getUniqueId());
     }
 
-    private synchronized void sendToViewers(PlayerListItem packet) {
-        String component = "tab.out";
-        switch(packet.getAction()) {
-            case ADD_PLAYER:
-                logPacketOut(component + ".add", packet);
-                break;
-            case UPDATE_DISPLAY_NAME:
-                logPacketOut(component + ".display", packet);
-                break;
-            case REMOVE_PLAYER:
-                logPacketOut(component + ".remove", packet);
-                break;
-            case UPDATE_GAMEMODE:
-                logPacketOut(component + ".gamemode", packet);
-                break;
-            case UPDATE_LATENCY:
-                logPacketOut(component + ".latency", packet);
-                break;
-        }
-//Logger.getLogger(GlobalTabView.class.getSimpleName()).info("Viewers: " + viewers.size());
-        viewers.forEach(uuid -> {
-            ProxiedPlayer player = ProxyServer.getInstance().getPlayer(uuid);
-            if(player!=null) {
-//Logger.getLogger(GlobalTabView.class.getSimpleName()).info("Send packet to: " + player.getName());
-                player.unsafe().sendPacket(packet);
-            }
-        });
-    }
-
-    private void logPacketOut(String component, PlayerListItem packet) {
-        Log.LogLevel level = Log.LogLevel.VERBOSE;
-        Log.log(component, Log.LogLevel.INFO,"Sending: "+packet.getAction().name());
-        for(PlayerListItem.Item item : packet.getItems()) {
-            Log.log(component,level,"Items: "+packet.getItems().length);
-            Log.log(component,level,"uuid: "+item.getUuid());
-            Log.log(component,level,"username: "+item.getUsername());
-            Log.log(component,level,"displayName: "+item.getDisplayName());
-            Log.log(component,level,"ping: "+item.getPing());
-            Log.log(component,level,"gamemode: "+item.getGamemode());
-            level = Log.LogLevel.FREQUENT;
-            if(item.getProperties()!=null) {
-                Log.log(component,level,"Properties: "+item.getProperties().length);
-                for (String[] propertie : item.getProperties()) {
-                    Log.log(component,level,"Name: " + propertie[0]);
-                    Log.log(component,level,"Value: " + propertie[1]);
-                }
-            }
-        }
-    }
     private static String getDisplayName(TabViewPlayerItem item) {
         ProxiedPlayer player = ProxyServer.getInstance().getPlayer(item.getUuid());
         if(player!=null) {

@@ -42,13 +42,13 @@ public class PlayerItemManager {
         return result;
     }
 
-    public static synchronized Set<TabViewPlayerItem> addPlayerItems(ProxiedPlayer player, PlayerListItem packet) {
-//Logger.getLogger(PlayerItemManager.class.getName()).info("AddPlayer recipient: "+player.getName());
-        Map<UUID,TabViewPlayerItem> items = getPlayerItems(player.getServer().getInfo().getName());
+    public static synchronized Set<TabViewPlayerItem> addPlayerItems(ProxiedPlayer vanillaRecipient, PlayerListItem packet) {
+//Logger.getLogger(PlayerItemManager.class.getName()).info("AddPlayer recipient: "+vanillaRecipient.getName());
+        Map<UUID,TabViewPlayerItem> items = getPlayerItems(vanillaRecipient.getServer().getInfo().getName());
         if(items==null) {
-//Logger.getLogger(PlayerItemManager.class.getName()).info("Create Map: "+player.getServer().getInfo().getName());
+//Logger.getLogger(PlayerItemManager.class.getName()).info("Create Map: "+vanillaRecipient.getServer().getInfo().getName());
             items =  new HashMap<>();
-            playerItems.put(player.getServer().getInfo().getName(), items);
+            playerItems.put(vanillaRecipient.getServer().getInfo().getName(), items);
         }
         Set<TabViewPlayerItem> updates = new HashSet<>();
 //Logger.getLogger(PlayerItemManager.class.getName()).info("Items: "+packet.getItems().length);
@@ -73,8 +73,8 @@ public class PlayerItemManager {
         return updates;
     }
     
-    public static synchronized Set<TabViewPlayerItem> updatePlayerItems(ProxiedPlayer player, PlayerListItem packet) {
-        Map<UUID,TabViewPlayerItem> storedItems = getPlayerItems(player.getServer().getInfo().getName());
+    public static synchronized Set<TabViewPlayerItem> updatePlayerItems(ProxiedPlayer vanillaRecipient, PlayerListItem packet) {
+        Map<UUID,TabViewPlayerItem> storedItems = getPlayerItems(vanillaRecipient.getServer().getInfo().getName());
         Set<TabViewPlayerItem> updates = new HashSet<>();
         if(storedItems!=null) {
 //Logger.getLogger(PlayerItemManager.class.getName()).info("Items: "+packet.getItems().length);
@@ -91,9 +91,9 @@ public class PlayerItemManager {
                             break;
                         case UPDATE_LATENCY:
                             update = storedItem.getPing() != item.getPing();
-//Logger.getLogger(PlayerItemManager.class.getName()).info("Latency Update: "+storedItem.getPing()+" "+item.getPing()+" "+ update+" For: "+player.getName());
+//Logger.getLogger(PlayerItemManager.class.getName()).info("Latency Update: "+storedItem.getPing()+" "+item.getPing()+" "+ update+" For: "+vanillaRecipient.getName());
                             storedItem.setPing(item.getPing());
-//Logger.getLogger(PlayerItemManager.class.getName()).info("Updated ping: "+playerItems.get(player.getServer().getInfo().getName()).get(item.getUuid()).getPing());
+//Logger.getLogger(PlayerItemManager.class.getName()).info("Updated ping: "+playerItems.get(vanillaRecipient.getServer().getInfo().getName()).get(item.getUuid()).getPing());
                             break;
                         case UPDATE_DISPLAY_NAME:
                             update = storedItem.getDisplayname()==null || !storedItem.getDisplayname().equals(item.getDisplayname());
@@ -119,10 +119,10 @@ public class PlayerItemManager {
         return updates;
     }
     
-    public static synchronized Set<TabViewPlayerItem> removePlayerItems(ProxiedPlayer player, PlayerListItem packet) {
+    public static synchronized Set<TabViewPlayerItem> removePlayerItems(ProxiedPlayer vanillaRecipient, PlayerListItem packet) {
 //Logger.getGlobal().info("4");
 //PacketListener.printListItemPacket(packet);
-        Map<UUID,TabViewPlayerItem> items = getPlayerItems(player.getServer().getInfo().getName());
+        Map<UUID,TabViewPlayerItem> items = getPlayerItems(vanillaRecipient.getServer().getInfo().getName());
         Set<TabViewPlayerItem> updates = new HashSet<>();
         if(items==null) {
 //Logger.getGlobal().info("5 null items");

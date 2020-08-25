@@ -16,15 +16,19 @@ import net.md_5.bungee.protocol.packet.PlayerListHeaderFooter;
 public interface ITabView {
 
 
-    void handleAddPlayer(ProxiedPlayer player, Set<TabViewPlayerItem> items);
+    void handleAddPlayer(ProxiedPlayer vanillaRecipient, Set<TabViewPlayerItem> items);
     
-    void handleUpdateGamemode(ProxiedPlayer player, Set<TabViewPlayerItem> items);
+    void handleUpdateGamemode(ProxiedPlayer vanillaRecipient, Set<TabViewPlayerItem> items);
     
-    void handleUpdateLatency(ProxiedPlayer player, Set<TabViewPlayerItem> items);
+    void handleUpdateLatency(ProxiedPlayer vanillaRecipient, Set<TabViewPlayerItem> items);
     
-    void handleUpdateDisplayName(ProxiedPlayer player, Set<TabViewPlayerItem> items);
-    
-    void handleRemovePlayer(ProxiedPlayer player, Set<TabViewPlayerItem> items);
+    void handleUpdateDisplayName(ProxiedPlayer vanillaRecipient, Set<TabViewPlayerItem> items);
+
+    void handleRemovePlayer(ProxiedPlayer vanillaRecipient, Set<TabViewPlayerItem> items);
+
+    void handleVanishPlayer(TabViewPlayerItem items);
+
+    void handleUnvanishPlayer(TabViewPlayerItem items);
 
     void addViewer(ProxiedPlayer player);
     
@@ -32,6 +36,6 @@ public interface ITabView {
     
     boolean isViewer(ProxiedPlayer player);
 
-    void handleHeaderFooter(ProxiedPlayer player, PlayerListHeaderFooter packet);
+    void handleHeaderFooter(ProxiedPlayer vanillaRecipient, PlayerListHeaderFooter packet);
 
 }

@@ -30,6 +30,7 @@ public class TabViewPlayerItem {
     private String[][] properties;
     private int ping;
     private boolean afk;
+    private boolean vanished;
     
     public TabViewPlayerItem(PlayerListItem.Item item) {
         uuid = item.getUuid();

@@ -5,6 +5,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.mcmiddleearth.connect.log.Log;
+import de.myzelyam.api.vanish.PlayerVanishStateChangeEvent;
 import net.md_5.bungee.ServerConnection;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PlayerDisconnectEvent;
@@ -64,35 +65,49 @@ public class TabViewManager implements Listener {
         handleRemovePlayerPacket(event.getPlayer(),packet);
     }
 
-    public static void handleUpdateAfk(ProxiedPlayer player, boolean afk) {
-        Set<TabViewPlayerItem> items = PlayerItemManager.updateAfk(player.getUniqueId(),afk);
-        tabViews.forEach((identfier, tabView) -> tabView.handleUpdateDisplayName(player, items));
+    public static void handlePlayerVanish(ProxiedPlayer player) {
+        TabViewPlayerItem item = PlayerItemManager.getPlayerItem(player.getUniqueId());
+        if(item!=null) {
+            tabViews.forEach((identifier, tabView) -> tabView.handleVanishPlayer(item));
+        }
     }
 
-    public static void handleAddPlayerPacket(ProxiedPlayer player, PlayerListItem packet) {
-        Set<TabViewPlayerItem> items = PlayerItemManager.addPlayerItems(player, packet);
-        tabViews.forEach((identfier,tabView) -> tabView.handleAddPlayer(player,items));
+    public static void handlePlayerUnvanish(ProxiedPlayer player) {
+        TabViewPlayerItem item = PlayerItemManager.getPlayerItem(player.getUniqueId());
+        if(item!=null) {
+            tabViews.forEach((identifier, tabView) -> tabView.handleUnvanishPlayer(item));
+        }
+    }
+
+    public static void handleUpdateAfk(ProxiedPlayer vanillaRecipient, boolean afk) {
+        Set<TabViewPlayerItem> items = PlayerItemManager.updateAfk(vanillaRecipient.getUniqueId(),afk);
+        tabViews.forEach((identfier, tabView) -> tabView.handleUpdateDisplayName(vanillaRecipient, items));
+    }
+
+    public static void handleAddPlayerPacket(ProxiedPlayer vanillaRecipient, PlayerListItem packet) {
+        Set<TabViewPlayerItem> items = PlayerItemManager.addPlayerItems(vanillaRecipient, packet);
+        tabViews.forEach((identfier,tabView) -> tabView.handleAddPlayer(vanillaRecipient,items));
     }
     
-    public static void handleUpdateGamemodePacket(ProxiedPlayer player, PlayerListItem packet) {
-        Set<TabViewPlayerItem> items = PlayerItemManager.updatePlayerItems(player, packet);
-        tabViews.forEach((identfier,tabView) -> tabView.handleUpdateGamemode(player,items));
+    public static void handleUpdateGamemodePacket(ProxiedPlayer vanillaRecipient, PlayerListItem packet) {
+        Set<TabViewPlayerItem> items = PlayerItemManager.updatePlayerItems(vanillaRecipient, packet);
+        tabViews.forEach((identfier,tabView) -> tabView.handleUpdateGamemode(vanillaRecipient,items));
     }
     
-    public synchronized static void handleUpdateLatencyPacket(ProxiedPlayer player, PlayerListItem packet) {
-        Set<TabViewPlayerItem> items = PlayerItemManager.updatePlayerItems(player, packet);
-        tabViews.forEach((identfier,tabView) -> tabView.handleUpdateLatency(player,items));
+    public synchronized static void handleUpdateLatencyPacket(ProxiedPlayer vanillaRecipient, PlayerListItem packet) {
+        Set<TabViewPlayerItem> items = PlayerItemManager.updatePlayerItems(vanillaRecipient, packet);
+        tabViews.forEach((identfier,tabView) -> tabView.handleUpdateLatency(vanillaRecipient,items));
     }
     
-    public static void handleUpdateDisplayNamePacket(ProxiedPlayer player, PlayerListItem packet) {
-        Set<TabViewPlayerItem> items = PlayerItemManager.updatePlayerItems(player, packet);
-        tabViews.forEach((identfier,tabView) -> tabView.handleUpdateDisplayName(player,items));
+    public static void handleUpdateDisplayNamePacket(ProxiedPlayer vanillaRecipient, PlayerListItem packet) {
+        Set<TabViewPlayerItem> items = PlayerItemManager.updatePlayerItems(vanillaRecipient, packet);
+        tabViews.forEach((identfier,tabView) -> tabView.handleUpdateDisplayName(vanillaRecipient,items));
     }
-    
-    public static void handleRemovePlayerPacket(ProxiedPlayer player, PlayerListItem packet) {
+
+    public static void handleRemovePlayerPacket(ProxiedPlayer vanillaRecipient, PlayerListItem packet) {
         //PacketListener.printListItemPacket(packet);
-        Set<TabViewPlayerItem> items = PlayerItemManager.removePlayerItems(player, packet);
-        tabViews.forEach((identfier, tabView) -> tabView.handleRemovePlayer(player, items));
+        Set<TabViewPlayerItem> items = PlayerItemManager.removePlayerItems(vanillaRecipient, packet);
+        tabViews.forEach((identfier, tabView) -> tabView.handleRemovePlayer(vanillaRecipient, items));
     }
 
     public static void handleHeaderFooter(ProxiedPlayer player, PlayerListHeaderFooter packet) {
@@ -128,7 +143,7 @@ public class TabViewManager implements Listener {
         }
         return null;
     }
-    
+
     public static ITabView getTabView(String identifier) {
         return tabViews.get(identifier);
     }
