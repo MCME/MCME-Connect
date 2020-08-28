@@ -7,17 +7,22 @@ package com.mcmiddleearth.connect.bungee.tabList;
 
 import com.google.common.collect.Sets;
 import com.mcmiddleearth.connect.bungee.ConnectBungeePlugin;
+import com.mcmiddleearth.connect.bungee.vanish.VanishHandler;
 import com.mcmiddleearth.connect.log.Log;
 import com.mcmiddleearth.connect.tabList.PlayerList;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
 import net.luckperms.api.model.user.User;
 import net.luckperms.api.query.QueryOptions;
+import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.protocol.packet.PlayerListHeaderFooter;
 import net.md_5.bungee.protocol.packet.PlayerListItem;
 
+import java.awt.*;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
@@ -175,6 +180,7 @@ public class GlobalTabView extends VanishSupportTabView {
         PlayerListItem.Item[] items = new PlayerListItem.Item[1];
         PlayerListItem.Item item = new PlayerListItem.Item();
         item.setUuid(tabViewItem.getUuid());
+        item.setDisplayName(getDisplayName(tabViewItem));
         items[0] = item;
         packet.setItems(items);
         packet.setAction(PlayerListItem.Action.REMOVE_PLAYER);
@@ -293,13 +299,42 @@ public class GlobalTabView extends VanishSupportTabView {
                 suffix = "~";
                 suffixLength = lengthWithoutFormatting(suffix);
             }
-            if (item.getAfk()) {
-                suffix = suffix + "§8AFK";
-                suffixLength = lengthWithoutFormatting(suffix);
+            Color rColor =  new Color(255,255,255);
+            if(roleColor.length()>1) {
+                rColor = ChatColor.getByChar(roleColor.charAt(1)).getColor();
             }
+            boolean italic = false;
+            String status = "";
+            String statusColor = "#ffffff";
+            if (item.getAfk()) {
+                //rColor = rColor.darker();
+                //suffix = suffix + "§8AFK";
+                status = "AFK";
+                statusColor = "#777777";
+                italic = true;
+            }
+            //chatColor = net.md_5.bungee.api.ChatColor.of(new Color(0,120+10 * 6, 90+10*7));
+            if (VanishHandler.isVanished(item.getUuid()) && roleColor.length()>1) {
+                //ChatColor chatColor = ChatColor.of(new Color(rColor.getRed()-100,rColor.getGreen()-50,rColor.getBlue()-50));
+                rColor = rColor.brighter().brighter();
+                //suffix = suffix + "§fV";
+                //status = "Vanish";
+                //statusColor = "#cccccc";
+            }
+            suffixLength = lengthWithoutFormatting(suffix+status);
+            roleColor = "#"+Integer.toHexString(rColor.getRGB()).substring(2);
+            //Logger.getGlobal().info(roleColor);
+            //roleColor = chatColor+"ak";
             String tempPlayername = player.getName();//+"1234567890";
             String username = tempPlayername.substring(0, Math.min(tempPlayername.length(), 20 - prefixLength - suffixLength));
-            return "\" " + prefix + roleColor + username + suffix + "\"";
+            //BaseComponent[] displayName = new ComponentBuilder(" ").appendLegacy(prefix).append("username"+suffix).color(chatColor).create();
+            String displayName = "{\"text\":\""+prefix+"\",\"italic\":\""+italic+"\",\"extra\":[{\"text\":\""
+                                  +username+suffix+"\",\"color\":\""+roleColor+"\"},{\"text\":\""
+                                  +status+"\",\"color\":\""+statusColor+"\"}]}";
+//player.sendMessage(displayName);
+//Logger.getGlobal().info(displayName);
+            //return "\" " + prefix + "#ffee33" + username + suffix + "\"";
+            return displayName;
         }
         return "null player";
     }

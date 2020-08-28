@@ -14,10 +14,17 @@ import java.util.function.IntFunction;
 public abstract class VanishSupportTabView implements ITabView {
 
     protected synchronized void sendVanishFakeToViewers(Set<UUID> viewers, PlayerListItem packet) {
+        PlayerListItem packetDisplay = new PlayerListItem();
+        packetDisplay.setItems(packet.getItems());
+        packetDisplay.setAction(PlayerListItem.Action.UPDATE_DISPLAY_NAME);
         viewers.forEach(uuid -> {
             ProxiedPlayer player = ProxyServer.getInstance().getPlayer(uuid);
-            if (player != null && !VanishHandler.hasVanishSeePermission(player)) {
-                player.unsafe().sendPacket(packet);
+            if (player != null) {
+                if (!VanishHandler.hasVanishSeePermission(player)) {
+                    player.unsafe().sendPacket(packet);
+                } else {
+                    player.unsafe().sendPacket(packetDisplay);
+                }
             }
         });
     }

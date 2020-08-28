@@ -102,7 +102,7 @@
     <dependency>
       <groupId>net.md-5</groupId>
       <artifactId>bungeecord-api</artifactId>
-      <version>1.15-SNAPSHOT</version>
+      <version>1.16-R0.4-SNAPSHOT</version>
       <scope>provided</scope>
       <exclusions>
         <exclusion>
@@ -130,7 +130,7 @@
     <dependency>
       <groupId>net.md-5</groupId>
       <artifactId>bungeecord-proxy</artifactId>
-      <version>1.15-SNAPSHOT</version>
+      <version>1.16-R0.4-SNAPSHOT</version>
       <scope>provided</scope>
       <exclusions>
         <exclusion>
@@ -166,10 +166,6 @@
           <groupId>net.sf.jopt-simple</groupId>
         </exclusion>
         <exclusion>
-          <artifactId>jo-nbt</artifactId>
-          <groupId>se.llbit</groupId>
-        </exclusion>
-        <exclusion>
           <artifactId>mysql-connector-java</artifactId>
           <groupId>mysql</groupId>
         </exclusion>
@@ -182,7 +178,7 @@
     <dependency>
       <groupId>net.md-5</groupId>
       <artifactId>bungeecord-event</artifactId>
-      <version>1.15-SNAPSHOT</version>
+      <version>1.16-R0.4-SNAPSHOT</version>
       <scope>provided</scope>
       <exclusions>
         <exclusion>
@@ -194,7 +190,7 @@
     <dependency>
       <groupId>net.md-5</groupId>
       <artifactId>bungeecord-protocol</artifactId>
-      <version>1.15-SNAPSHOT</version>
+      <version>1.16-R0.4-SNAPSHOT</version>
       <scope>provided</scope>
       <exclusions>
         <exclusion>
@@ -210,6 +206,10 @@
           <groupId>net.sf.trove4j</groupId>
         </exclusion>
         <exclusion>
+          <artifactId>jo-nbt</artifactId>
+          <groupId>se.llbit</groupId>
+        </exclusion>
+        <exclusion>
           <artifactId>bungeecord-chat</artifactId>
           <groupId>net.md-5</groupId>
         </exclusion>
@@ -222,7 +222,7 @@
     <dependency>
       <groupId>net.md-5</groupId>
       <artifactId>bungeecord-api</artifactId>
-      <version>1.15-SNAPSHOT</version>
+      <version>1.16-R0.4-SNAPSHOT</version>
       <type>javadoc</type>
       <scope>provided</scope>
       <exclusions>
@@ -402,7 +402,7 @@
     <maven.compiler.target>1.8</maven.compiler.target>
     <maven.compiler.source>1.8</maven.compiler.source>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <bungeecord.version>1.15-SNAPSHOT</bungeecord.version>
+    <bungeecord.version>1.16-R0.4-SNAPSHOT</bungeecord.version>
   </properties>
 </project>
 

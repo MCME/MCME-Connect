@@ -46,7 +46,7 @@ public class PacketListener extends MessageToMessageDecoder<PacketWrapper> {
                                 break;
                             case UPDATE_DISPLAY_NAME:
                                 printListItemPacket(component + ".display", ((PlayerListItem) packetWrapper.packet));
-//Logger.getGlobal().info("Update Displayname: "+playerListPacket.getItems().length+" "+playerListPacket.getItems()[0].getDisplayName());
+Logger.getGlobal().info("Update Displayname: "+playerListPacket.getItems().length+" "+playerListPacket.getItems()[0].getDisplayName());
                                 TabViewManager.handleUpdateDisplayNamePacket(player, playerListPacket);
                                 break;
                             case REMOVE_PLAYER:

@@ -10,7 +10,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-        <bungeecord.version>1.15-SNAPSHOT</bungeecord.version>
+        <bungeecord.version>1.16-R0.4-SNAPSHOT</bungeecord.version>
     </properties>
     <build>
         <plugins>
@@ -82,7 +82,8 @@
         <repository>
             <id>papermc</id>
             <url>https://papermc.io/repo/repository/maven-public/</url>
-        </repository>    </repositories>
+        </repository>
+    </repositories>
     <dependencies>
         <!-- SuperVanish -->
         <dependency>
@@ -153,7 +154,7 @@
         <dependency>
             <groupId>net.md-5</groupId>
             <artifactId>bungeecord-api</artifactId>
-            <version>1.15-SNAPSHOT</version>
+            <version>${bungeecord.version}</version>
             <type>javadoc</type>
             <scope>provided</scope>
         </dependency>
