@@ -306,20 +306,27 @@ public class GlobalTabView extends VanishSupportTabView {
             boolean italic = false;
             String status = "";
             String statusColor = "#ffffff";
+            boolean grayout = false;
             if (item.getAfk()) {
                 //rColor = rColor.darker();
                 //suffix = suffix + "§8AFK";
                 status = "AFK";
                 statusColor = "#777777";
-                italic = true;
+                grayout = true;
             }
             //chatColor = net.md_5.bungee.api.ChatColor.of(new Color(0,120+10 * 6, 90+10*7));
             if (VanishHandler.isVanished(item.getUuid()) && roleColor.length()>1) {
                 //ChatColor chatColor = ChatColor.of(new Color(rColor.getRed()-100,rColor.getGreen()-50,rColor.getBlue()-50));
                 rColor = rColor.brighter().brighter();
+                italic = true;
                 //suffix = suffix + "§fV";
-                //status = "Vanish";
-                //statusColor = "#cccccc";
+                status = status + "_V";
+                statusColor = "#cccccc";
+                grayout = true;
+            }
+            if(grayout) {
+                float[] hsb = Color.RGBtoHSB(rColor.getRed(),rColor.getGreen(),rColor.getBlue(),null);
+                rColor = Color.getHSBColor(hsb[0],hsb[1]*0.5f,hsb[2]*0.8f);
             }
             suffixLength = lengthWithoutFormatting(suffix+status);
             roleColor = "#"+Integer.toHexString(rColor.getRGB()).substring(2);
