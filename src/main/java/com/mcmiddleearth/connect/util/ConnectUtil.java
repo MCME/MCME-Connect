@@ -91,17 +91,14 @@ public class ConnectUtil {
     }
 
     public static void sendDiscord(String discordChannel, String message) {
-Logger.getLogger(ConnectUtil.class.getSimpleName()).info("Send: "+discordChannel+" "+message);
         if ((discordChannel == null) || (discordChannel.equals(""))) {
             discordChannel = ConnectPlugin.getDiscordChannel();
-Logger.getLogger(ConnectUtil.class.getSimpleName()).info("Changed Channel to: "+discordChannel);
         }
         DiscordSRV discordPlugin = DiscordSRV.getPlugin();
         if (discordPlugin != null) {
             TextChannel channel = discordPlugin.getDestinationTextChannelForGameChannelName(discordChannel);
             if(channel == null) {
                 discordChannel = ConnectPlugin.getDiscordChannel();
-Logger.getLogger(ConnectUtil.class.getSimpleName()).info("Not found changed Channel to: "+discordChannel);
                 channel = discordPlugin.getDestinationTextChannelForGameChannelName(discordChannel);
             }
             if (channel != null) {

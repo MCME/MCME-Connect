@@ -97,13 +97,10 @@ public class ConnectBungeePlugin extends Plugin {
         if(myWarpEnabled) {
             myWarpConnector = new MyWarpDBConnector(getConfig().getSection("myWarp"));
         }
-//Logger.getGlobal().info("HeY ");
         if(VanishHandler.isPvSupport()) {
-//Logger.getGlobal().info("enable vanish support ");
             VanishHandler.loadVanished();
             getProxy().getPluginManager().registerListener(this, new VanishListener());
         }
-        //loadLegacyRedirect();
         ProxyServer.getInstance().registerChannel(Channel.MAIN);
         getProxy().getPluginManager().registerListener(this, new PluginMessageListener());
         getProxy().getPluginManager().registerListener(this, new CommandListener());
