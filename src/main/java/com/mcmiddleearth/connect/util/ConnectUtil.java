@@ -16,13 +16,19 @@
  */
 package com.mcmiddleearth.connect.util;
 
+import com.google.common.base.Joiner;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import com.mcmiddleearth.connect.Channel;
 import com.mcmiddleearth.connect.ConnectPlugin;
+import github.scarsz.discordsrv.DiscordSRV;
+import github.scarsz.discordsrv.dependencies.jda.api.entities.Guild;
+import github.scarsz.discordsrv.dependencies.jda.api.entities.TextChannel;
+import github.scarsz.discordsrv.util.DiscordUtil;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
+import java.util.Arrays;
 import java.util.UUID;
 import java.util.logging.Logger;
 
@@ -43,7 +49,6 @@ public class ConnectUtil {
         out.writeUTF(player.getName());
         out.writeUTF(world);
         out.writeUTF(location.getX()+";"+location.getY()+";"+location.getZ()+";"+location.getYaw()+";"+location.getPitch());
-Logger.getGlobal().info("teleport player "+player.getName()+" to server: "+server);
         player.sendPluginMessage(ConnectPlugin.getInstance(), Channel.MAIN, out.toByteArray());
     }
     
@@ -78,11 +83,46 @@ Logger.getGlobal().info("teleport player "+player.getName()+" to server: "+serve
     }
 
     public static void sendWorldUUID(Player sender, UUID uid, String name) {
-Logger.getGlobal().info("Sending world uuid: "+uid.toString()+" "+name);
         ByteArrayDataOutput out = ByteStreams.newDataOutput();
         out.writeUTF(Channel.WORLD_UUID);
         out.writeUTF(uid.toString());
         out.writeUTF(name);
         sender.sendPluginMessage(ConnectPlugin.getInstance(), Channel.MAIN, out.toByteArray());
     }
+
+    public static void sendDiscord(String discordChannel, String message) {
+Logger.getLogger(ConnectUtil.class.getSimpleName()).info("Send: "+discordChannel+" "+message);
+        if ((discordChannel == null) || (discordChannel.equals(""))) {
+            discordChannel = ConnectPlugin.getDiscordChannel();
+Logger.getLogger(ConnectUtil.class.getSimpleName()).info("Changed Channel to: "+discordChannel);
+        }
+        DiscordSRV discordPlugin = DiscordSRV.getPlugin();
+        if (discordPlugin != null) {
+            TextChannel channel = discordPlugin.getDestinationTextChannelForGameChannelName(discordChannel);
+            if(channel == null) {
+                discordChannel = ConnectPlugin.getDiscordChannel();
+Logger.getLogger(ConnectUtil.class.getSimpleName()).info("Not found changed Channel to: "+discordChannel);
+                channel = discordPlugin.getDestinationTextChannelForGameChannelName(discordChannel);
+            }
+            if (channel != null) {
+                Guild guild = DiscordSRV.getPlugin().getMainGuild();
+                String[] split = message.split(" ");
+                for(int i = 0; i < split.length; i++) {
+                    if (split[i].startsWith("@")) {
+                        String tag = DiscordUtil.convertMentionsFromNames(split[i], guild);
+                        if (tag != null && !tag.equals("")) {
+                            split[i] = tag;
+                        }
+                    }
+                }
+                message = Joiner.on(" ").join(split);
+                DiscordUtil.sendMessage(channel, message, 0, false);
+            } else {
+                Logger.getLogger("ConnectPlugin").warning("ConnectPlugin: Discord channel not found.");
+            }
+        } else {
+            Logger.getLogger("ConnectPlugin").warning("ConnectPlugin: DiscordSRV plugin not found.");
+        }
+    }
 }
+

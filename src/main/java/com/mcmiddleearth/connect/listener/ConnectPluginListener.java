@@ -25,6 +25,7 @@ import com.mcmiddleearth.connect.events.PlayerConnectEvent;
 import com.mcmiddleearth.connect.restart.RestartHandler;
 import com.mcmiddleearth.connect.tabList.ConnectedPlayer;
 import com.mcmiddleearth.connect.tabList.PlayerList;
+import com.mcmiddleearth.connect.util.ConnectUtil;
 import com.onarandombox.MultiverseCore.MultiverseCore;
 import github.scarsz.discordsrv.DiscordSRV;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.TextChannel;
@@ -107,21 +108,13 @@ Logger.getGlobal().info("Pugin Message! "+player+" channel "+subchannel);
                 p.sendTitle(title, subtitle, intro, show, extro);
             });
         } else if (subchannel.equals(Channel.COMMAND)) {
-//Logger.getGlobal().info("COMMAND");
             String recipient = in.readUTF();
             String command = in.readUTF();
-//Logger.getGlobal().info("recipient: "+recipient+ " "+command.substring(1));
             runAfterArrival(recipient, source -> {
-//Logger.getGlobal().info("dispatch: "+source.getName()+" "+command);
                 Bukkit.dispatchCommand(source, command.substring(1));
             });
         } else if (subchannel.equals(Channel.SPAWN)) {
             String name = in.readUTF();
-            /*Player p = Bukkit.getPlayer(name);
-            int delay = (p==null?ConnectBungeePlugin.getConnectDelay():1);
-            new BukkitRunnable() {
-                @Override
-                public void run() {*/
             runAfterArrival(name, p -> {
                 Location spawn = p.getWorld().getSpawnLocation().clone();
                 try {
@@ -131,35 +124,25 @@ Logger.getGlobal().info("Pugin Message! "+player+" channel "+subchannel);
                 } catch (NullPointerException ex) {}
                 p.teleport(spawn);//.add(0.5,0,0.5));
             });
-            //}.runTaskLater(ConnectPlugin.getInstance(), delay);
         } else if(subchannel.equals(Channel.DISCORD)) {
-            String name = in.readUTF();
-            String event = in.readUTF();
-//Logger.getGlobal().info("Recieved discord message: "+name+" - "+event);
-            //TextChannel discordChannel = DiscordUtil.getTextChannelById("global");
-            if(event.equals("join")) {
-                sendDiscord(":bangbang: **"+name+" joined the game.**");
-            } else if(event.equals("leave")) {
-                sendDiscord(":x: **"+name+" left the game.**");
-            }
+            String discordChannel = in.readUTF();
+            String discordMessage = in.readUTF();
+            ConnectUtil.sendDiscord(discordChannel,discordMessage);
         } else if(subchannel.equals(Channel.LEGACY)) {
             String playerName = in.readUTF();
             String target = in.readUTF();
-//Logger.getGlobal().info("Recieved LEGACY message: "+playerName+" - "+target);
             runAfterArrival(playerName, p -> {
                 if(ConnectPlugin.getStatisticStorage()!=null) {
                     ConnectPlugin.getStatisticStorage().saveStaticstic(p, pp-> {
                         ByteArrayDataOutput out = ByteStreams.newDataOutput();
                         out.writeUTF(Channel.CONNECT);
                         out.writeUTF(target);
-    //Logger.getGlobal().info("Sending forward message after stats: "+playerName+" - "+target);
                         pp.sendPluginMessage(ConnectPlugin.getInstance(), "BungeeCord", out.toByteArray());
                     });
                 } else {
                     ByteArrayDataOutput out = ByteStreams.newDataOutput();
                     out.writeUTF(Channel.CONNECT);
                     out.writeUTF(target);
-//Logger.getGlobal().info("Sending forward message: "+playerName+" - "+target);
                     p.sendPluginMessage(ConnectPlugin.getInstance(), "BungeeCord", out.toByteArray());
                 }
             });
@@ -212,7 +195,7 @@ Logger.getGlobal().info("Add player: "+remove);
         }
     }
     
-    private void sendDiscord(String message) {
+    /*private void sendDiscord(String message) {
         String discordChannel = ConnectPlugin.getDiscordChannel();
         if ((discordChannel != null) && (!discordChannel.equals("")))
         {
@@ -232,7 +215,7 @@ Logger.getGlobal().info("Add player: "+remove);
             Logger.getLogger("ConnectPlugin").warning("DiscordSRV plugin not found.");
           }
         }
-    }
+    }*/
 
     private void runAfterArrival(String playerName, Consumer<Player> callback) {
         new BukkitRunnable() {
