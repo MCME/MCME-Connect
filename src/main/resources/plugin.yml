@@ -3,7 +3,7 @@ main: com.mcmiddleearth.connect.ConnectPlugin
 version: ${project.version}
 description: Connecting MCME servers in a BungeeCord
 load: POSTWORLD
-api-version: 1.15
+api-version: 1.16
 softdepend: [PremiumVanish, DiscordSRV]
 
 commands:
@@ -15,7 +15,14 @@ commands:
         description: stops a server
         usage: /stop [shutdown message]
         aliases: shutdown
+    log:
+        description: manages logging system
+        usage: /log <subcommand>
+        aliases: logger
 permissions:
+    logger.admin:
+        description: allows do manage logger
+        default: op
     mcmeconnect.tp:
         description: allows to tp to other players across the network
         default: op

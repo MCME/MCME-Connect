@@ -8,6 +8,7 @@ disableMVTP:
 serverWatchdog: true
 connectDelay: 200
 premiumVanish: true
+tabListUpdateSeconds: 2
 myWarp:
   enabled: true
   user: mywarp

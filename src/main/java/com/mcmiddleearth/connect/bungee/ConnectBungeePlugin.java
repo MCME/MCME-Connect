@@ -28,19 +28,20 @@ import com.mcmiddleearth.connect.bungee.Handler.TpahereHandler;
 import com.mcmiddleearth.connect.bungee.listener.CommandListener;
 import com.mcmiddleearth.connect.bungee.listener.ConnectionListener;
 import com.mcmiddleearth.connect.bungee.listener.PluginMessageListener;
+import com.mcmiddleearth.connect.bungee.tabList.PlayerItemUpdater;
+import com.mcmiddleearth.connect.bungee.tabList.TabViewManager;
 import com.mcmiddleearth.connect.bungee.vanish.VanishHandler;
 import com.mcmiddleearth.connect.bungee.vanish.VanishListener;
 import com.mcmiddleearth.connect.bungee.warp.MyWarpDBConnector;
 import com.mcmiddleearth.connect.bungee.watchdog.ServerWatchdog;
+import com.mcmiddleearth.connect.log.BungeeLog;
+import com.mcmiddleearth.connect.log.Log;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.api.scheduler.ScheduledTask;
 
 import java.io.*;
-import java.util.HashSet;
-import java.util.Scanner;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -62,6 +63,8 @@ public class ConnectBungeePlugin extends Plugin {
     
     private static Set<String> noMVTP = new HashSet<>();
           
+    private static PlayerItemUpdater playerItemUpdater;
+
     private static MyWarpDBConnector myWarpConnector;
     
     private static boolean myWarpEnabled;
@@ -69,6 +72,10 @@ public class ConnectBungeePlugin extends Plugin {
     private RestartScheduler restartScheduler;
     private ScheduledTask tpaCleanupScheduler;
     private ScheduledTask tpahereCleanupScheduler;
+
+    private Map<String,ServerInformation> serverInformation = new HashMap<>();
+
+    private Log logger;
     
     @Override
     public void onEnable() {
@@ -76,6 +83,7 @@ public class ConnectBungeePlugin extends Plugin {
         configFile = new File(getDataFolder(),"config.yml");
         saveDefaultConfig();
         loadConfig();
+        logger = new BungeeLog();
         RestartHandler.init();
         tpaCleanupScheduler = TpaHandler.startCleanupScheduler();
         tpahereCleanupScheduler = TpahereHandler.startCleanupScheduler();
@@ -101,6 +109,8 @@ public class ConnectBungeePlugin extends Plugin {
         getProxy().getPluginManager().registerListener(this, new CommandListener());
         getProxy().getPluginManager().registerListener(this, 
                          new ConnectionListener());
+        getProxy().getPluginManager().registerListener(this, new TabViewManager());
+        playerItemUpdater = new PlayerItemUpdater();
     }
     
     @Override
@@ -110,6 +120,8 @@ public class ConnectBungeePlugin extends Plugin {
         restartScheduler.cancel();
         tpaCleanupScheduler.cancel();
         tpahereCleanupScheduler.cancel();
+        playerItemUpdater.disable();
+        logger.disable();
     }
     
     public static boolean isMvtpDisabled(String server) {
@@ -248,5 +260,14 @@ public class ConnectBungeePlugin extends Plugin {
 
     public static boolean isMyWarpEnabled() {
         return myWarpEnabled;
+    }
+
+    public ServerInformation getServerInformation(String name) {
+        ServerInformation info =  serverInformation.get(name);
+        if(info==null) {
+            info = new ServerInformation(name);
+            serverInformation.put(name,info);
+        }
+        return info;
     }
 }

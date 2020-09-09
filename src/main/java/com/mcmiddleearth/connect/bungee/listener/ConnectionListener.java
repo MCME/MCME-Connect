@@ -31,6 +31,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
+
+import com.mcmiddleearth.connect.util.ConnectUtil;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -142,9 +144,9 @@ Logger.getGlobal().info("Connecting to: "+server.getName());
                 return;
             }
             ByteArrayDataOutput out = ByteStreams.newDataOutput();
-            out.writeUTF("Discord");
-            out.writeUTF(player.getName());
-            out.writeUTF("join");
+            out.writeUTF(Channel.DISCORD);
+            out.writeUTF("Global");
+            out.writeUTF(":bangbang: **"+player.getName()+" joined the game.**");
             other.getServer().getInfo().sendData(Channel.MAIN, out.toByteArray(),true);
         }
     }
@@ -163,8 +165,8 @@ Logger.getGlobal().info("Connecting to: "+server.getName());
         if(other != null && other.getServer() != null) {
             ByteArrayDataOutput out = ByteStreams.newDataOutput();
             out.writeUTF(Channel.DISCORD);
-            out.writeUTF(player.getName());
-            out.writeUTF("leave");
+            out.writeUTF("Global");
+            out.writeUTF(":x: **"+player.getName()+" left the game.**");
             other.getServer().getInfo().sendData(Channel.MAIN, out.toByteArray(),false);
         }
     }

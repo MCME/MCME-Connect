@@ -19,6 +19,7 @@ package com.mcmiddleearth.connect.bungee.vanish;
 import com.mcmiddleearth.connect.Permission;
 import com.mcmiddleearth.connect.bungee.ConnectBungeePlugin;
 import com.mcmiddleearth.connect.bungee.listener.ConnectionListener;
+import com.mcmiddleearth.connect.bungee.tabList.TabViewManager;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -51,7 +52,7 @@ public class VanishHandler {
         }
         if(isVanished(player)) {
             ProxyServer.getInstance().getPlayers().stream()
-                .filter(p -> p.hasPermission(Permission.VANISH_SEE)).forEach(p -> {
+                .filter(VanishHandler::hasVanishSeePermission).forEach(p -> {
                 p.sendMessage(new ComponentBuilder(player.getName()+" joined the MCME-Network while being vanished.")
                                             .color(ChatColor.GREEN).create());
             });
@@ -63,7 +64,7 @@ public class VanishHandler {
     public static void quit(ProxiedPlayer player) {
         if(isVanished(player)) {
             ProxyServer.getInstance().getPlayers().stream()
-                    .filter(p -> p.hasPermission("pv.see")).forEach(p -> {
+                    .filter(VanishHandler::hasVanishSeePermission).forEach(p -> {
                     p.sendMessage(new ComponentBuilder(player.getName()+" left the MCME-Network while being vanished.")
                                                 .color(ChatColor.GREEN).create());
             });
@@ -77,27 +78,33 @@ public class VanishHandler {
         vanishedPlayers.add(player.getUniqueId());
         saveVanished();
         ProxyServer.getInstance().getPlayers().stream()
-                .filter(p -> p.hasPermission("pv.see")).forEach(p -> {
+                .filter(VanishHandler::hasVanishSeePermission).forEach(p -> {
                 p.sendMessage(new ComponentBuilder(player.getName()+" vanished.")
                                             .color(ChatColor.GREEN).create());
         });
         ConnectionListener.sendLeaveMessage(player,true);
+        TabViewManager.handlePlayerVanish(player);
     }
     
     public static void unvanish(ProxiedPlayer player) {
         vanishedPlayers.remove(player.getUniqueId());
         saveVanished();
         ProxyServer.getInstance().getPlayers().stream()
-                .filter(p -> p.hasPermission("pv.see")).forEach(p -> {
+                .filter(VanishHandler::hasVanishSeePermission).forEach(p -> {
                 p.sendMessage(new ComponentBuilder(player.getName()+" unvanished.")
                                             .color(ChatColor.GREEN).create());
         });
         ConnectionListener.sendJoinMessage(player,true);
+        TabViewManager.handlePlayerUnvanish(player);
     }
     
     public static boolean isVanished(ProxiedPlayer player) {
+        return isVanished(player.getUniqueId());
+    }
+
+    public static boolean isVanished(UUID player) {
 //Logger.getGlobal().info("Vanished: "+player.getName()+" "+pvSupport+" "+vanishedPlayers.contains(player.getUniqueId()));
-        return pvSupport && vanishedPlayers.contains(player.getUniqueId());
+        return pvSupport && vanishedPlayers.contains(player);
     }
     
     public static void saveVanished() {
@@ -135,5 +142,9 @@ public class VanishHandler {
 
     public static void setPvSupport(boolean pvSupport) {
         VanishHandler.pvSupport = pvSupport;
+    }
+
+    public static boolean hasVanishSeePermission(ProxiedPlayer player) {
+        return isPvSupport() && player.hasPermission(Permission.VANISH_SEE);
     }
 }

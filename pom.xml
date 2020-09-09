@@ -4,12 +4,13 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.mcmiddleearth</groupId>
     <artifactId>MCME-Connect</artifactId>
-    <version>1.2.4</version>
+    <version>1.4-SNAPSHOT</version>
     <packaging>jar</packaging>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
+        <bungeecord.version>1.16-R0.4-SNAPSHOT</bungeecord.version>
     </properties>
     <build>
         <plugins>
@@ -78,6 +79,10 @@
             <id>Scarsz-Nexus</id>
             <url>https://nexus.scarsz.me/content/groups/public/</url>
         </repository>
+        <repository>
+            <id>papermc</id>
+            <url>https://papermc.io/repo/repository/maven-public/</url>
+        </repository>
     </repositories>
     <dependencies>
         <!-- SuperVanish -->
@@ -101,10 +106,15 @@
             <systemPath>D:\SystemRepository\PremiumVanishAPI.jar</systemPath>
         </dependency>
         <dependency>
-            <groupId>org.spigotmc</groupId>
-            <artifactId>spigot-API</artifactId>
-            <version>1.15.2-R0.1-SNAPSHOT</version>
+            <groupId>net.luckperms</groupId>
+            <artifactId>api</artifactId>
+            <version>5.0</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.ess3</groupId>
+            <artifactId>Essentials</artifactId>
+            <version>2.13-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.mariadb.jdbc</groupId>
@@ -114,8 +124,7 @@
         <dependency>
             <groupId>net.md-5</groupId>
             <artifactId>bungeecord-api</artifactId>
-            <version>1.15-SNAPSHOT</version>
-            <type>jar</type>
+            <version>${bungeecord.version}</version>
             <scope>provided</scope>
             <exclusions>
                 <exclusion>
@@ -126,8 +135,26 @@
         </dependency>
         <dependency>
             <groupId>net.md-5</groupId>
+            <artifactId>bungeecord-proxy</artifactId>
+            <version>${bungeecord.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.md-5</groupId>
+            <artifactId>bungeecord-event</artifactId>
+            <version>${bungeecord.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.md-5</groupId>
+            <artifactId>bungeecord-protocol</artifactId>
+            <version>${bungeecord.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.md-5</groupId>
             <artifactId>bungeecord-api</artifactId>
-            <version>1.15-SNAPSHOT</version>
+            <version>${bungeecord.version}</version>
             <type>javadoc</type>
             <scope>provided</scope>
         </dependency>
@@ -148,5 +175,12 @@
             <version>0.1.4</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>com.destroystokyo.paper</groupId>
+            <artifactId>paper-api</artifactId>
+            <version>1.16.1-R0.1-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
+
 </project>
