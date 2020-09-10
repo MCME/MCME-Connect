@@ -25,9 +25,8 @@ import com.mcmiddleearth.connect.bungee.ConnectBungeePlugin;
 import com.mcmiddleearth.connect.bungee.Handler.ChatMessageHandler;
 import com.mcmiddleearth.connect.bungee.Handler.RestartHandler;
 import com.mcmiddleearth.connect.bungee.Handler.TitleHandler;
-import com.mcmiddleearth.connect.bungee.tabList.PlayerItemManager;
+import com.mcmiddleearth.connect.bungee.tabList.playerItem.PlayerItemManager;
 import com.mcmiddleearth.connect.bungee.tabList.TabViewManager;
-import com.mcmiddleearth.connect.bungee.warp.MyWarpDBConnector;
 
 import java.util.UUID;
 import java.util.logging.Logger;

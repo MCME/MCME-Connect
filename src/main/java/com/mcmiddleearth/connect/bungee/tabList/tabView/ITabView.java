@@ -3,9 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.mcmiddleearth.connect.bungee.tabList;
+package com.mcmiddleearth.connect.bungee.tabList.tabView;
 
 import java.util.Set;
+
+import com.mcmiddleearth.connect.bungee.tabList.playerItem.TabViewPlayerItem;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.protocol.packet.PlayerListHeaderFooter;
 
@@ -38,4 +40,5 @@ public interface ITabView {
 
     void handleHeaderFooter(ProxiedPlayer vanillaRecipient, PlayerListHeaderFooter packet);
 
+    boolean isAllowedOn(String server);
 }

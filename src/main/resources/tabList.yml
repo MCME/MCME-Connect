@@ -58,7 +58,7 @@ globalView:
         permissions:
           - "group.badge_moderator"
     - playername:
-        text: "{roleColor}{player}"
+        text: "{RoleColor}{Player}"
         shorten: true
     - badges:
         text: "~"
@@ -70,7 +70,7 @@ globalView:
           - "group.badge_worldeditlimited"
           - "group.badge_worldeditfull"
           - "group.badge_moderator"
-        requireAllPermisssion: false
+        requireAllPermisssions: false
     - afk:
         text: "§8AFK"
         afk: true
@@ -78,6 +78,6 @@ globalView:
         text: "$7PvP"
         servers:
           - "pvp"
-  maxItemLength: 20
+  maxPlayerItemLength: 20
 
 

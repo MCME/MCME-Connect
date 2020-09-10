@@ -1,11 +1,12 @@
 package com.mcmiddleearth.connect.bungee.tabList;
 
-import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
+import com.mcmiddleearth.connect.bungee.ConnectBungeePlugin;
+import com.mcmiddleearth.connect.bungee.tabList.playerItem.PlayerItemManager;
+import com.mcmiddleearth.connect.bungee.tabList.playerItem.TabViewPlayerItem;
+import com.mcmiddleearth.connect.bungee.tabList.tabView.GlobalTabView;
+import com.mcmiddleearth.connect.bungee.tabList.tabView.ITabView;
+import com.mcmiddleearth.connect.bungee.tabList.tabView.configuration.ViewableTabViewConfig;
 import com.mcmiddleearth.connect.log.Log;
-import de.myzelyam.api.vanish.PlayerVanishStateChangeEvent;
 import net.md_5.bungee.ServerConnection;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PlayerDisconnectEvent;
@@ -17,15 +18,26 @@ import net.md_5.bungee.netty.PipelineUtils;
 import net.md_5.bungee.protocol.packet.PlayerListHeaderFooter;
 import net.md_5.bungee.protocol.packet.PlayerListItem;
 
+import java.io.File;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public class TabViewManager implements Listener {
 
     //Available views for each server
-    private final static Map<String,ITabView> tabViews = new HashMap<>();
+    private final static Map<String, ITabView> tabViews = new HashMap<>();
     
     private final static String defaultView = "global";
-    
+
+    private final static File configFile = new File(ConnectBungeePlugin.getInstance().getDataFolder(),
+                                              "tabList.yml");
+
     static {
-        tabViews.put(defaultView, new GlobalTabView());
+        tabViews.put(defaultView, new GlobalTabView(new ViewableTabViewConfig(configFile, "GlobalView")));
     }
 
     @EventHandler

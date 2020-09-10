@@ -1,5 +1,7 @@
-package com.mcmiddleearth.connect.bungee.tabList;
+package com.mcmiddleearth.connect.bungee.tabList.tabView;
 
+import com.mcmiddleearth.connect.bungee.tabList.playerItem.TabViewPlayerItem;
+import com.mcmiddleearth.connect.bungee.tabList.tabView.configuration.ViewableTabViewConfig;
 import com.mcmiddleearth.connect.bungee.vanish.VanishHandler;
 import com.mcmiddleearth.connect.log.Log;
 import net.md_5.bungee.api.ProxyServer;
@@ -9,9 +11,45 @@ import net.md_5.bungee.protocol.packet.PlayerListItem;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.UUID;
-import java.util.function.IntFunction;
 
-public abstract class VanishSupportTabView implements ITabView {
+public abstract class VanishSupportTabView extends AbstractViewableTabView {
+
+    public VanishSupportTabView(ViewableTabViewConfig config) {
+        super(config);
+    }
+
+    @Override
+    public void handleVanishPlayer(TabViewPlayerItem tabViewItem) {
+        PlayerListItem packet = new PlayerListItem();
+        PlayerListItem.Item[] items = new PlayerListItem.Item[1];
+        PlayerListItem.Item item = new PlayerListItem.Item();
+        item.setUuid(tabViewItem.getUuid());
+        item.setDisplayName(getConfig().getDisplayName(tabViewItem));
+        items[0] = item;
+        packet.setItems(items);
+        packet.setAction(PlayerListItem.Action.REMOVE_PLAYER);
+        sendVanishFakeToViewers(getViewers(), packet);
+    }
+
+    @Override
+    public void handleUnvanishPlayer(TabViewPlayerItem tabViewItem) {
+        PlayerListItem packet = new PlayerListItem();
+        PlayerListItem.Item[] items = new PlayerListItem.Item[1];
+        PlayerListItem.Item item = new PlayerListItem.Item();
+        item.setUuid(tabViewItem.getUuid());
+        item.setUsername(tabViewItem.getUsername());
+        item.setDisplayName(getConfig().getDisplayName(tabViewItem));
+        item.setGamemode(tabViewItem.getGamemode());
+        String[][] prop = tabViewItem.getProperties();
+        if(prop != null) {
+            item.setProperties(prop.clone());
+        }
+        item.setPing(tabViewItem.getPing());
+        items[0] = item;
+        packet.setItems(items);
+        packet.setAction(PlayerListItem.Action.ADD_PLAYER);
+        sendVanishFakeToViewers(getViewers(), packet);
+    }
 
     protected synchronized void sendVanishFakeToViewers(Set<UUID> viewers, PlayerListItem packet) {
         PlayerListItem packetDisplay = new PlayerListItem();
@@ -29,6 +67,7 @@ public abstract class VanishSupportTabView implements ITabView {
         });
     }
 
+    @Override
     protected synchronized void sendToViewers(Set<UUID> viewers, PlayerListItem packet) {
         String component = "tab.out";
         switch(packet.getAction()) {

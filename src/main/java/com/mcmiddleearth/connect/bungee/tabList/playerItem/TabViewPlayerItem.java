@@ -3,18 +3,16 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.mcmiddleearth.connect.bungee.tabList;
+package com.mcmiddleearth.connect.bungee.tabList.playerItem;
 
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.logging.Logger;
 
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import com.mcmiddleearth.connect.Channel;
 import com.mcmiddleearth.connect.log.Log;
-import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.protocol.packet.PlayerListItem;
 
 /**

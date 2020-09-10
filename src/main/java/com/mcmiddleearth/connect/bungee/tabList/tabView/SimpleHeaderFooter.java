@@ -1,17 +1,13 @@
-package com.mcmiddleearth.connect.bungee.tabList;
+package com.mcmiddleearth.connect.bungee.tabList.tabView;
 
 import com.mcmiddleearth.connect.bungee.ConnectBungeePlugin;
 import com.mcmiddleearth.connect.bungee.ServerInformation;
 import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.protocol.packet.PlayerListHeaderFooter;
 
-import java.sql.Time;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.concurrent.TimeUnit;
-import java.util.logging.Logger;
 
 public class SimpleHeaderFooter implements IHeaderFooter {
 

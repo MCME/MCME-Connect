@@ -28,8 +28,8 @@ import com.mcmiddleearth.connect.bungee.Handler.TpahereHandler;
 import com.mcmiddleearth.connect.bungee.listener.CommandListener;
 import com.mcmiddleearth.connect.bungee.listener.ConnectionListener;
 import com.mcmiddleearth.connect.bungee.listener.PluginMessageListener;
-import com.mcmiddleearth.connect.bungee.tabList.PlayerItemUpdater;
 import com.mcmiddleearth.connect.bungee.tabList.TabViewManager;
+import com.mcmiddleearth.connect.bungee.tabList.playerItem.PlayerItemUpdater;
 import com.mcmiddleearth.connect.bungee.vanish.VanishHandler;
 import com.mcmiddleearth.connect.bungee.vanish.VanishListener;
 import com.mcmiddleearth.connect.bungee.warp.MyWarpDBConnector;
@@ -57,11 +57,11 @@ public class ConnectBungeePlugin extends Plugin {
     
     private static ServerWatchdog watcher;
     
-    private static YamlConfiguration config = new YamlConfiguration();
+    private static final YamlConfiguration config = new YamlConfiguration();
             
     private static File configFile;
     
-    private static Set<String> noMVTP = new HashSet<>();
+    private static final Set<String> noMVTP = new HashSet<>();
           
     private static PlayerItemUpdater playerItemUpdater;
 
@@ -73,7 +73,7 @@ public class ConnectBungeePlugin extends Plugin {
     private ScheduledTask tpaCleanupScheduler;
     private ScheduledTask tpahereCleanupScheduler;
 
-    private Map<String,ServerInformation> serverInformation = new HashMap<>();
+    private final Map<String,ServerInformation> serverInformation = new HashMap<>();
 
     private Log logger;
     

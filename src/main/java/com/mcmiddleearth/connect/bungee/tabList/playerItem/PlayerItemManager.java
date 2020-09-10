@@ -3,17 +3,8 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.mcmiddleearth.connect.bungee.tabList;
+package com.mcmiddleearth.connect.bungee.tabList.playerItem;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import java.util.logging.Logger;
-
-import com.google.common.io.ByteArrayDataOutput;
-import com.google.common.io.ByteStreams;
 import com.mcmiddleearth.connect.Channel;
 import com.mcmiddleearth.connect.log.Log;
 import net.md_5.bungee.api.ProxyServer;
@@ -22,13 +13,16 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.protocol.packet.PlayerListItem;
 import net.md_5.bungee.protocol.packet.PlayerListItem.Item;
 
+import java.util.*;
+
 /**
  *
  * @author Eriol_Eandur
  */
 public class PlayerItemManager {
-    
-    private final static Map<String,Map<UUID,TabViewPlayerItem>> playerItems =  new HashMap<>();
+
+    //Server name, player UUID, tab view item
+    private final static Map<String,Map<UUID, TabViewPlayerItem>> playerItems =  new HashMap<>();
 
     public static synchronized Set<TabViewPlayerItem> updateAfk(UUID uuid, boolean afk) {
         Set<TabViewPlayerItem> result = new HashSet<>();

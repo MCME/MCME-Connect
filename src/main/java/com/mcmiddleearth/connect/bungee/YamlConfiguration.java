@@ -34,7 +34,13 @@ import org.yaml.snakeyaml.Yaml;
 public class YamlConfiguration {
     
     private Map<String,Object> map = new HashMap<>();
-    
+
+    public YamlConfiguration(Map<String,Object> map) {
+        this.map = map;
+    }
+
+    public YamlConfiguration() {}
+
     public void load(File file) {
         Yaml yaml = new Yaml();
         try {
@@ -72,7 +78,9 @@ public class YamlConfiguration {
     public List<String> getStringList(String key) {
         return (List<String>)getValue(key);
     }
-    
+
+    public List<Object> getList(String key) {return (List<Object>)getValue(key); }
+
     private Object getValue(String key) {
 //Logger.getGlobal().info("Key: "+key);
 //Logger.getGlobal().info("Keysplit: "+key.split("\\.").length);
