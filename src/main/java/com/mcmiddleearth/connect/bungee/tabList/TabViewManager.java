@@ -1,10 +1,13 @@
 package com.mcmiddleearth.connect.bungee.tabList;
 
 import com.mcmiddleearth.connect.bungee.ConnectBungeePlugin;
+import com.mcmiddleearth.connect.bungee.YamlConfiguration;
 import com.mcmiddleearth.connect.bungee.tabList.playerItem.PlayerItemManager;
 import com.mcmiddleearth.connect.bungee.tabList.playerItem.TabViewPlayerItem;
 import com.mcmiddleearth.connect.bungee.tabList.tabView.GlobalTabView;
 import com.mcmiddleearth.connect.bungee.tabList.tabView.ITabView;
+import com.mcmiddleearth.connect.bungee.tabList.tabView.ServerTabView;
+import com.mcmiddleearth.connect.bungee.tabList.tabView.configuration.ITabViewConfig;
 import com.mcmiddleearth.connect.bungee.tabList.tabView.configuration.ViewableTabViewConfig;
 import com.mcmiddleearth.connect.log.Log;
 import net.md_5.bungee.ServerConnection;
@@ -37,7 +40,45 @@ public class TabViewManager implements Listener {
                                               "tabList.yml");
 
     static {
-        tabViews.put(defaultView, new GlobalTabView(new ViewableTabViewConfig(configFile, "GlobalView")));
+        YamlConfiguration config = new YamlConfiguration();
+        config.load(configFile);
+        for(String key: config.getKeys()) {
+            Map<String, Object> map = config.getSection(key);
+            YamlConfiguration tabViewConfig = new YamlConfiguration(map);
+            String type = tabViewConfig.getString("type", "GlobalTabView");
+            createTabView(type, key, tabViewConfig);
+        }
+        //tabViews.put(defaultView, new GlobalTabView(new ViewableTabViewConfig(configFile, "GlobalView")));
+    }
+
+    public static void createTabView(String type, String key, YamlConfiguration tabViewConfig) {
+        switch(type) {
+            case "GlobalTabView":
+                tabViews.put(key, new GlobalTabView(new ViewableTabViewConfig(tabViewConfig)));
+                break;
+            case "ServerTabView":
+                tabViews.put(key, new ServerTabView(new ViewableTabViewConfig(tabViewConfig)));
+                break;
+        }
+    }
+
+    public static void reloadConfig() {
+        YamlConfiguration config = new YamlConfiguration();
+        config.load(configFile);
+        for(String key: config.getKeys()) {
+            Map<String, Object> map = config.getSection(key);
+            YamlConfiguration tabViewConfig = new YamlConfiguration(map);
+            ITabView view = tabViews.get(key);
+            if(view!=null) {
+                view.getConfig().reload(tabViewConfig);
+            } else {
+                String type = tabViewConfig.getString("type", "GlobalTabView");
+                createTabView(type, key, tabViewConfig);
+            }
+        }
+        // add player to default view
+        //remove all viewers
+        //remove all tabViews
     }
 
     @EventHandler

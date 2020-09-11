@@ -165,7 +165,7 @@ public abstract class AbstractViewableTabView implements ITabView{
     @Override
     public synchronized void addViewer(ProxiedPlayer player) {
 //Logger.getLogger(GlobalTabView.class.getSimpleName()).info("AddPlayer: "+player.getName()+" **********************************");
-        if(player.getUniqueId()!=null) {
+        if(player.getUniqueId()!=null && isViewerAllowedOn(player.getServer().getInfo().getName())) {
             viewers.add(player.getUniqueId());
             Set<TabViewPlayerItem> tabViewItems = PlayerItemManager.getPlayerItems();
             if(!tabViewItems.isEmpty()) {
@@ -231,8 +231,8 @@ public abstract class AbstractViewableTabView implements ITabView{
     protected abstract void sendToViewers(Set<UUID> viewers, PlayerListItem packet);
 
     @Override
-    public boolean isAllowedOn(String server) {
-        return true;
+    public boolean isViewerAllowedOn(String server) {
+        return getConfig().getViewerServers().contains(server);
     }
 
     protected abstract boolean isDisplayed(TabViewPlayerItem item);
@@ -263,7 +263,7 @@ public abstract class AbstractViewableTabView implements ITabView{
         this.headerFooter = headerFooter;
     }
 
-    protected ViewableTabViewConfig getConfig() {
+    public ViewableTabViewConfig getConfig() {
         return config;
     }
 }

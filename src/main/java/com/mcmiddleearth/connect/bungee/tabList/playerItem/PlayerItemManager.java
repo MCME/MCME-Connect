@@ -186,6 +186,15 @@ public class PlayerItemManager {
         });
         return result;
     }
-    
+
+    public static String getServer(TabViewPlayerItem item) {
+        for(Map.Entry<String,Map<UUID, TabViewPlayerItem>> items: playerItems.entrySet()) {
+            if(items.getValue().containsKey(item.getUuid())) {
+                return items.getKey();
+            }
+
+        }
+        return "";
+    }
 
 }

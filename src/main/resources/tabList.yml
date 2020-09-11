@@ -2,44 +2,21 @@
 globalView:
   # name of providing java class
   type: GlobalTabView
-  # servers on which this tab view is available
-  servers:
+  # players on these servers will be displayed
+  displayedServers:
     - world
     - moria
     - plotworld
     - freebuild
     - themedbuilds
-  # prefix may consist of several parts
-  # permissions for display of part can be configured
-  # only one permission is required for display unless 'requireAllPermissions' is true
-  prefix:
-    - moderator:
-        permissions:
-          - "group.badge_moderator"
-        text: "§6M"
-  # suffix may consist of several parts
-  # permissions for display of part can be configured
-  # only one permission is required for display unless 'requireAllPermissions' is true
-  suffix:
-    - badge:
-        permissions:
-          - "group.badge_tours"
-          - "group.badge_minigames"
-          - "group.badge_animations"
-          - "group.badge_voxel"
-          - "group.badge_worldeditlimited"
-          - "group.badge_worldeditfull"
-          - "group.badge_moderator"
-        requireAllPermisssion: false
-        text: "~"
-  # server text may consist of several parts
-  # connected server conditions for each part to be displayed can be configured
-  server:
-    - pvp:
-        servers:
-          - "pvp"
-        text: "$7PvP"
-  afk: "§8AFK"
+  # servers on which this tab view is available
+  viewerServers:
+    - world
+    - moria
+    - plotworld
+    - freebuild
+    - themedbuilds
+    - pvp
   # supported placeholder {RoleColor], {Role}, {Player}, {Ping} "Server", {Time}, {CurrentTick},
   # {PaperVersion}, {BukkitVersion}, {MinecraftVersion}, {ViewDistance}, {WorldType},
   # {TPS_1}, {TPS_5}, {TPS_15}, {Welcome}
@@ -48,6 +25,7 @@ globalView:
   # supported conditions:
   #         permissions: list of permission nodes, player needs one of them to display the text
   #                      except "requireAllPermissions is set to true
+  #         requireAllPermissions: default false
   #         server: list of server names, player needs to be connected to one of them to display the text
   #         afk: boolean to indicate the afk status to display the text
   # set "shorten: true" for one part if you want that part truncated if the text is longer than maxItem Length
@@ -79,5 +57,7 @@ globalView:
         servers:
           - "pvp"
   maxPlayerItemLength: 20
+  lighten: vanish
+  darken: afk
 
 

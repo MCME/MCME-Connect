@@ -8,6 +8,7 @@ package com.mcmiddleearth.connect.bungee.tabList.tabView;
 import java.util.Set;
 
 import com.mcmiddleearth.connect.bungee.tabList.playerItem.TabViewPlayerItem;
+import com.mcmiddleearth.connect.bungee.tabList.tabView.configuration.ITabViewConfig;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.protocol.packet.PlayerListHeaderFooter;
 
@@ -40,5 +41,7 @@ public interface ITabView {
 
     void handleHeaderFooter(ProxiedPlayer vanillaRecipient, PlayerListHeaderFooter packet);
 
-    boolean isAllowedOn(String server);
+    boolean isViewerAllowedOn(String server);
+
+    ITabViewConfig getConfig();
 }

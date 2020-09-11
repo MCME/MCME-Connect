@@ -2,15 +2,15 @@ package com.mcmiddleearth.connect.bungee.tabList.tabView.configuration;
 
 import java.util.List;
 
-public class PlayerItemConfig {
+public class PlayerItemPartConfig {
 
     private String text;
     private List<String> permissions;
     private boolean shorten;
-    private boolean afk;
+    private Boolean afk;
     private boolean requireAllPermissions;
     private List<String> servers;
-    private boolean vanished;
+    private Boolean vanished;
 
     public String getText() {
         return text;
@@ -36,11 +36,11 @@ public class PlayerItemConfig {
         this.shorten = shorten;
     }
 
-    public boolean isAfk() {
+    public Boolean isAfk() {
         return afk;
     }
 
-    public void setAfk(boolean afk) {
+    public void setAfk(Boolean afk) {
         this.afk = afk;
     }
 
@@ -60,11 +60,11 @@ public class PlayerItemConfig {
         this.servers = servers;
     }
 
-    public boolean isVanished() {
+    public Boolean isVanished() {
         return vanished;
     }
 
-    public void setVanished(boolean vanished) {
+    public void setVanished(Boolean vanished) {
         this.vanished = vanished;
     }
 }

@@ -19,10 +19,7 @@ package com.mcmiddleearth.connect.bungee;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.yaml.snakeyaml.Yaml;
@@ -81,7 +78,7 @@ public class YamlConfiguration {
 
     public List<Object> getList(String key) {return (List<Object>)getValue(key); }
 
-    private Object getValue(String key) {
+    public Object getValue(String key) {
 //Logger.getGlobal().info("Key: "+key);
 //Logger.getGlobal().info("Keysplit: "+key.split("\\.").length);
         return getValue(map, key.split("\\."));
@@ -99,5 +96,9 @@ public class YamlConfiguration {
         } else {
             return submap.get(subkeys[0]);
         }
+    }
+
+    public Set<String> getKeys() {
+        return map.keySet();
     }
 }
