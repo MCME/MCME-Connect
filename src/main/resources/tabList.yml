@@ -22,6 +22,7 @@ globalView:
   # {TPS_1}, {TPS_5}, {TPS_15}, {Welcome}
   header: "§eWelcome to §6§lMCME §f{Player}"
   footer: "§6Time: §e{Time} §4| §6Node: §e{Server}\n§6Ping: {Ping} §4| {TPS_1} tps"
+  # supported placeholder {RoleColor], {Player}
   # supported conditions:
   #         permissions: list of permission nodes, player needs one of them to display the text
   #                      except "requireAllPermissions is set to true
@@ -29,35 +30,55 @@ globalView:
   #         server: list of server names, player needs to be connected to one of them to display the text
   #         afk: boolean to indicate the afk status to display the text
   # set "shorten: true" for one part if you want that part truncated if the text is longer than maxItem Length
-  # if several parts have "shorten: true" a random part will be shortened.
+  # if several parts have "shorten: true" parts will be shortened in order of appearance
   playerItem:
-    - moderator:
-        text: "§6M"
-        permissions:
-          - "group.badge_moderator"
-    - playername:
-        text: "{RoleColor}{Player}"
-        shorten: true
-    - badges:
-        text: "~"
-        permissions:
-          - "group.badge_tours"
-          - "group.badge_minigames"
-          - "group.badge_animations"
-          - "group.badge_voxel"
-          - "group.badge_worldeditlimited"
-          - "group.badge_worldeditfull"
-          - "group.badge_moderator"
-        requireAllPermisssions: false
-    - afk:
-        text: "§8AFK"
-        afk: true
-    - pvp:
-        text: "$7PvP"
-        servers:
-          - "pvp"
-  maxPlayerItemLength: 20
-  lighten: vanish
-  darken: afk
+    format:
+      - vanishItalics:
+          text: "§o"
+          vanished: true
+      - moderator:
+          text: "§6M"
+          permissions:
+            - "group.badge_moderator"
+      - playername:
+          text: "{RoleColor}{Player}"
+          shorten: true
+      - badges:
+          text: "~"
+          permissions:
+            - "group.badge_tours"
+            - "group.badge_minigames"
+            - "group.badge_animations"
+            - "group.badge_voxel"
+            - "group.badge_worldeditlimited"
+            - "group.badge_worldeditfull"
+            - "group.badge_moderator"
+          requireAllPermisssions: false
+      - afk:
+          text: "#888888AFK"
+          afk: true
+      - vanish:
+          text: "§fV"
+          vanished: true
+      - pvp:
+          text: "$7PvP"
+          servers:
+            - "pvp"
+    maxLength: 20
+    colorAdjustment:
+      afk:
+        method: ADJUST
+        hue: 1
+        saturation: 0.8
+        brightness: 0.8
+      vanished:
+        method: ADJUST
+        hue: 1
+        saturation: 0.7
+        brightness: 1.2
+  #     some_condition
+  #        method: BRIGHTEN
+  #     some_other_condition:
+  #        method: DARKEN
 
 

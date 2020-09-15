@@ -28,6 +28,7 @@ import com.mcmiddleearth.connect.bungee.Handler.TpahereHandler;
 import com.mcmiddleearth.connect.bungee.listener.CommandListener;
 import com.mcmiddleearth.connect.bungee.listener.ConnectionListener;
 import com.mcmiddleearth.connect.bungee.listener.PluginMessageListener;
+import com.mcmiddleearth.connect.bungee.tabList.TabViewCommand;
 import com.mcmiddleearth.connect.bungee.tabList.TabViewManager;
 import com.mcmiddleearth.connect.bungee.tabList.playerItem.PlayerItemUpdater;
 import com.mcmiddleearth.connect.bungee.vanish.VanishHandler;
@@ -73,6 +74,8 @@ public class ConnectBungeePlugin extends Plugin {
     private ScheduledTask tpaCleanupScheduler;
     private ScheduledTask tpahereCleanupScheduler;
 
+    private TabViewCommand tabViewCommand;
+
     private final Map<String,ServerInformation> serverInformation = new HashMap<>();
 
     private Log logger;
@@ -81,7 +84,7 @@ public class ConnectBungeePlugin extends Plugin {
     public void onEnable() {
         instance = this;
         configFile = new File(getDataFolder(),"config.yml");
-        saveDefaultConfig();
+        saveDefaultConfig(configFile, "config.yml");
         loadConfig();
         logger = new BungeeLog();
         RestartHandler.init();
@@ -108,6 +111,9 @@ public class ConnectBungeePlugin extends Plugin {
                          new ConnectionListener());
         getProxy().getPluginManager().registerListener(this, new TabViewManager());
         playerItemUpdater = new PlayerItemUpdater();
+        TabViewManager.init();
+        tabViewCommand = new TabViewCommand();
+        ProxyServer.getInstance().getPluginManager().registerCommand(this, tabViewCommand);
     }
     
     @Override
@@ -193,11 +199,11 @@ public class ConnectBungeePlugin extends Plugin {
         }
     }*/
     
-    private void saveDefaultConfig() {
+    public void saveDefaultConfig(File configFile, String resource) {
         if(!configFile.exists()) {
             try {
                 configFile.createNewFile();
-                try(InputStreamReader in = new InputStreamReader(getResourceAsStream("config.yml"));
+                try(InputStreamReader in = new InputStreamReader(getResourceAsStream(resource));
                     FileWriter fw = new FileWriter(configFile)) {
                     char[] buf = new char[1024];
                     int read = 1;
@@ -266,5 +272,9 @@ public class ConnectBungeePlugin extends Plugin {
             serverInformation.put(name,info);
         }
         return info;
+    }
+
+    public TabViewCommand getTabViewCommand() {
+        return tabViewCommand;
     }
 }

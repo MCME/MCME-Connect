@@ -1,0 +1,57 @@
+# supported conditions:
+#         permissions: list of permission nodes, player needs one of them to display the text
+#                      except "requireAllPermissions is set to true
+#         requireAllPermissions: default false
+#         server: list of server names, player needs to be connected to one of them to display the text
+#         afk: boolean to indicate the afk status to display the text
+# set "shorten: true" for one part if you want that part truncated if the text is longer than maxItem Length
+# if several parts have "shorten: true" a random part will be shortened.
+default:
+  format:
+    - vanishItalics:
+        text: "§o"
+        vanished: true
+    - moderator:
+        text: "§6M"
+        permissions:
+          - "group.badge_moderator"
+    - playername:
+        text: "{RoleColor}{Player}"
+        shorten: true
+    - badges:
+        text: "~"
+        permissions:
+          - "group.badge_tours"
+          - "group.badge_minigames"
+          - "group.badge_animations"
+          - "group.badge_voxel"
+          - "group.badge_worldeditlimited"
+          - "group.badge_worldeditfull"
+          - "group.badge_moderator"
+        requireAllPermisssions: false
+    - afk:
+        text: "#888888AFK"
+        afk: true
+    - vanish:
+        text: "§fV"
+        vanished: true
+    - pvp:
+        text: "$7PvP"
+        servers:
+          - "pvp"
+  maxLength: 20
+  colorAdjustment:
+    afk:
+      method: ADJUST
+      hue: 1
+      saturation: 0.8
+      brightness: 0.8
+    vanished:
+      method: ADJUST
+      hue: 1
+      saturation: 0.7
+      brightness: 1.2
+#     some_condition
+#        method: BRIGHTEN
+#     some_other_condition: 
+#        method: DARKEN

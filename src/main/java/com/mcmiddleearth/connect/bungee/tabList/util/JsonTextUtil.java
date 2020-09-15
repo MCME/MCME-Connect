@@ -29,11 +29,9 @@ public class JsonTextUtil {
                 for(int j = 0; j < oldColorSplit.length; j++) {
                     if(!firstPart) {
                         JsonArray extra = new JsonArray();
-                        current.add("extra",extra);
+                        current.add("extra", extra);
                         current = new JsonObject();
                         extra.add(current);
-                    } else {
-                        firstPart = false;
                     }
                     if (j == 0) {
                         if(!color.equals("")) {
@@ -49,6 +47,13 @@ public class JsonTextUtil {
                             case 'n': status.underline = true; current.addProperty("underline",true); break;
                             case 'o': status.italic = true; current.addProperty("italic",true); break;
                             case 'r':
+                                if(status.obfuscated) current.addProperty("obfuscated",false);
+                                if(status.bold) current.addProperty("bold",false);
+                                if(status.strikethrough) current.addProperty("strikethrough",false);
+                                if(status.underline) current.addProperty("underline",false);
+                                if(status.italic) current.addProperty("italic",false);
+                                current.addProperty("color", adjustColor(ChatColor.getByChar('f'),adjust));
+                                break;
                             case '0':
                             case '1':
                             case '2':
@@ -65,33 +70,12 @@ public class JsonTextUtil {
                             case 'd':
                             case 'e':
                             case 'f':
-                                if(status.obfuscated) current.addProperty("obfuscated",false);
-                                if(status.bold) current.addProperty("bold",false);
-                                if(status.strikethrough) current.addProperty("strikethrough",false);
-                                if(status.underline) current.addProperty("underline",false);
-                                if(status.italic) current.addProperty("italic",false);
                                 current.addProperty("color", adjustColor(ChatColor.getByChar(formattingCode),adjust));
-                            /*case '0': resetFormat(current, status,"black"); break;
-                            case '1': resetFormat(current, status,"dark_blue"); break;
-                            case '2': resetFormat(current, status,"dark_green"); break;
-                            case '3': resetFormat(current, status,"dark_cyan"); break;
-                            case '4': resetFormat(current, status,"dark_red"); break;
-                            case '5': resetFormat(current, status,"purple"); break;
-                            case '6': resetFormat(current, status,"gold"); break;
-                            case '7': resetFormat(current, status,"gray"); break;
-                            case '8': resetFormat(current, status,"dark_gray"); break;
-                            case '9': resetFormat(current, status,"blue"); break;
-                            case 'a': resetFormat(current, status,"green"); break;
-                            case 'b': resetFormat(current, status,"aqua"); break;
-                            case 'c': resetFormat(current, status,"red"); break;
-                            case 'd': resetFormat(current, status,"light_purple"); break;
-                            case 'e': resetFormat(current, status,"yellow"); break;*/
                         }
                         oldColorSplit[j] = oldColorSplit[j].substring(1);
                     }
-                    if(oldColorSplit[j].length()>0) {
-                        current.addProperty("text",oldColorSplit[j]);
-                    }
+                    current.addProperty("text",oldColorSplit[j]);
+                    firstPart = false;
                 }
             }
         }
@@ -99,7 +83,7 @@ public class JsonTextUtil {
     }
 
     public static String adjustColor(ChatColor color, ColorAdjustment adjust) {
-        if(adjust.equals(ColorAdjustment.NONE)) {
+        if(adjust.getMethod().equals(AdjustmentMethod.NONE)) {
             return color.getName();
         } else {
             return adjustColor(color.getColor(),adjust);
@@ -113,7 +97,7 @@ public class JsonTextUtil {
      * @return hex RGB color string
      */
     public static String adjustColor(String color, ColorAdjustment adjust) {
-        if(adjust.equals(ColorAdjustment.NONE)) {
+        if(adjust.getMethod().equals(AdjustmentMethod.NONE)) {
             return color;
         } else {
             return adjustColor(Color.decode(color),adjust);
@@ -121,24 +105,22 @@ public class JsonTextUtil {
     }
 
     public static String adjustColor(Color color, ColorAdjustment adjust) {
-        switch (adjust) {
-            case BRIGHTEN: return Integer.toHexString(color.brighter().getRGB()).substring(2);
-            case DARKEN: return Integer.toHexString(color.darker().getRGB()).substring(2);
+        switch (adjust.method) {
+            case BRIGHTEN: return "#"+Integer.toHexString(color.brighter().getRGB()).substring(2);
+            case DARKEN: return "#"+Integer.toHexString(color.darker().getRGB()).substring(2);
             case GRAYOUT:
                 float[] hsb = Color.RGBtoHSB(color.getRed(),color.getGreen(),color.getBlue(),null);
-                color = Color.getHSBColor(hsb[0],hsb[1]*0.5f,hsb[2]*0.8f);
-                return Integer.toHexString(color.darker().getRGB()).substring(2);
-            default: return Integer.toHexString(color.getRGB()).substring(2);
+                color = Color.getHSBColor(hsb[0],hsb[1]*0.7f,hsb[2]*0.8f);
+                return "#"+Integer.toHexString(color.getRGB()).substring(2);
+            case ADJUST:
+                hsb = Color.RGBtoHSB(color.getRed(),color.getGreen(),color.getBlue(),null);
+                color = Color.getHSBColor(hsb[0]*adjust.getHue(),
+                                          Math.min(hsb[1]*adjust.getSaturation(),1),
+                                          Math.min(hsb[2]*adjust.getBrightness(),1));
+                return "#"+Integer.toHexString(color.getRGB()).substring(2);
+            default: return "#"+Integer.toHexString(color.getRGB()).substring(2);
         }
     }
-
-    /*private static void resetFormat(JsonObject current, Format status, String color) {
-        if(status.obfuscated) current.addProperty("obfuscated",false);
-        if(status.bold) current.addProperty("bold",false);
-        if(status.strikethrough) current.addProperty("strikethrough",false);
-        if(status.underline) current.addProperty("underline",false);
-        if(status.italic) current.addProperty("italic",false);
-    }*/
 
     private static class Format {
         public boolean obfuscated;
@@ -148,11 +130,52 @@ public class JsonTextUtil {
         public boolean italic;
     }
 
-    public enum ColorAdjustment {
+    public enum AdjustmentMethod {
         BRIGHTEN,
         DARKEN,
         GRAYOUT,
+        ADJUST,
         NONE;
+    }
+
+    public static class ColorAdjustment {
+
+        private AdjustmentMethod method;
+        private float hue=1;
+        private float saturation=1;
+        private float brightness=1;
+
+        public ColorAdjustment(AdjustmentMethod method) {
+            this.method = method;
+        }
+
+        public float getHue() {
+            return hue;
+        }
+
+        public void setHue(float hue) {
+            this.hue = hue;
+        }
+
+        public float getSaturation() {
+            return saturation;
+        }
+
+        public void setSaturation(float saturation) {
+            this.saturation = saturation;
+        }
+
+        public float getBrightness() {
+            return brightness;
+        }
+
+        public void setBrightness(float brightness) {
+            this.brightness = brightness;
+        }
+
+        public AdjustmentMethod getMethod() {
+            return method;
+        }
     }
 
 }

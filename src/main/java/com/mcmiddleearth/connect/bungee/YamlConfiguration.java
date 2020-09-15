@@ -59,14 +59,37 @@ public class YamlConfiguration {
     
     public int getInt(String key, int defaultValue) {
         Object value = getValue(key);
-        return (value!=null?(Integer)value:defaultValue);
+        if(value instanceof Integer) {
+            return (Integer)value;
+        } else if(value instanceof  Double) {
+            return ((Double) value).intValue();
+        } else {
+            return defaultValue;
+        }
     }
-    
+
     public double getDouble(String key, double defaultValue) {
         Object value = getValue(key);
-        return (value!=null?(Double)value:defaultValue);
+        if(value instanceof Integer) {
+            return ((Integer)value).doubleValue();
+        } else if(value instanceof  Double) {
+            return (Double) value;
+        } else {
+            return defaultValue;
+        }
     }
-    
+
+    public float getFloat(String key, float defaultValue) {
+        Object value = getValue(key);
+        if(value instanceof Integer) {
+            return ((Integer)value).floatValue();
+        } else if(value instanceof  Double) {
+            return ((Double) value).floatValue();
+        } else {
+            return defaultValue;
+        }
+    }
+
     public String getString(String key, String defaultValue) {
         Object value = getValue(key);
         return (value!=null?(String)value:defaultValue);

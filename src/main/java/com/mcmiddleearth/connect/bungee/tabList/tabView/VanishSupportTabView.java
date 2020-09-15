@@ -11,6 +11,7 @@ import net.md_5.bungee.protocol.packet.PlayerListItem;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.UUID;
+import java.util.logging.Logger;
 
 public abstract class VanishSupportTabView extends AbstractViewableTabView {
 
@@ -76,6 +77,8 @@ public abstract class VanishSupportTabView extends AbstractViewableTabView {
                 break;
             case UPDATE_DISPLAY_NAME:
                 logPacketOut(component + ".display", packet);
+                //Logger.getLogger("VanishSupportTabView").info("display packet:");
+                //Arrays.stream(packet.getItems()).forEach(item->Logger.getLogger("VanishSupportTabView").info(item.getDisplayName()));
                 break;
             case REMOVE_PLAYER:
                 logPacketOut(component + ".remove", packet);
@@ -88,6 +91,12 @@ public abstract class VanishSupportTabView extends AbstractViewableTabView {
                 break;
         }
 //Logger.getLogger(GlobalTabView.class.getSimpleName()).info("Viewers: " + viewers.size());
+        PlayerListItem publicPacket = new PlayerListItem();
+        publicPacket.setAction(packet.getAction());
+        PlayerListItem.Item[] items = packet.getItems();
+        items = Arrays.stream(items).filter(item -> !VanishHandler.isVanished(item.getUuid())).toArray(PlayerListItem.Item[]::new);
+        publicPacket.setItems(items);
+
         viewers.forEach(uuid -> {
             ProxiedPlayer player = ProxyServer.getInstance().getPlayer(uuid);
             if(player!=null && VanishHandler.hasVanishSeePermission(player)) {
@@ -95,14 +104,11 @@ public abstract class VanishSupportTabView extends AbstractViewableTabView {
                 player.unsafe().sendPacket(packet);
             }
         });
-        PlayerListItem.Item[] items = packet.getItems();
-        items = Arrays.stream(items).filter(item -> !VanishHandler.isVanished(item.getUuid())).toArray(PlayerListItem.Item[]::new);
-        packet.setItems(items);
         viewers.forEach(uuid -> {
             ProxiedPlayer player = ProxyServer.getInstance().getPlayer(uuid);
             if(player!=null && !VanishHandler.hasVanishSeePermission(player)) {
 //Logger.getLogger(GlobalTabView.class.getSimpleName()).info("Send packet to: " + player.getName());
-                player.unsafe().sendPacket(packet);
+                player.unsafe().sendPacket(publicPacket);
             }
         });
     }

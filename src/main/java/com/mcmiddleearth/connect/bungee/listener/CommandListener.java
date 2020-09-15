@@ -26,10 +26,14 @@ import com.mcmiddleearth.connect.bungee.Handler.RestorestatsHandler;
 import com.mcmiddleearth.connect.bungee.Handler.ThemeHandler;
 import com.mcmiddleearth.connect.bungee.Handler.TpaHandler;
 import com.mcmiddleearth.connect.bungee.Handler.TpahereHandler;
+import com.mcmiddleearth.connect.bungee.tabList.TabViewManager;
 import com.mcmiddleearth.connect.bungee.vanish.VanishHandler;
 import com.mcmiddleearth.connect.bungee.warp.WarpHandler;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -38,6 +42,7 @@ import net.md_5.bungee.api.event.ChatEvent;
 import net.md_5.bungee.api.event.TabCompleteEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
+import sun.tools.jconsole.Tab;
 
 /**
  *
@@ -50,16 +55,10 @@ public class CommandListener implements Listener {
     
     @EventHandler
     public void onChat(ChatEvent event) {
-//Logger.getGlobal().info("Has perms: "+((ProxiedPlayer)event.getSender()).hasPermission(Permission.TP)
-// +" "+((ProxiedPlayer)event.getSender()).hasPermission(Permission.WORLD));
         if(event.isCommand() && event.getSender() instanceof ProxiedPlayer) {
-//Logger.getGlobal().info("Is command!");
             ProxiedPlayer player = (ProxiedPlayer) event.getSender();
             String[] message = replaceAlias(event.getMessage()).split(" ");
-//if(message.length>1) 
-//Logger.getGlobal().info("server "+message[0]+" "+message[1]+" "+ProxyServer.getInstance().getServerInfo(message[1]));
             if(message[0].equalsIgnoreCase("/tp") && message.length>1) {
-//Logger.getGlobal().info("/tp!");
                 if(player.hasPermission(Permission.TP)) {
                     if(message.length<3) {
                         ProxiedPlayer destination = getPlayer(message[1]);
@@ -107,7 +106,6 @@ public class CommandListener implements Listener {
                     }
                 }
             } else if(message[0].equalsIgnoreCase("/tpa") && message.length>1) {
-//Logger.getGlobal().info("/tpa!");
                 if(player.hasPermission(Permission.TPA)) {
                     ProxiedPlayer destination = getPlayer(message[1]);
                     if(destination != null 
@@ -126,7 +124,6 @@ public class CommandListener implements Listener {
                     }
                 }
             } else if(message[0].equalsIgnoreCase("/tpahere") && message.length>1) {
-//Logger.getGlobal().info("/tpa!");
                 if(player.hasPermission(Permission.TPA)) {
                     ProxiedPlayer destination = getPlayer(message[1]);
                     if(destination != null 
@@ -157,11 +154,9 @@ public class CommandListener implements Listener {
                     event.setCancelled(true);
                 }
             } else if(message[0].equalsIgnoreCase("/tphere") && message.length>1) {
-//Logger.getGlobal().info("/tphere!");
                 if(player.hasPermission(Permission.TPHERE)) {
                     ProxiedPlayer target = getPlayer(message[1]);
-//Logger.getGlobal().info("/tphere! 2");
-                    if(target != null 
+                    if(target != null
                             && !target.getServer().getInfo().getName()
                                     .equals(player.getServer().getInfo().getName())) {
                         if(target.hasPermission(Permission.WORLD+"."
@@ -185,13 +180,11 @@ public class CommandListener implements Listener {
                 if(!player.getServer().getInfo().getName()
                         .equals(themedWorld)) {
                     if(!isMvtpAllowed(player)) {
-//      wrong config key                              .equals(ConnectBungeePlugin.getLegacyRedirectFrom())) {
                         player.sendMessage(new ComponentBuilder(
                                                 "/theme isn't allowed here.")
                                                 .color(ChatColor.RED).create());
                     } else {
                         if(player.hasPermission(Permission.WORLD+"."+themedWorld)) {
-    //Logger.getGlobal().info("handle");
                             if(!ThemeHandler.handle(player,themedWorld, event.getMessage())) {
                                 sendError(player);
                             }
@@ -207,17 +200,14 @@ public class CommandListener implements Listener {
                        || message[0].equalsIgnoreCase("/switch"))
                     && message.length>1
                     && ProxyServer.getInstance().getServerInfo(message[1])!=null) {
-//Logger.getGlobal().info("/mvtp");
                 String target = message[1];
                 if(!player.getServer().getInfo().getName().equals(target)) {
                     if(!isMvtpAllowed(player)) {
-//   wrong config key                                 .equals(ConnectBungeePlugin.getLegacyRedirectFrom())) {
                         player.sendMessage(new ComponentBuilder(
                                                 "/mvtp and /switch isn't allowed here.")
                                                 .color(ChatColor.RED).create());
                     } else {
                         if(player.hasPermission(Permission.WORLD+"."+target)) {
-    //Logger.getGlobal().info("handle");
                             if(message[0].equalsIgnoreCase("/mvtp")) {
                                 if(!MvtpHandler.handle(player.getName(),target)) {
                                     sendError(player);
@@ -236,9 +226,7 @@ public class CommandListener implements Listener {
                     event.setCancelled(true);
                 }
             } else if(WarpHandler.isWarpCommand(message)) {
-//Logger.getGlobal().info("handle Warp");
                 if(!isMvtpAllowed(player)) {
-//   wrong config key                                 .equals(ConnectBungeePlugin.getLegacyRedirectFrom())) {
                     player.sendMessage(new ComponentBuilder(
                                             "/warp isn't allowed here.")
                                             .color(ChatColor.RED).create());
@@ -281,15 +269,9 @@ public class CommandListener implements Listener {
     }
     
     
-/*    @EventHandler
-    public void onTabCompleteResponse(TabCompleteResponseEvent event) {
-Logger.getGlobal().info("Response:");        
-event.getSuggestions().forEach(name->Logger.getGlobal().info(name));
-    }*/
-    
+
     @EventHandler
     public void onTabComplete(TabCompleteEvent event) {
-//Logger.getGlobal().info("TAB: "+event.getCursor());
         String[] argtemp = event.getCursor().split(" ");
         if(event.getCursor().charAt(event.getCursor().length()-1)==' ') {
             argtemp = Arrays.copyOf(argtemp, argtemp.length+1);
@@ -298,19 +280,6 @@ event.getSuggestions().forEach(name->Logger.getGlobal().info(name));
         String[] args = argtemp;
         if(args.length>0) {
             switch(args[0]) {
-                /*case "/call":
-                case "/tpa":
-                case "/tpahere":
-                    Collection<ProxiedPlayer> players = ProxyServer.getInstance().getPlayers();
-                    if(args.length>1 && event.getSender() instanceof ProxiedPlayer) {
-                        players.stream()
-                               .filter(player -> 
-                                    player.getName().toLowerCase().startsWith(args[1].toLowerCase())
-                                 && player.getServer().getInfo().getName().equals(
-                                        ((ProxiedPlayer)event.getSender()).getServer().getInfo().getName()))
-                               .forEach(player -> event.getSuggestions().add(player.getName()));
-                    }
-                    break;*/
                 case "/mvtp":
                 case "/switch":
                     Collection<String> servers = ProxyServer.getInstance().getServers().keySet();
@@ -347,18 +316,11 @@ event.getSuggestions().forEach(name->Logger.getGlobal().info(name));
                         }
                     break;
                 default:
-//Logger.getGlobal().info("Default: "+args[0]+" "+args[0].startsWith("/"));
                     if(!args[0].startsWith("/")) {
                         suggestAllOtherPlayers(event,args[args.length-1]);
                     }
             }
         } 
-        /*if(event.getSuggestions().isEmpty()) {
-            Collection<ProxiedPlayer> players = ProxyServer.getInstance().getPlayers();
-            players.forEach(player -> event.getSuggestions().add(player.getName()));
-        }*/
-//Logger.getGlobal().info("Bungee:");        
-//event.getSuggestions().forEach(name->Logger.getGlobal().info(name));
     }
     
     private void suggestAllOtherPlayers(TabCompleteEvent event, String start) {

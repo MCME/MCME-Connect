@@ -57,7 +57,7 @@ public abstract class AbstractViewableTabView implements ITabView{
             PlayerListItem.Item item = new PlayerListItem.Item();
             item.setUuid(tabViewItem.getUuid());
             item.setUsername(tabViewItem.getUsername());
-            item.setDisplayName(getDisplayName(tabViewItem));
+            item.setDisplayName(getConfig().getDisplayName(tabViewItem));
             item.setGamemode(tabViewItem.getGamemode());
             String[][] prop = tabViewItem.getProperties();
             if(prop != null) {
@@ -66,9 +66,10 @@ public abstract class AbstractViewableTabView implements ITabView{
             item.setPing(tabViewItems.iterator().next().getPing());
             items[i] = item;
         }*/
-        packet.setItems(createTabviewItems(tabViewItems,true));//items);
+        packet.setItems(createTabviewItems(tabViewItems,PlayerListItem.Action.ADD_PLAYER));//items);
         packet.setAction(PlayerListItem.Action.ADD_PLAYER);
 
+        //ProxyServer.getInstance().getPlayers().forEach(player -> player.unsafe().sendPacket(packet));
         sendToViewers(viewers, packet);
     }
 
@@ -87,9 +88,10 @@ public abstract class AbstractViewableTabView implements ITabView{
             item.setGamemode(tabViewItem.getGamemode());
             items[i] = item;
         }*/
-        packet.setItems(createTabviewItems(tabViewItems,false));//items);
+        packet.setItems(createTabviewItems(tabViewItems,PlayerListItem.Action.UPDATE_GAMEMODE));//items);
         packet.setAction(PlayerListItem.Action.UPDATE_GAMEMODE);
 
+        //ProxyServer.getInstance().getPlayers().forEach(player -> player.unsafe().sendPacket(packet));
         sendToViewers(viewers, packet);
     }
 
@@ -108,9 +110,10 @@ public abstract class AbstractViewableTabView implements ITabView{
             item.setPing(tabViewItem.getPing());
             items[i] = item;
         }*/
-        packet.setItems(createTabviewItems(tabViewItems,false));//items);
+        packet.setItems(createTabviewItems(tabViewItems,PlayerListItem.Action.UPDATE_LATENCY));//items);
         packet.setAction(PlayerListItem.Action.UPDATE_LATENCY);
 
+        //ProxyServer.getInstance().getPlayers().forEach(player -> player.unsafe().sendPacket(packet));
         sendToViewers(viewers, packet);
     }
 
@@ -127,11 +130,13 @@ public abstract class AbstractViewableTabView implements ITabView{
             PlayerListItem.Item item = new PlayerListItem.Item();
             item.setUuid(tabViewItem.getUuid());
             ProxiedPlayer itemPlayer = ProxyServer.getInstance().getPlayer(item.getUuid());
-            item.setDisplayName(getDisplayName(tabViewItem));
+            item.setDisplayName(getConfig().getDisplayName(tabViewItem));
             items[i] = item;
         }*/
-        packet.setItems(createTabviewItems(tabViewItems,false));//items);
+        packet.setItems(createTabviewItems(tabViewItems,PlayerListItem.Action.UPDATE_DISPLAY_NAME));//items);
         packet.setAction(PlayerListItem.Action.UPDATE_DISPLAY_NAME);
+
+        //ProxyServer.getInstance().getPlayers().forEach(player -> player.unsafe().sendPacket(packet));
 
         sendToViewers(viewers, packet);
     }
@@ -151,9 +156,10 @@ public abstract class AbstractViewableTabView implements ITabView{
             item.setUuid(tabViewItem.getUuid());
             items[i] = item;
         }*/
-        packet.setItems(createTabviewItems(tabViewItems,false));//items);
+        packet.setItems(createTabviewItems(tabViewItems,PlayerListItem.Action.REMOVE_PLAYER));//items);
         packet.setAction(PlayerListItem.Action.REMOVE_PLAYER);
 
+        //ProxyServer.getInstance().getPlayers().forEach(player -> player.unsafe().sendPacket(packet));
         sendToViewers(viewers, packet);
     }
 
@@ -188,7 +194,7 @@ public abstract class AbstractViewableTabView implements ITabView{
                     item.setPing(tabViewItems.iterator().next().getPing());
                     items[i] = item;
                 }*/
-                packet.setItems(createTabviewItems(tabViewItems,true));//items);
+                packet.setItems(createTabviewItems(tabViewItems,PlayerListItem.Action.ADD_PLAYER));//items);
                 packet.setAction(PlayerListItem.Action.ADD_PLAYER);
 
                 sendToViewers(Sets.newHashSet(player.getUniqueId()), packet);
@@ -198,6 +204,7 @@ public abstract class AbstractViewableTabView implements ITabView{
 
     @Override
     public synchronized void removeViewer(ProxiedPlayer player) {
+        if(player==null) return;
         boolean removed = viewers.remove(player.getUniqueId());
 //viewers.forEach(viewer -> Logger.getLogger(GlobalTabView.class.getSimpleName()).info("stored: "+viewer.toString()));
 //Logger.getLogger(GlobalTabView.class.getSimpleName()).info("remove viewer 2: "+player.getUniqueId().toString()+" "+removed);
@@ -215,7 +222,7 @@ public abstract class AbstractViewableTabView implements ITabView{
                     item.setUuid(tabViewItem.getUuid());
                     items[i] = item;
                 }*/
-                packet.setItems(createTabviewItems(tabViewItems,false));//items);
+                packet.setItems(createTabviewItems(tabViewItems,PlayerListItem.Action.REMOVE_PLAYER));//items);
                 packet.setAction(PlayerListItem.Action.REMOVE_PLAYER);
 
                 sendToViewers(Sets.newHashSet(player.getUniqueId()), packet);
@@ -235,27 +242,45 @@ public abstract class AbstractViewableTabView implements ITabView{
         return getConfig().getViewerServers().contains(server);
     }
 
+    @Override
+    public boolean isViewerAllowed(ProxiedPlayer player) {
+        return isViewerAllowedOn(player.getServer().getInfo().getName());
+    }
+
     protected abstract boolean isDisplayed(TabViewPlayerItem item);
 
-    private PlayerListItem.Item[] createTabviewItems(Set<TabViewPlayerItem> playerItems, boolean includeProperties) {
+    private PlayerListItem.Item[] createTabviewItems(Set<TabViewPlayerItem> playerItems, PlayerListItem.Action action) {
         List<PlayerListItem.Item> itemList = new ArrayList<>();
         playerItems.stream().filter(this::isDisplayed).forEach(playerItem -> {
             PlayerListItem.Item item = new PlayerListItem.Item();
             item.setUuid(playerItem.getUuid());
-            item.setUsername(playerItem.getUsername());
-            item.setDisplayName(config.getDisplayName(playerItem));
-            item.setGamemode(playerItem.getGamemode());
-            String[][] prop = playerItem.getProperties();
-            if (includeProperties && prop != null) {
-                item.setProperties(prop.clone());
+            switch(action) {
+                case ADD_PLAYER:
+                    item.setUsername(playerItem.getUsername());
+                    String[][] prop = playerItem.getProperties();
+                    if (prop != null) {
+                        item.setProperties(prop.clone());
+                    }
+                    item.setDisplayName(config.getDisplayName(playerItem));//"{\"text\":\"test\"}");//
+                    item.setGamemode(playerItem.getGamemode());
+                    item.setPing(playerItem.getPing());//playerItems.iterator().next().getPing());
+                    break;
+                case UPDATE_DISPLAY_NAME:
+                    item.setDisplayName(config.getDisplayName(playerItem));//"{\"text\":\"test\"}");//
+                    break;
+                case UPDATE_LATENCY:
+                    item.setPing(playerItem.getPing());//playerItems.iterator().next().getPing());
+                    break;
+                case UPDATE_GAMEMODE:
+                    item.setGamemode(playerItem.getGamemode());
+                    break;
             }
-            item.setPing(playerItem.getPing());//playerItems.iterator().next().getPing());
             itemList.add(item);
         });
         return itemList.toArray(new PlayerListItem.Item[0]);
     }
 
-    protected Set<UUID> getViewers() {
+    public Set<UUID> getViewers() {
         return viewers;
     }
 
@@ -263,7 +288,11 @@ public abstract class AbstractViewableTabView implements ITabView{
         this.headerFooter = headerFooter;
     }
 
+    @Override
     public ViewableTabViewConfig getConfig() {
         return config;
     }
+
+    @Override
+    public int getPriority(String server) { return getConfig().getPriority(server);}
 }

@@ -5,7 +5,9 @@
  */
 package com.mcmiddleearth.connect.bungee.tabList.tabView;
 
+import java.util.Collection;
 import java.util.Set;
+import java.util.UUID;
 
 import com.mcmiddleearth.connect.bungee.tabList.playerItem.TabViewPlayerItem;
 import com.mcmiddleearth.connect.bungee.tabList.tabView.configuration.ITabViewConfig;
@@ -43,5 +45,11 @@ public interface ITabView {
 
     boolean isViewerAllowedOn(String server);
 
+    boolean isViewerAllowed(ProxiedPlayer player);
+
     ITabViewConfig getConfig();
+
+    Set<UUID> getViewers();
+
+    int getPriority(String server);
 }

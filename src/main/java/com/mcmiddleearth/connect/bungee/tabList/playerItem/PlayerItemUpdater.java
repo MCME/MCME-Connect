@@ -22,12 +22,15 @@ public class PlayerItemUpdater {
         updateTask = ProxyServer.getInstance().getScheduler().schedule(ConnectBungeePlugin.getInstance(), () -> {
             for (Map.Entry<String, ServerInfo> server : ProxyServer.getInstance().getServers().entrySet()) {
                 Log.info("PIUpdate","Server: "+server.getKey());
+
                 if (!server.getValue().getPlayers().isEmpty()) {
                     ProxiedPlayer sender = server.getValue().getPlayers().stream().findFirst().orElse(null);
                     Log.info("PIUpdate","Sender: "+sender.getName());
                     List<PlayerListItem.Item> removal = new ArrayList<>();
+
                     for (TabViewPlayerItem item : PlayerItemManager.getPlayerItems()) {
                         ProxiedPlayer search = ProxyServer.getInstance().getPlayer(item.getUuid());
+
                         if (search == null || !search.getServer().getInfo().getName().equals(server.getValue().getName())) {
                             PlayerListItem.Item removalItem = new PlayerListItem.Item();
                             removalItem.setUuid(item.getUuid());

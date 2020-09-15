@@ -7,10 +7,12 @@ import com.mcmiddleearth.connect.bungee.tabList.playerItem.TabViewPlayerItem;
 import com.mcmiddleearth.connect.bungee.tabList.tabView.GlobalTabView;
 import com.mcmiddleearth.connect.bungee.tabList.tabView.ITabView;
 import com.mcmiddleearth.connect.bungee.tabList.tabView.ServerTabView;
-import com.mcmiddleearth.connect.bungee.tabList.tabView.configuration.ITabViewConfig;
+import com.mcmiddleearth.connect.bungee.tabList.tabView.configuration.IPlayerItemConfig;
+import com.mcmiddleearth.connect.bungee.tabList.tabView.configuration.PlayerItemConfig;
 import com.mcmiddleearth.connect.bungee.tabList.tabView.configuration.ViewableTabViewConfig;
 import com.mcmiddleearth.connect.log.Log;
 import net.md_5.bungee.ServerConnection;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PlayerDisconnectEvent;
 import net.md_5.bungee.api.event.ServerSwitchEvent;
@@ -22,33 +24,51 @@ import net.md_5.bungee.protocol.packet.PlayerListHeaderFooter;
 import net.md_5.bungee.protocol.packet.PlayerListItem;
 
 import java.io.File;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 public class TabViewManager implements Listener {
 
     //Available views for each server
     private final static Map<String, ITabView> tabViews = new HashMap<>();
-    
-    private final static String defaultView = "global";
+    private final static Map<String, IPlayerItemConfig> playerItemConfigs= new HashMap<>();
+    private final static Map<String, String> headers = new HashMap<>();
+    private final static Map<String, String> footers = new HashMap<>();
 
-    private final static File configFile = new File(ConnectBungeePlugin.getInstance().getDataFolder(),
-                                              "tabList.yml");
+    private final static String viewConfigFileName = "views.yml";
+    private final static String playerItemConfigFileName = "playerItems.yml";
+    private final static String headerFooterConfigFileName = "headerFooter.yml";
+    private final static File configFolder = new File(ConnectBungeePlugin.getInstance().getDataFolder(),"tabList");
+    private final static File viewConfigFile = new File(configFolder, viewConfigFileName);
+    private final static File playerItemConfigFile = new File(configFolder, playerItemConfigFileName);
+    private final static File headerFooterConfigFile = new File(configFolder, headerFooterConfigFileName);
 
-    static {
+    public static void init() {
+        if(!configFolder.exists()) {
+            configFolder.mkdirs();
+        }
+        ConnectBungeePlugin.getInstance().saveDefaultConfig(viewConfigFile,viewConfigFileName);
+        ConnectBungeePlugin.getInstance().saveDefaultConfig(playerItemConfigFile,playerItemConfigFileName);
+        ConnectBungeePlugin.getInstance().saveDefaultConfig(headerFooterConfigFile,headerFooterConfigFileName);
+        reloadConfig();
+        /*playerItemConfigs.clear();
         YamlConfiguration config = new YamlConfiguration();
-        config.load(configFile);
+        config.load(playerItemConfigFile);
+        for(String key: config.getKeys()) {
+            Map<String, Object> map = config.getSection(key);
+            YamlConfiguration playerItemConfig = new YamlConfiguration(map);
+            playerItemConfigs.put(key, new PlayerItemConfig(playerItemConfig));
+        }
+        config = new YamlConfiguration();
+        config.load(viewConfigFile);
         for(String key: config.getKeys()) {
             Map<String, Object> map = config.getSection(key);
             YamlConfiguration tabViewConfig = new YamlConfiguration(map);
-            String type = tabViewConfig.getString("type", "GlobalTabView");
+            String type = tabViewConfig.getString("type", "global");
             createTabView(type, key, tabViewConfig);
-        }
-        //tabViews.put(defaultView, new GlobalTabView(new ViewableTabViewConfig(configFile, "GlobalView")));
+        }*/
     }
 
     public static void createTabView(String type, String key, YamlConfiguration tabViewConfig) {
@@ -62,23 +82,47 @@ public class TabViewManager implements Listener {
         }
     }
 
-    public static void reloadConfig() {
+    public static synchronized void reloadConfig() {
+        Map<ProxiedPlayer,String> playerViews = getPlayerViews();
+        tabViews.values().forEach(view ->
+                view.getViewers().forEach(viewer -> view.removeViewer(ProxyServer.getInstance().getPlayer(viewer))));
+        tabViews.clear();
+        playerItemConfigs.clear();
         YamlConfiguration config = new YamlConfiguration();
-        config.load(configFile);
+        config.load(playerItemConfigFile);
+        for(String key: config.getKeys()) {
+            Map<String, Object> map = config.getSection(key);
+            YamlConfiguration playerItemConfig = new YamlConfiguration(map);
+            playerItemConfigs.put(key, new PlayerItemConfig(playerItemConfig));
+        }
+        headers.clear();
+        footers.clear();
+        config = new YamlConfiguration();
+        config.load(headerFooterConfigFile);
+        YamlConfiguration headerConfig = new YamlConfiguration(config.getSection("header"));
+        for(String key: headerConfig.getKeys()) {
+            headers.put(key, headerConfig.getString(key,"Welcome to MCME!"));
+        }
+        YamlConfiguration footerConfig = new YamlConfiguration(config.getSection("footer"));
+        for(String key: footerConfig.getKeys()) {
+            footers.put(key, footerConfig.getString(key,"Welcome to MCME!"));
+        }
+        config = new YamlConfiguration();
+        config.load(viewConfigFile);
         for(String key: config.getKeys()) {
             Map<String, Object> map = config.getSection(key);
             YamlConfiguration tabViewConfig = new YamlConfiguration(map);
             ITabView view = tabViews.get(key);
-            if(view!=null) {
+            /*if(view!=null) {
                 view.getConfig().reload(tabViewConfig);
-            } else {
+            } else {*/
                 String type = tabViewConfig.getString("type", "GlobalTabView");
                 createTabView(type, key, tabViewConfig);
-            }
+            //}
         }
-        // add player to default view
-        //remove all viewers
-        //remove all tabViews
+        for(Map.Entry<ProxiedPlayer,String> entry: playerViews.entrySet()) {
+            setTabView(entry.getValue(),entry.getKey());
+        }
     }
 
     @EventHandler
@@ -88,13 +132,9 @@ public class TabViewManager implements Listener {
             ServerConnection server = (ServerConnection) event.getPlayer().getServer();
             ChannelWrapper wrapper = server.getCh();
             PacketListener packetListener = new PacketListener(server, player);
-            //packetHandler.onServerSwitch();
-//Logger.getGlobal().info("addView 1");
-            if(getTabView(player)==null) {
-//Logger.getGlobal().info("addView 2");
-                addToTabView(defaultView, player);
+            if(getTabView(player)==null || !getTabView(player).isViewerAllowed(player)) {
+                setTabView(null, player);
             }
-//Logger.getGlobal().info("inject");
             Log.info("tab_packet","inject listener for "+player.getName());
             wrapper.getHandle().pipeline().addBefore(PipelineUtils.BOSS_HANDLER, "mcme-connect-packet-listener", packetListener);
         } catch (Exception ex) {
@@ -105,9 +145,7 @@ public class TabViewManager implements Listener {
     @EventHandler
     public void onPlayerDisconnect(PlayerDisconnectEvent event) {
         ITabView tabView = getTabView(event.getPlayer());
-//Logger.getGlobal().info("disconnect");
         if(tabView!=null) {
-//Logger.getGlobal().info("remove player 1");
             tabView.removeViewer(event.getPlayer());
         }
         PlayerListItem packet = new PlayerListItem();
@@ -167,27 +205,36 @@ public class TabViewManager implements Listener {
         tabViews.forEach((identfier,tabView) -> tabView.handleHeaderFooter(player,packet));
     }
 
-    private static void addToTabView(String viewName, ProxiedPlayer player) {
-//Logger.getGlobal().info("addToTabView  1");
-        ITabView nextView = getTabView(viewName); 
+    public static synchronized boolean setTabView(String viewName, ProxiedPlayer player) {
+        ITabView nextView = getTabView(viewName);
         ITabView lastView = getTabView(player);
-        if(nextView!=null) {
-            if(lastView != null) {
-//Logger.getGlobal().info("removeTabView  1");
-                lastView.removeViewer(player);
-            }
-//Logger.getGlobal().info("addView  2");
-            nextView.addViewer(player);
-        } else if(lastView==null) {
-            ITabView defaultViewObject = getTabView(defaultView);
-            if(defaultViewObject!=null) {
-                defaultViewObject.addViewer(player);
-            } else {
-                getTabViews().iterator().next().addViewer(player);
+        if(nextView!=null && nextView.isViewerAllowed(player)) {
+            switchTabView(lastView,nextView,player);
+            return true;
+        } else {
+            List<Map.Entry<String,ITabView>> tabViewList = new ArrayList<>(tabViews.entrySet());
+            tabViewList.sort(Comparator
+                    .comparingInt(stringITabViewEntry -> stringITabViewEntry.getValue()
+                                                         .getPriority(player.getServer().getInfo().getName())*-1));
+            for(Map.Entry<String,ITabView> entry: tabViewList) {
+                if (entry.getValue().isViewerAllowed(player)) {
+                    switchTabView(lastView,entry.getValue(),player);
+                    return true;
+                }
             }
         }
+        return false;
     }
-    
+
+    private static void switchTabView(ITabView lastView, ITabView nextView, ProxiedPlayer player) {
+        if (nextView != lastView) {
+            if (lastView != null) {
+                lastView.removeViewer(player);
+            }
+            nextView.addViewer(player);
+        }
+    }
+
     private static ITabView getTabView(ProxiedPlayer player) {
         for(ITabView view : tabViews.values()) {
             if(view.isViewer(player)) {
@@ -204,9 +251,52 @@ public class TabViewManager implements Listener {
     public static Set<String> getTabViewIdentifiers() {
         return tabViews.keySet();
     }
+
+    public static Set<String> getAvailableTabViewIdentifiers(ProxiedPlayer player) {
+        return tabViews.entrySet().stream().filter(entry -> entry.getValue().isViewerAllowed(player))
+                       .map(Map.Entry::getKey).collect(Collectors.toSet());
+    }
     
     public static Collection<ITabView> getTabViews() {
         return tabViews.values();
     }
 
+    public static Map<ProxiedPlayer,String> getPlayerViews() {
+        Map<ProxiedPlayer,String> map = new HashMap<>();
+        tabViews.forEach((identifier, tabView) -> {
+            tabView.getViewers().forEach(viewer -> {
+                ProxiedPlayer player = ProxyServer.getInstance().getPlayer(viewer);
+                if(player!=null) {
+                    map.put(player,identifier);
+                }
+            });
+        });
+        return map;
+    }
+
+    public static IPlayerItemConfig getPlayerItemConfig(String playerItemConfig) {
+        return playerItemConfigs.get(playerItemConfig);
+    }
+
+    public static String getHeader(String identifier) {
+        return headers.getOrDefault(identifier, "not found");
+    }
+
+    public static String getFooter(String identifier) {
+        return footers.getOrDefault(identifier,"not found");
+    }
+
+
+    /*public static boolean setTabView(ProxiedPlayer player, String tabView) {
+        ITabView currentView = getTabView(player);
+        ITabView nextView = getTabView(tabView);
+        if(nextView!=null && nextView.isViewerAllowed(player)) {
+            if (currentView != null) {
+                currentView.removeViewer(player);
+            }
+            nextView.addViewer(player);
+            return true;
+        }
+        return false;
+    }*/
 }

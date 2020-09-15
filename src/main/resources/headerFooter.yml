@@ -1,0 +1,6 @@
+header:
+  default: "§ePlayers on MCME network"
+  pvp: "§ePlayers on PvP server"
+  main: "§ePlayers on mainworld server"
+footer:
+  default: "§6Time: §e{Time} §4| §6Node: §e{Server}\n§6Ping: {Ping} §4| {TPS_1} tps"
