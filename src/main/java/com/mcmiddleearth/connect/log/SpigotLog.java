@@ -32,7 +32,6 @@ public class SpigotLog extends Log implements CommandExecutor, Listener {
         if(!commandSender.hasPermission(getPermission())) {
             commandSender.sendMessage(ChatColor.RED+"You don't have permission");
         } else {
-//Logger.getGlobal().info("Spigot command handling!");
             if((commandSender instanceof Player) && args.length>1 && args[1].equalsIgnoreCase("on")) {
                 developer.add((Player) commandSender);
             } else if((commandSender instanceof Player) && args.length>1 && args[1].equalsIgnoreCase("off")) {

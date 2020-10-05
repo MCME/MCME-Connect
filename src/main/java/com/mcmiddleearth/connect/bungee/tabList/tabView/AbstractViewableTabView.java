@@ -146,7 +146,6 @@ public abstract class AbstractViewableTabView implements ITabView{
         if(tabViewItems.isEmpty()) {
             return;
         }
-//Logger.getGlobal().info("7 handleREmove!!");
         PlayerListItem packet = new PlayerListItem();
         /*PlayerListItem.Item[] items = new PlayerListItem.Item[tabViewItems.size()];
         Iterator<TabViewPlayerItem> iterator = tabViewItems.iterator();
@@ -170,14 +169,12 @@ public abstract class AbstractViewableTabView implements ITabView{
 
     @Override
     public synchronized void addViewer(ProxiedPlayer player) {
-//Logger.getLogger(GlobalTabView.class.getSimpleName()).info("AddPlayer: "+player.getName()+" **********************************");
         if(player.getUniqueId()!=null && isViewerAllowedOn(player.getServer().getInfo().getName())) {
             viewers.add(player.getUniqueId());
             Set<TabViewPlayerItem> tabViewItems = PlayerItemManager.getPlayerItems();
             if(!tabViewItems.isEmpty()) {
                 PlayerListItem packet = new PlayerListItem();
                 /*PlayerListItem.Item[] items = new PlayerListItem.Item[tabViewItems.size()];
-//Logger.getLogger(GlobalTabView.class.getSimpleName()).info("items: "+items.length);
                 Iterator<TabViewPlayerItem> iterator = tabViewItems.iterator();
                 for(int i = 0; i<tabViewItems.size();i++) {
                     TabViewPlayerItem tabViewItem = iterator.next();
@@ -206,15 +203,11 @@ public abstract class AbstractViewableTabView implements ITabView{
     public synchronized void removeViewer(ProxiedPlayer player) {
         if(player==null) return;
         boolean removed = viewers.remove(player.getUniqueId());
-//viewers.forEach(viewer -> Logger.getLogger(GlobalTabView.class.getSimpleName()).info("stored: "+viewer.toString()));
-//Logger.getLogger(GlobalTabView.class.getSimpleName()).info("remove viewer 2: "+player.getUniqueId().toString()+" "+removed);
         if(player.getUniqueId()!=null) {
-//Logger.getLogger(GlobalTabView.class.getSimpleName()).info("remove viewer 3");
             Set<TabViewPlayerItem> tabViewItems = PlayerItemManager.getPlayerItems();
             if(!tabViewItems.isEmpty()) {
                 PlayerListItem packet = new PlayerListItem();
                 /*PlayerListItem.Item[] items = new PlayerListItem.Item[tabViewItems.size()];
-//Logger.getLogger(GlobalTabView.class.getSimpleName()).info("items: "+items.length);
                 Iterator<TabViewPlayerItem> iterator = tabViewItems.iterator();
                 for(int i = 0; i<tabViewItems.size();i++) {
                     TabViewPlayerItem tabViewItem = iterator.next();

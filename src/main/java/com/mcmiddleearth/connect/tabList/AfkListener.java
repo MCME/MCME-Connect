@@ -16,7 +16,6 @@ public class AfkListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = false)
     public void afkStatusChange(AfkStatusChangeEvent event) {
-        Logger.getGlobal().info("AFK EvENT: "+event.getValue());
         setAfk(event.getAffected().getBase(),event.getValue());
     }
 

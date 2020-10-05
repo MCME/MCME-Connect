@@ -205,7 +205,6 @@ public class PlayerItemConfig implements IPlayerItemConfig{
                 color = "";
             }
 
-//Logger.getGlobal().info("tt"+color+"test");
             return color;
         }
         return "";
@@ -268,17 +267,11 @@ public class PlayerItemConfig implements IPlayerItemConfig{
             }
             suffixLength = lengthWithoutFormatting(suffix+status);
             roleColor = "#"+Integer.toHexString(rColor.getRGB()).substring(2);
-            //Logger.getGlobal().info(roleColor);
-            //roleColor = chatColor+"ak";
             String tempPlayername = player.getName();//+"1234567890";
             String username = tempPlayername.substring(0, Math.min(tempPlayername.length(), 20 - prefixLength - suffixLength));
-            //BaseComponent[] displayName = new ComponentBuilder(" ").appendLegacy(prefix).append("username"+suffix).color(chatColor).create();
             String displayName = "{\"text\":\""+prefix+"\",\"italic\":\""+italic+"\",\"extra\":[{\"text\":\""
                     +username+suffix+"\",\"color\":\""+roleColor+"\"},{\"text\":\""
                     +status+"\",\"color\":\""+statusColor+"\"}]}";
-//player.sendMessage(displayName);
-//Logger.getGlobal().info(displayName);
-            //return "\" " + prefix + "#ffee33" + username + suffix + "\"";
             return displayName;
         }
         throw new RuntimeException("ViewableTabViewConfig: null player");

@@ -26,11 +26,9 @@ public class BungeeLog extends Log implements Listener {
 
     @EventHandler
     public void onChat(ChatEvent event) {
-//Logger.getGlobal().info("Chat event: "+event.getMessage()+" "+event.isCommand()+" "+event.isProxyCommand());
         if(event.isCommand() && event.getSender() instanceof ProxiedPlayer && ((ProxiedPlayer)event.getSender()).hasPermission(getPermission())) {
             String[] split = event.getMessage().split(" ");
             if(split[0].equalsIgnoreCase("/log") && Arrays.stream(split).sequential().noneMatch(arg -> arg.equalsIgnoreCase("-spigot"))) {
-//Logger.getGlobal().info("Bungee command handling!"+(event.getSender() instanceof ProxiedPlayer)+" "+(split.length>1)+" "+split[1].equalsIgnoreCase("on"));
                 if((event.getSender() instanceof ProxiedPlayer) && split.length>1 && split[1].equalsIgnoreCase("on")) {
                     developer.add((ProxiedPlayer) event.getSender());
                 } else if((event.getSender() instanceof ProxiedPlayer) && split.length>1 && split[1].equalsIgnoreCase("off")) {

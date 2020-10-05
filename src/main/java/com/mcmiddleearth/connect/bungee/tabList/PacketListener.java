@@ -24,7 +24,6 @@ public class PacketListener extends MessageToMessageDecoder<PacketWrapper> {
 
     @Override
     protected void decode(ChannelHandlerContext ctx, PacketWrapper packetWrapper, List<Object> out) {
-//Logger.getGlobal().info("decode");
         String component = "tab.in";
         if (!connection.isObsolete()) {
             if (packetWrapper.packet != null) {
@@ -46,7 +45,6 @@ public class PacketListener extends MessageToMessageDecoder<PacketWrapper> {
                                 break;
                             case UPDATE_DISPLAY_NAME:
                                 printListItemPacket(component + ".display", ((PlayerListItem) packetWrapper.packet));
-Logger.getGlobal().info("Update Displayname: "+playerListPacket.getItems().length+" "+playerListPacket.getItems()[0].getDisplayName());
                                 TabViewManager.handleUpdateDisplayNamePacket(player, playerListPacket);
                                 break;
                             case REMOVE_PLAYER:
@@ -77,7 +75,6 @@ Logger.getGlobal().info("Update Displayname: "+playerListPacket.getItems().lengt
 
 
     protected void invalid_decode(ChannelHandlerContext ctx, PacketWrapper packetWrapper, List<Object> out) {
-//Logger.getGlobal().info("decode");
         String component = "tab.in";
         boolean shouldRelease = true;
         try {
@@ -100,7 +97,6 @@ Logger.getGlobal().info("Update Displayname: "+playerListPacket.getItems().lengt
                                 break;
                             case UPDATE_DISPLAY_NAME:
                                 printListItemPacket(component+".display",((PlayerListItem) packetWrapper.packet));
-//Logger.getGlobal().info("Update Displayname: "+playerListPacket.getItems().length+" "+playerListPacket.getItems()[0].getDisplayName());
                                 TabViewManager.handleUpdateDisplayNamePacket(player,playerListPacket);
                                 break;
                             case REMOVE_PLAYER:
@@ -108,12 +104,6 @@ Logger.getGlobal().info("Update Displayname: "+playerListPacket.getItems().lengt
                                 TabViewManager.handleRemovePlayerPacket(player,playerListPacket);
                                 break;
                         }
-                        //boolean result = handler.onPlayerListPacket((PlayerListItem) packetWrapper.packet, player);
-//Logger.getGlobal().info("handle");
-//                        if (result) {
-//Logger.getGlobal().info("send");
-//                            player.unsafe().sendPacket(packetWrapper.packet);
-//                        }
                         return;
                     } else if(packetWrapper.packet instanceof PlayerListHeaderFooter) {
                         TabViewManager.handleHeaderFooter(player,(PlayerListHeaderFooter)packetWrapper.packet);

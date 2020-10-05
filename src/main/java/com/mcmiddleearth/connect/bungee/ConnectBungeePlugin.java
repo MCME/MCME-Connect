@@ -160,44 +160,7 @@ public class ConnectBungeePlugin extends Plugin {
         legacyRedirectTo = config.getString("legacyRedirect.to","build");
         noMVTP.addAll(config.getStringList("disableMVTP"));
         connectDelay = config.getInt("connectDelay",200);
-        Logger.getGlobal().info("legacyREdirectEnabled: "+legacyRedirectEnabled);
-        Logger.getGlobal().info("legacyREdirectFrom: "+legacyRedirectFrom);
-        Logger.getGlobal().info("legacyREdirectTo: "+legacyRedirectTo);
-        Logger.getGlobal().info("connectDelay: "+connectDelay);
-        Logger.getGlobal().info("noMVTP length: "+noMVTP.size());
     }
-    
-    /*private void loadLegacyRedirect() {
-        if(!getDataFolder().exists()) {
-            getDataFolder().mkdir();
-        }
-        File file = new File(getDataFolder(),"legacyRedirect.yml");
-        if(!file.exists()) {
-            try {
-                file.createNewFile();
-                try(FileWriter fw = new FileWriter(file)) {
-                    fw.write("legacyRedirect: \n");
-                    fw.write("  enabled: "+legacyRedirectEnabled+"\n");
-                    fw.write("  from: "+legacyRedirectFrom+"\n");
-                    fw.write("  to: "+legacyRedirectTo+"\n");
-                }
-            } catch (IOException ex) {
-                Logger.getLogger(ConnectBungeePlugin.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        } else {
-            try(Scanner scanner = new Scanner(file))
-            {
-                scanner.nextLine();
-                String str = scanner.nextLine().split(":")[1].trim();
-//Logger.getGlobal().info(str);
-                legacyRedirectEnabled = Boolean.parseBoolean(str);
-                legacyRedirectFrom = scanner.nextLine().split(":")[1].trim();
-                legacyRedirectTo = scanner.nextLine().split(":")[1].trim();
-            } catch (FileNotFoundException ex) {
-                Logger.getLogger(ConnectBungeePlugin.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-    }*/
     
     public void saveDefaultConfig(File configFile, String resource) {
         if(!configFile.exists()) {

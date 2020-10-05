@@ -68,34 +68,12 @@ public class ConnectionListener implements Listener {
                                     "Your statistics are currently restored. Please wait a minute before rejoining.")
                                     .color(ChatColor.WHITE).create());
         }
-/*        ServerInfo server = event.getPlayer().getServer().getInfo();
-Logger.getGlobal().info("Reconnect: "+server);
-        int i = 0;
-        List<String> uplist = ConnectBungeePlugin.getWatcher().getUpList();
-uplist.forEach(entry -> Logger.getGlobal().info(entry));
-        while(server==null || !uplist.contains(server.getName())) {
-Logger.getGlobal().info(""+i);
-            if(i<priorities.size()) {
-                server = ProxyServer.getInstance().getServerInfo(priorities.get(i));    
-Logger.getGlobal().info("Checking: "+server.getName());
-            } else {
-                event.getPlayer().disconnect(new ComponentBuilder(
-                                        "Sorry, all servers are down at the moment.")
-                                        .color(ChatColor.WHITE).create());
-                return;
-            }
-            i++;
+        ProxiedPlayer player = event.getPlayer();
+        if(!VanishHandler.isPvSupport()) {
+            sendJoinMessage(player,false);
+        } else {
+            VanishHandler.join(player);
         }
-Logger.getGlobal().info("Connecting to: "+server.getName());
-        event.getPlayer().connect(server);*/
-        //ProxyServer.getInstance().getScheduler().schedule(ConnectBungeePlugin.getInstance(), () -> {
-            ProxiedPlayer player = event.getPlayer();
-            if(!VanishHandler.isPvSupport()) {
-                sendJoinMessage(player,false);
-            } else {
-                VanishHandler.join(player);
-            }
-        //}, 5, TimeUnit.SECONDS);
     }
     
     @EventHandler
@@ -112,11 +90,9 @@ Logger.getGlobal().info("Connecting to: "+server.getName());
     @EventHandler
     public void handleLegacyPlayers(ServerConnectEvent event) {
         if(event.getReason().equals(ServerConnectEvent.Reason.JOIN_PROXY)) {
- Logger.getGlobal().info("enabled LEGACY: "+ConnectBungeePlugin.isLegacyRedirectEnabled());
             if(!ConnectBungeePlugin.isLegacyRedirectEnabled()) {
                 return;
             }
- Logger.getGlobal().info("handle LEGACY: "+ConnectBungeePlugin.getLegacyPlayers().contains(event.getPlayer().getUniqueId()));
             if(ConnectBungeePlugin.getLegacyPlayers().contains(event.getPlayer().getUniqueId())
                     && event.getTarget().getName().equals(ConnectBungeePlugin.getLegacyRedirectFrom())) {
                 //event.setTarget(ProxyServer.getInstance().getServerInfo(ConnectBungeePlugin.getLegacyRedirectTo()));
@@ -139,7 +115,6 @@ Logger.getGlobal().info("Connecting to: "+server.getName());
         Iterator<ProxiedPlayer> it = ProxyServer.getInstance().getPlayers().iterator();
         if(it.hasNext()) {
             ProxiedPlayer other = it.next();
-//Logger.getGlobal().info("send Discord join Message to: "+other);
             if(other.getServer()==null) {
                 return;
             }
@@ -161,7 +136,6 @@ Logger.getGlobal().info("Connecting to: "+server.getName());
                                             .color(ChatColor.YELLOW).create());
         });
         ProxiedPlayer other = getOtherPlayer(player); 
-//Logger.getGlobal().info("send Discord leave Message to: "+other);
         if(other != null && other.getServer() != null) {
             ByteArrayDataOutput out = ByteStreams.newDataOutput();
             out.writeUTF(Channel.DISCORD);

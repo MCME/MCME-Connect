@@ -102,13 +102,10 @@ public class YamlConfiguration {
     public List<Object> getList(String key) {return (List<Object>)getValue(key); }
 
     public Object getValue(String key) {
-//Logger.getGlobal().info("Key: "+key);
-//Logger.getGlobal().info("Keysplit: "+key.split("\\.").length);
         return getValue(map, key.split("\\."));
     }
     
     private Object getValue(Map<String,Object> submap, String[] subkeys) {
-//Logger.getGlobal().info("length "+subkeys.length);
         if(subkeys.length>1) {
             if(submap.containsKey(subkeys[0])) {
                 return getValue((Map<String,Object>)submap.get(subkeys[0]),

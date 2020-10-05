@@ -50,11 +50,7 @@ public class PluginMessageListener implements Listener {
     
     @EventHandler
     public void onMessage(PluginMessageEvent event) {
-        //if(event.getTag().equals("BungeeCord")) return;
-//Logger.getGlobal().info("Plugin Message! "+event.getTag());
-//Logger.getGlobal().info("Plugin Message! "+event.toString());
         if(event.getTag().equals(Channel.MAIN)) {
-//Logger.getGlobal().info("Plugin Connect Message!");
             event.setCancelled(true);
             ByteArrayDataInput in = ByteStreams.newDataInput(event.getData());
             String subchannel = in.readUTF();
@@ -69,15 +65,11 @@ public class PluginMessageListener implements Listener {
                     }
                 case Channel.TPPOS:
                     {
-                        Logger.getGlobal().info("reading TPPOS message!");
                         String server = in.readUTF();
                         String sender = in.readUTF();
                         String world = in.readUTF();
                         String locLine = in.readUTF();
                         TpposHandler.handle(sender, server, world, locLine, "");
-                        //String[] locData = locLine.split(";");
-                        //connect to server
-                        //Logger.getGlobal().info("found teleport data!");
                         break;
                     }
                 case Channel.MESSAGE:
@@ -104,7 +96,6 @@ public class PluginMessageListener implements Listener {
                     }
                 case Channel.WORLD_UUID:
                 {
-//Logger.getGlobal().info("world uuid!");
 
                     String uuid = in.readUTF();
                     String worldName = in.readUTF();
@@ -130,7 +121,6 @@ public class PluginMessageListener implements Listener {
                     }
                     break;
                 case Channel.PLAYER:
-Logger.getGlobal().info("subchannel player!");
                     ServerInfo info = ((ProxiedPlayer)event.getReceiver()).getServer().getInfo();
                     PlayerItemManager.sendAllPlayerList(info);
                 default:

@@ -22,7 +22,6 @@ public class Log {
     protected void enable() {
         instance = this;
         try {
-//Logger.getGlobal().info("creating new log file!");
             writer = new PrintWriter(logFile);
         } catch (IOException e) {
             e.printStackTrace();
@@ -88,7 +87,6 @@ public class Log {
 
     public static void log(String component, LogLevel level, String message) {
         boolean enabled = false;
-//Logger.getGlobal().info("log");
         if(!components.containsKey(component)) {
             setLogLevel(component, LogLevel.INFO);
             enabled = true;
@@ -99,7 +97,6 @@ public class Log {
                 writer.flush();
                 instance.sendToDeveloper(component, level, message);
                 break;
-                //Logger.getGlobal().info("logging message!");
             }
         }
     }

@@ -33,7 +33,6 @@ public class ConnectHandler {
         ProxiedPlayer source = ProxyServer.getInstance().getPlayer(sender);
         Server origin = source.getServer();
         if(!origin.getInfo().getName().equals(server)) {
-//Logger.getGlobal().info("onChat connect to other server");
             if(welcomeMsg) {
                 ChatMessageHandler.handle(server, sender, ChatColor.YELLOW+"Welcome to '"+server+"'!", 
                                           ConnectBungeePlugin.getConnectDelay());

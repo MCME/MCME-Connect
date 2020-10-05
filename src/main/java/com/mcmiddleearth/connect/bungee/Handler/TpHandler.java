@@ -36,8 +36,6 @@ public class TpHandler {
             if(connected) {
                 ProxyServer.getInstance().getScheduler().schedule(ConnectBungeePlugin.getInstance(), () -> {
                     ProxiedPlayer player = ProxyServer.getInstance().getPlayer(sender);
-                    //ProxiedPlayer destination = ProxyServer.getInstance().getPlayer(target);
-    //Logger.getGlobal().info("onChat tp to player: "+player.getName());
                     ByteArrayDataOutput out = ByteStreams.newDataOutput();
                     out.writeUTF(Channel.TP);
                     out.writeUTF(sender);
@@ -46,18 +44,6 @@ public class TpHandler {
                 }, ConnectBungeePlugin.getConnectDelay(), TimeUnit.MILLISECONDS);
             }
         };
-        return (ConnectHandler.handle(sender, server, true, callback));/*if {
-            ProxiedPlayer destination = ProxyServer.getInstance().getPlayer(target);
-            ProxyServer.getInstance().getScheduler().schedule(ConnectBungeePlugin.getInstance(), () -> {
-Logger.getGlobal().info("onChat tp to player");
-                ByteArrayDataOutput out = ByteStreams.newDataOutput();
-                out.writeUTF(Channel.TP);
-                out.writeUTF(sender);
-                out.writeUTF(target);
-                destination.getServer().sendData(Channel.MAIN, out.toByteArray());   
-            }, ConnectBungeePlugin.getConnectDelay(), TimeUnit.MILLISECONDS);
-            return true;
-        }
-        return false;*/
+        return (ConnectHandler.handle(sender, server, true, callback));
     }
 }

@@ -39,26 +39,13 @@ public class MvtpHandler {
                 ProxyServer.getInstance().getScheduler().schedule(ConnectBungeePlugin.getInstance(), () -> {
                     ServerInfo dest = ProxyServer.getInstance().getServerInfo(server);
                     ProxiedPlayer player = ProxyServer.getInstance().getPlayer(sender);
-//Logger.getGlobal().info("mvtp player "+player.getName()+" to "+dest.getName()+" at "+player.getServer().getInfo().getName());
                     ByteArrayDataOutput out = ByteStreams.newDataOutput();
                     out.writeUTF(Channel.SPAWN);
                     out.writeUTF(sender);
-//Logger.getGlobal().info("mctp to "+server+" done!");
-                    ProxyServer.getInstance().getServerInfo(server).sendData(Channel.MAIN, out.toByteArray(),true);   
+                    ProxyServer.getInstance().getServerInfo(server).sendData(Channel.MAIN, out.toByteArray(),true);
                 }, ConnectBungeePlugin.getConnectDelay(), TimeUnit.MILLISECONDS);
             }
         };
         return (ConnectHandler.handle(sender, server, true, callback)); //if {
-            /*ServerInfo dest = ProxyServer.getInstance().getServerInfo(server);
-            ProxyServer.getInstance().getScheduler().schedule(ConnectBungeePlugin.getInstance(), () -> {
-Logger.getGlobal().info("onChat tp to player");
-                ByteArrayDataOutput out = ByteStreams.newDataOutput();
-                out.writeUTF(Channel.SPAWN);
-                out.writeUTF(sender);
-                dest.sendData(Channel.MAIN, out.toByteArray(),true);   
-            }, ConnectBungeePlugin.getConnectDelay(), TimeUnit.MILLISECONDS);*
-            return true;
-        }
-        return false;*/
     }
 }

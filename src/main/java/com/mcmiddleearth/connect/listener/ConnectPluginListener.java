@@ -62,16 +62,13 @@ public class ConnectPluginListener implements PluginMessageListener {
         }
         ByteArrayDataInput in = ByteStreams.newDataInput(message);
         String subchannel = in.readUTF();
-Logger.getGlobal().info("Pugin Message! "+player+" channel "+subchannel);
         if (subchannel.equals(Channel.TPPOS)) {
             String playerData = in.readUTF();
             String worldData = in.readUTF();
             String[] locData = in.readUTF().split(";");
             runAfterArrival(playerData, source -> {
-//Logger.getGlobal().info("TPPOS! "+source+" ");
                 source.sendMessage(ChatColor.GOLD+"Teleporting ...");
                 World world = Bukkit.getWorld(worldData);
-//Logger.getGlobal().info("TPPOS to "+worldData+" "+locData[0]+" "+locData[1]+" "+locData[2]);
                 if(world!=null) {
                     Location location = new Location(world,Double.parseDouble(locData[0]),
                                                          Double.parseDouble(locData[1]),
@@ -186,7 +183,6 @@ Logger.getGlobal().info("Pugin Message! "+player+" channel "+subchannel);
             String displayName = in.readUTF();
             ConnectedPlayer connectedPlayer = new ConnectedPlayer(uuid,name);
             connectedPlayer.setDisplayName(displayName);
-Logger.getGlobal().info("Add player: "+remove);
             if(!remove) {
                 PlayerList.addPlayer(connectedPlayer);
             } else {
@@ -194,39 +190,16 @@ Logger.getGlobal().info("Add player: "+remove);
             }
         }
     }
-    
-    /*private void sendDiscord(String message) {
-        String discordChannel = ConnectPlugin.getDiscordChannel();
-        if ((discordChannel != null) && (!discordChannel.equals("")))
-        {
-          DiscordSRV discordPlugin = DiscordSRV.getPlugin();
-          if (discordPlugin != null)
-          {
-            TextChannel channel = discordPlugin
-                    .getDestinationTextChannelForGameChannelName(discordChannel);
-            if (channel != null) {
-              DiscordUtil.sendMessage(channel, message, 0, false);
-            } else {
-              Logger.getLogger("ConnectPlugin").warning("Discord channel not found.");
-            }
-          }
-          else
-          {
-            Logger.getLogger("ConnectPlugin").warning("DiscordSRV plugin not found.");
-          }
-        }
-    }*/
 
     private void runAfterArrival(String playerName, Consumer<Player> callback) {
         new BukkitRunnable() {
             int counter = 40;
             @Override
             public void run() {
-//Logger.getGlobal().info("try "+counter);
                 Player source = Bukkit.getPlayer(playerName);
                 if(source==null) {
                     if(counter==0) {
-                        Logger.getGlobal().info("WARNING! Expected player didn't arrive!");
+                        Logger.getLogger("ConnectionPluginListener").info("WARNING! Expected player didn't arrive!");
                         cancel();
                     } else {
                         counter--;

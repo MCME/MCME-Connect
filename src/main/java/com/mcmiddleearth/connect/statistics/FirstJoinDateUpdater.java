@@ -56,8 +56,6 @@ public class FirstJoinDateUpdater {
                 }
             }
         }
-//Logger.getGlobal().info("update first join 2 "+LocalDateTime
-//                            .ofEpochSecond(player.getFirstPlayed()/1000, 0, ZoneOffset.UTC));
     }
     
     //remove methods below after 1.13 update (included in PluginUtils 1.2

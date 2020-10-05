@@ -49,7 +49,6 @@ public class PlayerListener implements Listener {
             }
         }.runTaskLater(ConnectPlugin.getInstance(), 50);
         if(Bukkit.getOnlinePlayers().size()==1) {
-Logger.getGlobal().info("request Player list");
             PlayerList.requestPlayerList(event.getPlayer());
         }
     }

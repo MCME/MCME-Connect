@@ -115,8 +115,8 @@ public class StatisticDBConnector {
     private synchronized void checkConnection() {
         try {
             if (connected && dbConnection.isValid(5)) {
-                ConnectPlugin.getInstance().getLogger().log(Level.INFO,
-                        "Successfully checked connection to statistics database.");
+                //ConnectPlugin.getInstance().getLogger().log(Level.INFO,
+                //        "Successfully checked connection to statistics database.");
             } else {
                 if (dbConnection != null) {
                     dbConnection.close();
@@ -338,7 +338,6 @@ public class StatisticDBConnector {
 
     private synchronized void loadStatisticSync(Player player) {
             try {
-//Logger.getLogger(ConnectPlugin.class.getName()).info("load Statistic for "+player.getName());
                 selectPlayerStats.setString(1, player.getUniqueId().toString());
                 ResultSet result = selectPlayerStats.executeQuery();
                 if(result.next()) {
@@ -359,7 +358,6 @@ public class StatisticDBConnector {
                     }.runTask(ConnectPlugin.getInstance());
                 }
                 int id = getPlayerId(player.getUniqueId());
-//Logger.getGlobal().warning("Load Statistic for: "+player.getName()+ " "+player.getUniqueId()+" stats id: "+id);
                 if(id>=0) {
                     selectPlayerAllMatStats.setInt(1, id);
                     ResultSet matResult = selectPlayerAllMatStats.executeQuery();
@@ -386,7 +384,6 @@ public class StatisticDBConnector {
                                                 if(stat.getType().equals(Statistic.Type.BLOCK)
                                                         ||stat.getType().equals(Statistic.Type.ITEM)) {
                                                     int value = matResult.getInt(getName(stat));
-    //Logger.getGlobal().info("Set Statistic: "+stat.name()+ " for material "+mat.name() + " to "+value);
                                                     if(value > 0) {
                                                         try {
                                                             player.setStatistic(stat, mat, value);
@@ -550,32 +547,26 @@ public class StatisticDBConnector {
     private synchronized void insertMatStat(int id, Statistic stat, Material mat, int value) throws SQLException {
         String statement = "INSERT INTO mcmeconnect_statistic_material (id, material, "+getName(stat)
                 +") VALUES (" + id + ", '"+ mat.name()+"', "+ value + ")";
-//Logger.getGlobal().info("insertMatStat "+statement);
         dbConnection.createStatement().execute(statement);
     }
 
     private synchronized void deleteMatStat(int id, String mat) throws SQLException {
         String statement = "DELETE FROM mcmeconnect_statistic_material "
                 +"WHERE id = "+id+" AND material = '"+ mat + "'";
-//Logger.getGlobal().info("insertMatStat "+statement);
         dbConnection.createStatement().execute(statement);
     }
 
     private synchronized void saveEntityStatsSync(Player player, Statistic stat,
                                       EntityType entity, int value) {
         try {
-//Logger.getLogger(StatisticDBConnector.class.getName()).info("save Statistic for "+player.getName());
             int id = getPlayerId(player.getUniqueId());
-//Logger.getGlobal().warning("Save entity Statistic for: "+player.getName()+ " "+player.getUniqueId()+" stats id: "+id);
             if(id>=0) {
                 selectPlayerEntityStats.setInt(1, id);
                 selectPlayerEntityStats.setString(2, entity.name());
                 ResultSet result = selectPlayerEntityStats.executeQuery();
                 if(result.next()) {
-//Logger.getLogger(StatisticDBConnector.class.getName()).info("update");
                     updateEntityStat(id, stat, entity, value);
                 } else {
-//Logger.getLogger(StatisticDBConnector.class.getName()).info("insert");
                     insertEntityStat(id, stat, entity, value);
                 }
             }
@@ -627,7 +618,6 @@ public class StatisticDBConnector {
                 }
                 result = result + split[i];
             }
-Logger.getGlobal().info("Mapping: "+result);
             return Material.valueOf(result);
         }
         return null;

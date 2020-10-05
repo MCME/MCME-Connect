@@ -114,21 +114,14 @@ public class PlayerItemManager {
     }
     
     public static synchronized Set<TabViewPlayerItem> removePlayerItems(ProxiedPlayer vanillaRecipient, PlayerListItem packet) {
-//Logger.getGlobal().info("4");
-//PacketListener.printListItemPacket(packet);
         Map<UUID,TabViewPlayerItem> items = getPlayerItems(vanillaRecipient.getServer().getInfo().getName());
         Set<TabViewPlayerItem> updates = new HashSet<>();
         if(items==null) {
-//Logger.getGlobal().info("5 null items");
             return updates;
         }
-//Logger.getGlobal().info("6 length "+packet.getItems().length);
         for(Item packetItem: packet.getItems()) {
             TabViewPlayerItem item = new TabViewPlayerItem(packetItem);
-//Logger.getGlobal().info("PacketItem uuid: "+packetItem.getUuid());
-//Logger.getGlobal().info("Item uuid: "+item.getUuid());
             if(items.containsKey(item.getUuid())) {
-//Logger.getGlobal().info("contains!");
                 items.remove(item.getUuid());
                 sendPlayerListUpdate(item,true);
                 updates.add(item);
@@ -138,13 +131,10 @@ public class PlayerItemManager {
     }
 
     private static void sendPlayerListUpdate(TabViewPlayerItem item, boolean remove) {
-//Logger.getGlobal().info("send Player List update: "+item.getUuid()+" "+remove);
         ProxyServer.getInstance().getServers().forEach((name, info) -> info.sendData(Channel.MAIN, item.toByteArray(remove)));
-//Logger.getGlobal().info("send Player List update: done");
     }
 
     public static void sendAllPlayerList(ServerInfo info) {
-//Logger.getGlobal().info("send Player List update to server: "+info.getName());
         getPlayerItems().forEach(item -> info.sendData(Channel.MAIN, item.toByteArray(false)));
     }
 

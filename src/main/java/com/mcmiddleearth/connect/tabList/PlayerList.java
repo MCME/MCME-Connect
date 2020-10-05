@@ -23,9 +23,6 @@ public class PlayerList {
 
     public static void addPlayer(ConnectedPlayer player) {
         connectedPlayers.add(player);
-connectedPlayers.forEach(listPlayer->  {
-    Logger.getGlobal().info(""+listPlayer.getUuid()+" "+listPlayer.getName()+" "+listPlayer.getDisplayName());
-});
     }
 
     public static void removePlayer(ConnectedPlayer player) {
@@ -35,7 +32,6 @@ connectedPlayers.forEach(listPlayer->  {
     public static void requestPlayerList(Player player) {
         ByteArrayDataOutput out = ByteStreams.newDataOutput();
         out.writeUTF(Channel.PLAYER);
-Logger.getGlobal().info("request player list");
         player.sendPluginMessage(ConnectPlugin.getInstance(), Channel.MAIN, out.toByteArray());
     }
 
