@@ -36,7 +36,7 @@ default:
         text: "§fV"
         vanished: true
     - pvp:
-        text: "$7PvP"
+        text: "§7PvP"
         servers:
           - "pvp"
   maxLength: 20

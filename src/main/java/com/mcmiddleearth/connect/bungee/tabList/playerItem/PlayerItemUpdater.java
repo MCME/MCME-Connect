@@ -12,7 +12,9 @@ import net.md_5.bungee.protocol.packet.PlayerListItem;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
 
 public class PlayerItemUpdater {
 
@@ -20,29 +22,31 @@ public class PlayerItemUpdater {
 
     public PlayerItemUpdater() {
         updateTask = ProxyServer.getInstance().getScheduler().schedule(ConnectBungeePlugin.getInstance(), () -> {
+
             for (Map.Entry<String, ServerInfo> server : ProxyServer.getInstance().getServers().entrySet()) {
-                Log.info("PIUpdate","Server: "+server.getKey());
 
-                if (!server.getValue().getPlayers().isEmpty()) {
-                    ProxiedPlayer sender = server.getValue().getPlayers().stream().findFirst().orElse(null);
-                    Log.info("PIUpdate","Sender: "+sender.getName());
-                    List<PlayerListItem.Item> removal = new ArrayList<>();
-
-                    for (TabViewPlayerItem item : PlayerItemManager.getPlayerItems()) {
+                List<PlayerListItem.Item> removal = new ArrayList<>();
+                Map<UUID,TabViewPlayerItem> itemMap = PlayerItemManager.getPlayerItems(server.getKey());
+                if(itemMap!=null) {
+                    for (TabViewPlayerItem item : itemMap.values()) {
                         ProxiedPlayer search = ProxyServer.getInstance().getPlayer(item.getUuid());
 
                         if (search == null || !search.getServer().getInfo().getName().equals(server.getValue().getName())) {
+                            Logger.getGlobal().info("PIUPdate remove: " + item.getUsername());
                             PlayerListItem.Item removalItem = new PlayerListItem.Item();
                             removalItem.setUuid(item.getUuid());
-                            Log.warn("PIUpdate","__________remove "+item.getUsername());
-                            Log.info("PIUpdate","uuid: "+item.getUuid());
+                            Log.warn("PIUpdate", "__________remove " + item.getUsername());
+                            Log.info("PIUpdate", "uuid: " + item.getUuid());
                             removal.add(removalItem);
                         }
                     }
-                    PlayerListItem packet = new PlayerListItem();
-                    packet.setItems(removal.toArray(new PlayerListItem.Item[0]));
-                    TabViewManager.handleRemovePlayerPacket(sender, packet);
+                }
+                PlayerListItem packet = new PlayerListItem();
+                packet.setItems(removal.toArray(new PlayerListItem.Item[0]));
+                TabViewManager.handleRemovePlayerPacket(null, packet);
 
+                if (!server.getValue().getPlayers().isEmpty()) {
+                    ProxiedPlayer sender = server.getValue().getPlayers().stream().findFirst().orElse(null);
                     PlayerListItem.Item[] items = new PlayerListItem.Item[server.getValue().getPlayers().size()];
                     int i = 0;
                     for (ProxiedPlayer player : server.getValue().getPlayers()) {

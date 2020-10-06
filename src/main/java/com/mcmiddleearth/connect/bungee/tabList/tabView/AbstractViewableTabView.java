@@ -12,6 +12,7 @@ import net.md_5.bungee.protocol.packet.PlayerListItem;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
 
 public abstract class AbstractViewableTabView implements ITabView{
 
@@ -244,7 +245,9 @@ public abstract class AbstractViewableTabView implements ITabView{
 
     private PlayerListItem.Item[] createTabviewItems(Set<TabViewPlayerItem> playerItems, PlayerListItem.Action action) {
         List<PlayerListItem.Item> itemList = new ArrayList<>();
-        playerItems.stream().filter(this::isDisplayed).forEach(playerItem -> {
+        playerItems.stream().filter(this::isDisplayed)
+                            .sorted((first,second) -> first.getUsername().toLowerCase().compareTo(second.getUsername().toLowerCase()))
+                   .forEachOrdered(playerItem -> {
             PlayerListItem.Item item = new PlayerListItem.Item();
             item.setUuid(playerItem.getUuid());
             switch(action) {
@@ -270,7 +273,11 @@ public abstract class AbstractViewableTabView implements ITabView{
             }
             itemList.add(item);
         });
-        return itemList.toArray(new PlayerListItem.Item[0]);
+        PlayerListItem.Item[] itemArray = itemList.toArray(new PlayerListItem.Item[0]);
+        for(int i = 0; i< itemArray.length; i++) {
+            Logger.getGlobal().info("-"+itemArray[i].getUsername());
+        }
+        return itemArray;
     }
 
     public Set<UUID> getViewers() {

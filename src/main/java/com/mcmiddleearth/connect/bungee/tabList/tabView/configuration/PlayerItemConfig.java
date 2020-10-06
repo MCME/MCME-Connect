@@ -17,6 +17,7 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import java.awt.*;
 import java.util.List;
 import java.util.*;
+import java.util.logging.Logger;
 
 public class PlayerItemConfig implements IPlayerItemConfig{
 
@@ -104,7 +105,9 @@ public class PlayerItemConfig implements IPlayerItemConfig{
             Log.info("getDisplayname",result);
             return result;//"{\"text\":\""+player.getName()+"\"}";//result;
         }
-        throw new RuntimeException("ViewableTabViewConfig: null player");
+        //throw new RuntimeException("ViewableTabViewConfig: null player");
+        Logger.getLogger("PlayerItemConfig").info("PIUPdate NULL PLAYER!!!!");
+        return "{\"text\":\"NULL PLAYER\"}";
     }
 
     private boolean matchesCondition(String condition, TabViewPlayerItem playerItem) {

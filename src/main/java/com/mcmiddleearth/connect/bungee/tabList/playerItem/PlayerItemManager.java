@@ -14,6 +14,7 @@ import net.md_5.bungee.protocol.packet.PlayerListItem;
 import net.md_5.bungee.protocol.packet.PlayerListItem.Item;
 
 import java.util.*;
+import java.util.logging.Logger;
 
 /**
  *
@@ -114,16 +115,29 @@ public class PlayerItemManager {
     }
     
     public static synchronized Set<TabViewPlayerItem> removePlayerItems(ProxiedPlayer vanillaRecipient, PlayerListItem packet) {
-        Map<UUID,TabViewPlayerItem> items = getPlayerItems(vanillaRecipient.getServer().getInfo().getName());
-        Set<TabViewPlayerItem> updates = new HashSet<>();
-        if(items==null) {
+        if(vanillaRecipient!=null) {
+            Map<UUID, TabViewPlayerItem> items = getPlayerItems(vanillaRecipient.getServer().getInfo().getName());
+            return remove(items,packet);
+        } else {
+            Set<TabViewPlayerItem> updates = new HashSet<>();
+            for(Map<UUID, TabViewPlayerItem> items: playerItems.values()) {
+                updates.addAll(remove(items, packet));
+            }
             return updates;
         }
-        for(Item packetItem: packet.getItems()) {
+    }
+
+    private static synchronized Set<TabViewPlayerItem> remove(Map<UUID,TabViewPlayerItem> items,
+                                                              PlayerListItem packet) {
+        Set<TabViewPlayerItem> updates = new HashSet<>();
+        if (items == null) {
+            return updates;
+        }
+        for (Item packetItem : packet.getItems()) {
             TabViewPlayerItem item = new TabViewPlayerItem(packetItem);
-            if(items.containsKey(item.getUuid())) {
+            if (items.containsKey(item.getUuid())) {
                 items.remove(item.getUuid());
-                sendPlayerListUpdate(item,true);
+                sendPlayerListUpdate(item, true);
                 updates.add(item);
             }
         }
@@ -165,7 +179,7 @@ public class PlayerItemManager {
         return null;
     }*/
 
-    private synchronized static Map<UUID,TabViewPlayerItem> getPlayerItems(String server) {
+    public synchronized static Map<UUID,TabViewPlayerItem> getPlayerItems(String server) {
         return playerItems.get(server);
     }
 
