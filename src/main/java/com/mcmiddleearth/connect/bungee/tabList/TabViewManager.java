@@ -125,6 +125,10 @@ public class TabViewManager implements Listener {
         }
     }
 
+    /*public static void updateViews() {
+        tabViews.forEach((identifier, tabView) -> tabView.update(PlayerItemManager.getPlayerItems()));
+    }*/
+
     @EventHandler
     public void onServerConnected(ServerSwitchEvent event) {
         try {

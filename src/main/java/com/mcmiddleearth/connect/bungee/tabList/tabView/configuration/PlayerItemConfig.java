@@ -102,12 +102,12 @@ public class PlayerItemConfig implements IPlayerItemConfig{
             //Logger.getLogger("ViewableTabViewConfig").info(result);
             Log.setLogLevel("all", Log.LogLevel.OFF);
             Log.setLogLevel("getDisplayname", Log.LogLevel.INFO);
-            Log.info("getDisplayname",result);
-            return result;//"{\"text\":\""+player.getName()+"\"}";//result;
+            //Log.info("getDisplayname",result);
+            return result;//"{\"text\":\""+item.getUsername()+"\"}";//result;
         }
         //throw new RuntimeException("ViewableTabViewConfig: null player");
-        Logger.getLogger("PlayerItemConfig").info("PIUPdate NULL PLAYER!!!!");
-        return "{\"text\":\"NULL PLAYER\"}";
+        //Logger.getLogger("PlayerItemConfig").info("PIUPdate NULL PLAYER!!!!");
+        return "{\"text\":\"*"+item.getUsername()+"*\"}";
     }
 
     private boolean matchesCondition(String condition, TabViewPlayerItem playerItem) {

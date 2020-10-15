@@ -13,6 +13,7 @@ import net.md_5.bungee.protocol.packet.PlayerListItem;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 public abstract class AbstractViewableTabView implements ITabView{
 
@@ -243,7 +244,36 @@ public abstract class AbstractViewableTabView implements ITabView{
 
     protected abstract boolean isDisplayed(TabViewPlayerItem item);
 
+    /*public synchronized void update(Set<TabViewPlayerItem> items) {
+        //*items = new HashSet<>();
+        items.add(new TabViewPlayerItem(UUID.fromString("0edf6ee0-8573-4588-89cf-5951e2596795"),"a"));
+        items.add(new TabViewPlayerItem(UUID.fromString("1edf6ee0-8573-4588-89cf-5951e2596795"),"b"));
+        items.add(new TabViewPlayerItem(UUID.fromString("2edf6ee0-8573-4588-89cf-5951e2596795"),"A"));
+        items.add(new TabViewPlayerItem(UUID.fromString("3edf6ee0-8573-4588-89cf-5951e2596795"),"F"));
+        items.add(new TabViewPlayerItem(UUID.fromString("4edf6ee0-8573-4588-89cf-5951e2596795"),"9"));
+        items.add(new TabViewPlayerItem(UUID.fromString("5edf6ee0-8573-4588-89cf-5951e2596795"),"8"));
+        items.add(new TabViewPlayerItem(UUID.fromString("6edf6ee0-8573-4588-89cf-5951e2596795"),"7"));
+        items.add(new TabViewPlayerItem(UUID.fromString("7edf6ee0-8573-4588-89cf-5951e2596795"),"6"));
+        PlayerListItem packet = new PlayerListItem();
+        packet.setItems(createTabviewItems(items.stream().filter(this::isDisplayed).collect(Collectors.toSet()),
+                                           PlayerListItem.Action.REMOVE_PLAYER));//items);
+        packet.setAction(PlayerListItem.Action.REMOVE_PLAYER);
+        sendToViewers(viewers, packet);
+        packet.setItems(createTabviewItems(items.stream()
+                                                .filter(this::isDisplayed)
+                                                .collect(Collectors.toSet()),
+                        PlayerListItem.Action.ADD_PLAYER));//items);
+        packet.setAction(PlayerListItem.Action.ADD_PLAYER);
+        sendToViewers(viewers, packet);
+    }*/
+
+//boolean dontshow;
+
     private PlayerListItem.Item[] createTabviewItems(Set<TabViewPlayerItem> playerItems, PlayerListItem.Action action) {
+//dontshow = true;
+        //playerItems = new HashSet<>();
+        //playerItems.add(new TabViewPlayerItem(UUID.fromString("0edf6ee0-8573-4588-89cf-5951e2596795"),"Eriol_Eandur"));
+        //playerItems.add(new TabViewPlayerItem(UUID.fromString("1edf6ee0-8573-4588-89cf-5951e2596795"),"Sam_Gardener"));
         List<PlayerListItem.Item> itemList = new ArrayList<>();
         playerItems.stream().filter(this::isDisplayed)
                             .sorted((first,second) -> first.getUsername().toLowerCase().compareTo(second.getUsername().toLowerCase()))
@@ -252,6 +282,7 @@ public abstract class AbstractViewableTabView implements ITabView{
             item.setUuid(playerItem.getUuid());
             switch(action) {
                 case ADD_PLAYER:
+                    //dontshow = false;
                     item.setUsername(playerItem.getUsername());
                     String[][] prop = playerItem.getProperties();
                     if (prop != null) {
@@ -262,6 +293,7 @@ public abstract class AbstractViewableTabView implements ITabView{
                     item.setPing(playerItem.getPing());//playerItems.iterator().next().getPing());
                     break;
                 case UPDATE_DISPLAY_NAME:
+                    //dontshow = true;
                     item.setDisplayName(config.getDisplayName(playerItem));//"{\"text\":\"test\"}");//
                     break;
                 case UPDATE_LATENCY:
@@ -274,9 +306,12 @@ public abstract class AbstractViewableTabView implements ITabView{
             itemList.add(item);
         });
         PlayerListItem.Item[] itemArray = itemList.toArray(new PlayerListItem.Item[0]);
-        for(int i = 0; i< itemArray.length; i++) {
-            Logger.getGlobal().info("-"+itemArray[i].getUsername());
-        }
+/*if(dontshow) return itemArray;
+Logger.getGlobal().info("createTabViewItems*********************"+action.name());
+//Logger.getGlobal().info("*** "+playerItem.getUsername());
+for(int i = 0; i< itemArray.length; i++) {
+   Logger.getGlobal().info("-"+itemArray[i].getDisplayName());
+}*/
         return itemArray;
     }
 

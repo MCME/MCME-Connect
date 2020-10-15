@@ -22,7 +22,7 @@ public class PlayerItemUpdater {
 
     public PlayerItemUpdater() {
         updateTask = ProxyServer.getInstance().getScheduler().schedule(ConnectBungeePlugin.getInstance(), () -> {
-
+//PlayerItemManager.showItems();
             for (Map.Entry<String, ServerInfo> server : ProxyServer.getInstance().getServers().entrySet()) {
 
                 List<PlayerListItem.Item> removal = new ArrayList<>();
@@ -67,6 +67,7 @@ public class PlayerItemUpdater {
                     packet.setItems(items);
                     TabViewManager.handleAddPlayerPacket(sender, packet);
                 }
+                //TabViewManager.updateViews();
             }
         }, 10, ConnectBungeePlugin.getConfig().getInt("TabListUpdateSeconds",2), TimeUnit.SECONDS);
     }

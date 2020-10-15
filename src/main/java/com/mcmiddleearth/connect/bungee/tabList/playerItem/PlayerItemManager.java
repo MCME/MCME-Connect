@@ -201,4 +201,12 @@ public class PlayerItemManager {
         return "";
     }
 
+    /*public static void showItems() {
+        playerItems.entrySet().forEach(entry-> {
+            Logger.getGlobal().info(entry.getKey());
+            entry.getValue().entrySet().forEach((entry2 -> {
+                Logger.getGlobal().info("-"+entry2.getKey().toString()+" "+entry2.getValue().getUsername()+" "+entry2.getValue().getDisplayname());
+            }));
+        });
+    }*/
 }

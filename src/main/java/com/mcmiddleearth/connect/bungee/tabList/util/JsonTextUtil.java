@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import net.md_5.bungee.api.ChatColor;
 
 import java.awt.*;
+import java.util.Random;
 
 public class JsonTextUtil {
 

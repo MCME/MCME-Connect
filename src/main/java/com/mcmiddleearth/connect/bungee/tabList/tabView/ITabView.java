@@ -52,4 +52,7 @@ public interface ITabView {
     Set<UUID> getViewers();
 
     int getPriority(String server);
+
+    //void update(Set<TabViewPlayerItem> items);
+
 }

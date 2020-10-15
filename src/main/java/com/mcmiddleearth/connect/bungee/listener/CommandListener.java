@@ -196,6 +196,20 @@ public class CommandListener implements Listener {
                     }
                     event.setCancelled(true);
                 }
+            } else if (message[0].equalsIgnoreCase("/survival")) {
+                String survivalserver = "survivalserver";
+                if (!player.getServer().getInfo().getName().equals(survivalserver) && ProxyServer.getInstance().getServerInfo(survivalserver) != null) {
+                    if (!this.isMvtpAllowed(player)) {
+                        player.sendMessage(new ComponentBuilder("/survival isn't allowed here.").color(ChatColor.RED).create());
+                    } else if (player.hasPermission(Permission.SURVIVAL)) {
+                        if (!ConnectHandler.handle(player.getName(), survivalserver, true, ((Boolean success, Throwable error) -> {}))) {
+                            this.sendError(player);
+                        }
+                    } else {
+                        player.sendMessage(new ComponentBuilder("You don't have permission to enter survival server.").color(ChatColor.RED).create());
+                    }
+                    event.setCancelled(true);
+                }
             } else if((message[0].equalsIgnoreCase("/mvtp")
                        || message[0].equalsIgnoreCase("/switch"))
                     && message.length>1

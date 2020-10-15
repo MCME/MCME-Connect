@@ -47,7 +47,13 @@ public class TabViewPlayerItem {
         Log.info("ViewItem",item.getUsername()+" ");
         afk = false;
     }
-    
+
+    public TabViewPlayerItem(UUID uuid, String username){
+        this.username = username;
+        this.uuid = uuid;
+        properties = new String[0][0];
+    }
+
     public boolean sameData(TabViewPlayerItem other) {
         boolean result =  equals(other) 
                 && username.equals(other.username)
