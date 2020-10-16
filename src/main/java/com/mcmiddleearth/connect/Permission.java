@@ -26,9 +26,12 @@ public class Permission {
     public static final String TPA          = "mcmeconnect.tpa";
     public static final String TP_OTHER     = "mcmeconnect.tp.other";
     public static final String TPHERE       = "mcmeconnect.tphere";
+    public static final String SURVIVAL     = "mcmeconnect.survival";
     public static final String WORLD        = "mcmeconnect.world";
     public static final String WATCHDOG     = "mcmeconnect.watchdog";
     public static final String RESTART      = "mcmeconnect.reboot";
+    public static final String RELOAD       = "mcmeconnect.reload";
+    public static final String TABVIEW      = "mcmeconnect.tablist";
     public static final String STOP         = "mcmeconnect.stop";
     public static final String IGNORE_DISABLED_MVTP     = "mcmeconnect.ignoreDisabledMVTP";
     public static final String VANISH_SEE   = "pv.see";

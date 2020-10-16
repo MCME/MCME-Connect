@@ -32,7 +32,6 @@ public class CommandHandler {
         out.writeUTF(Channel.COMMAND);
         out.writeUTF(commandSender);
         out.writeUTF(command);
-//Logger.getGlobal().info("Server send data: "+server);
         ProxyServer.getInstance().getServerInfo(server).sendData(Channel.MAIN, out.toByteArray(),true);
     }
 }

@@ -14,3 +14,7 @@ permissions:
         description: addition of .<servername> allows a player to /tp or /mvtp cross servers
     mcmeconnect.watchdog:
         description: players with this permission will recive warings about server downs
+    mcmeconnect.tablist:
+        description: allows to use /tablist command
+    mcmeconnect.reload:
+        description: allows to reload tabview config

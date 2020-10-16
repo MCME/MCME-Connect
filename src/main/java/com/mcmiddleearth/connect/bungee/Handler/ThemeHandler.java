@@ -33,9 +33,7 @@ public class ThemeHandler {
     
     public static boolean handle(ProxiedPlayer sender, String server, String command) {
         Callback<Boolean> callback = (connected, error) -> {
-//Logger.getGlobal().info("Handle Theme");
             if(connected) {
-//Logger.getGlobal().info("Connected sender: "+sender+" server "+sender.getServer().getInfo().getName()+" command "+command);
                 ProxyServer.getInstance().getScheduler().schedule(ConnectBungeePlugin.getInstance(), () -> {
                     sender.sendMessage(new ComponentBuilder("All Themed-build commands need to be issued from Themed-build world. You were teleported there.")
                                             .color(ChatColor.RED).create());
@@ -44,16 +42,5 @@ public class ThemeHandler {
             }
         };
         return (ConnectHandler.handle(sender.getName(), server, true, callback)); //if {
-            /*ServerInfo dest = ProxyServer.getInstance().getServerInfo(server);
-            ProxyServer.getInstance().getScheduler().schedule(ConnectBungeePlugin.getInstance(), () -> {
-Logger.getGlobal().info("onChat tp to player");
-                ByteArrayDataOutput out = ByteStreams.newDataOutput();
-                out.writeUTF(Channel.SPAWN);
-                out.writeUTF(sender);
-                dest.sendData(Channel.MAIN, out.toByteArray(),true);   
-            }, ConnectBungeePlugin.getConnectDelay(), TimeUnit.MILLISECONDS);*
-            return true;
-        }
-        return false;*/
     }
 }

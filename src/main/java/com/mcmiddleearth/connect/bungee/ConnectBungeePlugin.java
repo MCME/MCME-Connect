@@ -28,19 +28,21 @@ import com.mcmiddleearth.connect.bungee.Handler.TpahereHandler;
 import com.mcmiddleearth.connect.bungee.listener.CommandListener;
 import com.mcmiddleearth.connect.bungee.listener.ConnectionListener;
 import com.mcmiddleearth.connect.bungee.listener.PluginMessageListener;
+import com.mcmiddleearth.connect.bungee.tabList.TabViewCommand;
+import com.mcmiddleearth.connect.bungee.tabList.TabViewManager;
+import com.mcmiddleearth.connect.bungee.tabList.playerItem.PlayerItemUpdater;
 import com.mcmiddleearth.connect.bungee.vanish.VanishHandler;
 import com.mcmiddleearth.connect.bungee.vanish.VanishListener;
 import com.mcmiddleearth.connect.bungee.warp.MyWarpDBConnector;
 import com.mcmiddleearth.connect.bungee.watchdog.ServerWatchdog;
+import com.mcmiddleearth.connect.log.BungeeLog;
+import com.mcmiddleearth.connect.log.Log;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.api.scheduler.ScheduledTask;
 
 import java.io.*;
-import java.util.HashSet;
-import java.util.Scanner;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -56,12 +58,14 @@ public class ConnectBungeePlugin extends Plugin {
     
     private static ServerWatchdog watcher;
     
-    private static YamlConfiguration config = new YamlConfiguration();
+    private static final YamlConfiguration config = new YamlConfiguration();
             
     private static File configFile;
     
-    private static Set<String> noMVTP = new HashSet<>();
+    private static final Set<String> noMVTP = new HashSet<>();
           
+    private static PlayerItemUpdater playerItemUpdater;
+
     private static MyWarpDBConnector myWarpConnector;
     
     private static boolean myWarpEnabled;
@@ -69,13 +73,20 @@ public class ConnectBungeePlugin extends Plugin {
     private RestartScheduler restartScheduler;
     private ScheduledTask tpaCleanupScheduler;
     private ScheduledTask tpahereCleanupScheduler;
+
+    private TabViewCommand tabViewCommand;
+
+    private final Map<String,ServerInformation> serverInformation = new HashMap<>();
+
+    private Log logger;
     
     @Override
     public void onEnable() {
         instance = this;
         configFile = new File(getDataFolder(),"config.yml");
-        saveDefaultConfig();
+        saveDefaultConfig(configFile, "config.yml");
         loadConfig();
+        logger = new BungeeLog();
         RestartHandler.init();
         tpaCleanupScheduler = TpaHandler.startCleanupScheduler();
         tpahereCleanupScheduler = TpahereHandler.startCleanupScheduler();
@@ -89,18 +100,20 @@ public class ConnectBungeePlugin extends Plugin {
         if(myWarpEnabled) {
             myWarpConnector = new MyWarpDBConnector(getConfig().getSection("myWarp"));
         }
-//Logger.getGlobal().info("HeY ");
         if(VanishHandler.isPvSupport()) {
-//Logger.getGlobal().info("enable vanish support ");
             VanishHandler.loadVanished();
             getProxy().getPluginManager().registerListener(this, new VanishListener());
         }
-        //loadLegacyRedirect();
         ProxyServer.getInstance().registerChannel(Channel.MAIN);
         getProxy().getPluginManager().registerListener(this, new PluginMessageListener());
         getProxy().getPluginManager().registerListener(this, new CommandListener());
         getProxy().getPluginManager().registerListener(this, 
                          new ConnectionListener());
+        getProxy().getPluginManager().registerListener(this, new TabViewManager());
+        playerItemUpdater = new PlayerItemUpdater();
+        TabViewManager.init();
+        tabViewCommand = new TabViewCommand();
+        ProxyServer.getInstance().getPluginManager().registerCommand(this, tabViewCommand);
     }
     
     @Override
@@ -110,6 +123,8 @@ public class ConnectBungeePlugin extends Plugin {
         restartScheduler.cancel();
         tpaCleanupScheduler.cancel();
         tpahereCleanupScheduler.cancel();
+        playerItemUpdater.disable();
+        logger.disable();
     }
     
     public static boolean isMvtpDisabled(String server) {
@@ -145,50 +160,13 @@ public class ConnectBungeePlugin extends Plugin {
         legacyRedirectTo = config.getString("legacyRedirect.to","build");
         noMVTP.addAll(config.getStringList("disableMVTP"));
         connectDelay = config.getInt("connectDelay",200);
-        Logger.getGlobal().info("legacyREdirectEnabled: "+legacyRedirectEnabled);
-        Logger.getGlobal().info("legacyREdirectFrom: "+legacyRedirectFrom);
-        Logger.getGlobal().info("legacyREdirectTo: "+legacyRedirectTo);
-        Logger.getGlobal().info("connectDelay: "+connectDelay);
-        Logger.getGlobal().info("noMVTP length: "+noMVTP.size());
     }
     
-    /*private void loadLegacyRedirect() {
-        if(!getDataFolder().exists()) {
-            getDataFolder().mkdir();
-        }
-        File file = new File(getDataFolder(),"legacyRedirect.yml");
-        if(!file.exists()) {
-            try {
-                file.createNewFile();
-                try(FileWriter fw = new FileWriter(file)) {
-                    fw.write("legacyRedirect: \n");
-                    fw.write("  enabled: "+legacyRedirectEnabled+"\n");
-                    fw.write("  from: "+legacyRedirectFrom+"\n");
-                    fw.write("  to: "+legacyRedirectTo+"\n");
-                }
-            } catch (IOException ex) {
-                Logger.getLogger(ConnectBungeePlugin.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        } else {
-            try(Scanner scanner = new Scanner(file))
-            {
-                scanner.nextLine();
-                String str = scanner.nextLine().split(":")[1].trim();
-//Logger.getGlobal().info(str);
-                legacyRedirectEnabled = Boolean.parseBoolean(str);
-                legacyRedirectFrom = scanner.nextLine().split(":")[1].trim();
-                legacyRedirectTo = scanner.nextLine().split(":")[1].trim();
-            } catch (FileNotFoundException ex) {
-                Logger.getLogger(ConnectBungeePlugin.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-    }*/
-    
-    private void saveDefaultConfig() {
+    public void saveDefaultConfig(File configFile, String resource) {
         if(!configFile.exists()) {
             try {
                 configFile.createNewFile();
-                try(InputStreamReader in = new InputStreamReader(getResourceAsStream("config.yml"));
+                try(InputStreamReader in = new InputStreamReader(getResourceAsStream(resource));
                     FileWriter fw = new FileWriter(configFile)) {
                     char[] buf = new char[1024];
                     int read = 1;
@@ -248,5 +226,18 @@ public class ConnectBungeePlugin extends Plugin {
 
     public static boolean isMyWarpEnabled() {
         return myWarpEnabled;
+    }
+
+    public ServerInformation getServerInformation(String name) {
+        ServerInformation info =  serverInformation.get(name);
+        if(info==null) {
+            info = new ServerInformation(name);
+            serverInformation.put(name,info);
+        }
+        return info;
+    }
+
+    public TabViewCommand getTabViewCommand() {
+        return tabViewCommand;
     }
 }

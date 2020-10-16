@@ -37,8 +37,7 @@ public class LegacyPlayerHandler {
             out.writeUTF(Channel.LEGACY);
             out.writeUTF(player.getName());
             out.writeUTF(target);
- Logger.getGlobal().info("sent LEGACY message: "+server+" - "+ player.getName()+" - "+target);
-           ProxyServer.getInstance().getServerInfo(server).sendData(Channel.MAIN, out.toByteArray(),true);   
+           ProxyServer.getInstance().getServerInfo(server).sendData(Channel.MAIN, out.toByteArray(),true);
         }, ConnectBungeePlugin.getConnectDelay(), TimeUnit.MILLISECONDS);
     }
 }

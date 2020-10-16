@@ -78,13 +78,11 @@ public class RestartHandler {
                 }
             }
             String finalNext = next;
-Logger.getGlobal().info("Sending "+player.getName()+" to "+next);
             String others = "";
             for(String name: servers) {
                 others = others + name+" ";
             }
             String otherServers = others;
-Logger.getGlobal().info("other servers: "+others);
             Callback<Boolean> callback = (connected, error) -> {
                 if(connected) {
                     ProxyServer.getInstance().getScheduler().schedule(ConnectBungeePlugin.getInstance(), () -> {

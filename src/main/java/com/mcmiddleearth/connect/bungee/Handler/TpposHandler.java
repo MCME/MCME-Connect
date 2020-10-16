@@ -37,7 +37,6 @@ public class TpposHandler {
         if(player!=null) {
             Callback<Boolean> callback = (connected, error) -> {
                 if(connected) {
-                    //ServerInfo serverInfo = ProxyServer.getInstance().getServerInfo(server);
                     ProxyServer.getInstance().getScheduler().schedule(ConnectBungeePlugin.getInstance(), () -> {
                         ByteArrayDataOutput out = ByteStreams.newDataOutput();
                         out.writeUTF(Channel.TPPOS);
@@ -49,7 +48,6 @@ public class TpposHandler {
                             ChatMessageHandler.handle(server, sender, message, 400);
                         }
                     }, ConnectBungeePlugin.getConnectDelay(), TimeUnit.MILLISECONDS);
-                    //Logger.getGlobal().info("sending teleport message!");
                 }
             };
             if(!player.getServer().getInfo().getName().equals(server)) {
@@ -57,8 +55,6 @@ public class TpposHandler {
             } else {
                 callback.done(Boolean.TRUE, null);
             }
-            //ProxyServer.getInstance().getScheduler().schedule(ConnectBungeePlugin.getInstance(), () -> {
-            //}, ConnectBungeePlugin.getConnectDelay(), TimeUnit.MILLISECONDS);
         }
         return true;
     }

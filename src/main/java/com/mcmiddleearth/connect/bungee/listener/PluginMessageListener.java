@@ -25,9 +25,16 @@ import com.mcmiddleearth.connect.bungee.ConnectBungeePlugin;
 import com.mcmiddleearth.connect.bungee.Handler.ChatMessageHandler;
 import com.mcmiddleearth.connect.bungee.Handler.RestartHandler;
 import com.mcmiddleearth.connect.bungee.Handler.TitleHandler;
-import com.mcmiddleearth.connect.bungee.warp.MyWarpDBConnector;
+import com.mcmiddleearth.connect.bungee.tabList.playerItem.PlayerItemManager;
+import com.mcmiddleearth.connect.bungee.tabList.TabViewManager;
+
+import java.util.UUID;
 import java.util.logging.Logger;
+
+import net.md_5.bungee.ServerConnection;
 import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.config.ServerInfo;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PluginMessageEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
@@ -43,10 +50,8 @@ public class PluginMessageListener implements Listener {
     
     @EventHandler
     public void onMessage(PluginMessageEvent event) {
-        //if(event.getTag().equals("BungeeCord")) return;
-//Logger.getGlobal().info("Plugin Message! "+event.getTag());
         if(event.getTag().equals(Channel.MAIN)) {
-//Logger.getGlobal().info("Plugin Connect Message!");
+            event.setCancelled(true);
             ByteArrayDataInput in = ByteStreams.newDataInput(event.getData());
             String subchannel = in.readUTF();
             switch (subchannel) {
@@ -60,15 +65,11 @@ public class PluginMessageListener implements Listener {
                     }
                 case Channel.TPPOS:
                     {
-                        Logger.getGlobal().info("reading TPPOS message!");
                         String server = in.readUTF();
                         String sender = in.readUTF();
                         String world = in.readUTF();
                         String locLine = in.readUTF();
                         TpposHandler.handle(sender, server, world, locLine, "");
-                        //String[] locData = locLine.split(";");
-                        //connect to server
-                        //Logger.getGlobal().info("found teleport data!");
                         break;
                     }
                 case Channel.MESSAGE:
@@ -95,7 +96,6 @@ public class PluginMessageListener implements Listener {
                     }
                 case Channel.WORLD_UUID:
                 {
-//Logger.getGlobal().info("world uuid!");
 
                     String uuid = in.readUTF();
                     String worldName = in.readUTF();
@@ -108,6 +108,21 @@ public class PluginMessageListener implements Listener {
                     String[] servers = in.readUTF().split(" ");
                     RestartHandler.handle(ProxyServer.getInstance().getPlayer(player), servers, shutdown);
                     break;
+                case Channel.SERVER_INFO:
+                    String server = ((ServerConnection)event.getSender()).getInfo().getName();
+                    ConnectBungeePlugin.getInstance().getServerInformation(server).updateFromPluginMessage(in);
+                    break;
+                case Channel.AFK:
+                    String uuid = in.readUTF();
+                    boolean afk = in.readBoolean();
+                    ProxiedPlayer afkPlayer = ProxyServer.getInstance().getPlayer(UUID.fromString(uuid));
+                    if(afkPlayer!=null) {
+                        TabViewManager.handleUpdateAfk(afkPlayer, afk);
+                    }
+                    break;
+                case Channel.PLAYER:
+                    ServerInfo info = ((ProxiedPlayer)event.getReceiver()).getServer().getInfo();
+                    PlayerItemManager.sendAllPlayerList(info);
                 default:
                     break;
             }

@@ -19,10 +19,7 @@ package com.mcmiddleearth.connect.bungee;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.yaml.snakeyaml.Yaml;
@@ -34,7 +31,13 @@ import org.yaml.snakeyaml.Yaml;
 public class YamlConfiguration {
     
     private Map<String,Object> map = new HashMap<>();
-    
+
+    public YamlConfiguration(Map<String,Object> map) {
+        this.map = map;
+    }
+
+    public YamlConfiguration() {}
+
     public void load(File file) {
         Yaml yaml = new Yaml();
         try {
@@ -56,14 +59,37 @@ public class YamlConfiguration {
     
     public int getInt(String key, int defaultValue) {
         Object value = getValue(key);
-        return (value!=null?(Integer)value:defaultValue);
+        if(value instanceof Integer) {
+            return (Integer)value;
+        } else if(value instanceof  Double) {
+            return ((Double) value).intValue();
+        } else {
+            return defaultValue;
+        }
     }
-    
+
     public double getDouble(String key, double defaultValue) {
         Object value = getValue(key);
-        return (value!=null?(Double)value:defaultValue);
+        if(value instanceof Integer) {
+            return ((Integer)value).doubleValue();
+        } else if(value instanceof  Double) {
+            return (Double) value;
+        } else {
+            return defaultValue;
+        }
     }
-    
+
+    public float getFloat(String key, float defaultValue) {
+        Object value = getValue(key);
+        if(value instanceof Integer) {
+            return ((Integer)value).floatValue();
+        } else if(value instanceof  Double) {
+            return ((Double) value).floatValue();
+        } else {
+            return defaultValue;
+        }
+    }
+
     public String getString(String key, String defaultValue) {
         Object value = getValue(key);
         return (value!=null?(String)value:defaultValue);
@@ -72,15 +98,14 @@ public class YamlConfiguration {
     public List<String> getStringList(String key) {
         return (List<String>)getValue(key);
     }
-    
-    private Object getValue(String key) {
-//Logger.getGlobal().info("Key: "+key);
-//Logger.getGlobal().info("Keysplit: "+key.split("\\.").length);
+
+    public List<Object> getList(String key) {return (List<Object>)getValue(key); }
+
+    public Object getValue(String key) {
         return getValue(map, key.split("\\."));
     }
     
     private Object getValue(Map<String,Object> submap, String[] subkeys) {
-//Logger.getGlobal().info("length "+subkeys.length);
         if(subkeys.length>1) {
             if(submap.containsKey(subkeys[0])) {
                 return getValue((Map<String,Object>)submap.get(subkeys[0]),
@@ -91,5 +116,9 @@ public class YamlConfiguration {
         } else {
             return submap.get(subkeys[0]);
         }
+    }
+
+    public Set<String> getKeys() {
+        return map.keySet();
     }
 }

@@ -145,13 +145,8 @@ public class MyWarpDBConnector {
                 getWarp.setString(1, addWildcards(name));
                 getWarp.setString(2, player.getUniqueId().toString());
                 getWarp.setString(3, player.getUniqueId().toString());
-    //Logger.getGlobal().info(getWarp.toString());
                 ResultSet result = getWarp.executeQuery();
                 if(result.first()) {
-                    //if(!result.isLast()) {
-                        //several matching warps found
-                    //    return null;
-                    //}
                     String world = worldUUID.get(result.getString("world.uuid"));
                     if(world==null) {
                         //world unknown

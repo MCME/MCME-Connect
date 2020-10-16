@@ -58,17 +58,13 @@ public class WarpHandler {
             warpName = warpName + " " + message[i];
         }
         Warp warp = ConnectBungeePlugin.getMyWarpConnector().getWarp(player, warpName);
-//Logger.getGlobal().info("found warp "+warp);
         if(warp !=null && !warp.getWorld().equals(player.getServer().getInfo().getName())) {
-//Logger.getGlobal().info("is Cross World! ");
             if(warp.getWorld().equals("_unknown")) {
-//Logger.getGlobal().info("World unknown!");
-                ChatMessageHandler.handle(player.getServer().getInfo().getName(), player.getName(), 
+                ChatMessageHandler.handle(player.getServer().getInfo().getName(), player.getName(),
                                           ChatColor.RED+"The world of that warp could not be found!", 10);
             } else if((player.hasPermission(Permission.WORLD+"."
                        +warp.getWorld().toLowerCase()))){
-//Logger.getGlobal().info("Warpin!!");
-                TpposHandler.handle(player.getName(), warp.getServer(), 
+                TpposHandler.handle(player.getName(), warp.getServer(),
                                     warp.getWorld(), warp.getLocation(), 
                                     ChatColor.AQUA+warp.getWelcomeMessage()
                                            .replace("%player%", player.getName())
@@ -84,7 +80,6 @@ public class WarpHandler {
     }
     
     public static boolean isWarpCommand(String[] message) {
-//Logger.getGlobal().info("warpCommand? "+message[0]+message[1]);
         return message.length>1
             && commands.contains(message[0].toLowerCase())
             && !subcommands.contains(message[1].toLowerCase());
