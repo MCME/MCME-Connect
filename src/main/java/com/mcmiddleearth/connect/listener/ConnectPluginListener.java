@@ -35,10 +35,8 @@ import java.util.HashSet;
 import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
-import org.bukkit.ChatColor;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.World;
+
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.messaging.PluginMessageListener;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -62,6 +60,7 @@ public class ConnectPluginListener implements PluginMessageListener {
         }
         ByteArrayDataInput in = ByteStreams.newDataInput(message);
         String subchannel = in.readUTF();
+//Logger.getGlobal().info("Connect Plugin Message: "+subchannel);
         if (subchannel.equals(Channel.TPPOS)) {
             String playerData = in.readUTF();
             String worldData = in.readUTF();
@@ -187,6 +186,24 @@ public class ConnectPluginListener implements PluginMessageListener {
                 PlayerList.addPlayer(connectedPlayer);
             } else {
                 PlayerList.removePlayer(connectedPlayer);
+            }
+        } else if(subchannel.equals(Channel.GAMEMODE)) {
+            Player p = Bukkit.getPlayer(UUID.fromString(in.readUTF()));
+            short gm = in.readShort();
+//Logger.getLogger("ConnectPluginListener").info("receiveGamemode: "+p.getName()+" "+gm+" ");
+            switch(gm) {
+                case 0:
+                    p.setGameMode(GameMode.SURVIVAL);
+                    break;
+                case 1:
+                    p.setGameMode(GameMode.CREATIVE);
+                    break;
+                case 2:
+                    p.setGameMode(GameMode.ADVENTURE);
+                    break;
+                case 3:
+                    p.setGameMode(GameMode.SPECTATOR);
+                    break;
             }
         }
     }

@@ -10,7 +10,6 @@ import com.mcmiddleearth.connect.bungee.tabList.tabView.ServerTabView;
 import com.mcmiddleearth.connect.bungee.tabList.tabView.configuration.IPlayerItemConfig;
 import com.mcmiddleearth.connect.bungee.tabList.tabView.configuration.PlayerItemConfig;
 import com.mcmiddleearth.connect.bungee.tabList.tabView.configuration.ViewableTabViewConfig;
-import com.mcmiddleearth.connect.log.Log;
 import net.md_5.bungee.ServerConnection;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -53,22 +52,6 @@ public class TabViewManager implements Listener {
         ConnectBungeePlugin.getInstance().saveDefaultConfig(playerItemConfigFile,playerItemConfigFileName);
         ConnectBungeePlugin.getInstance().saveDefaultConfig(headerFooterConfigFile,headerFooterConfigFileName);
         reloadConfig();
-        /*playerItemConfigs.clear();
-        YamlConfiguration config = new YamlConfiguration();
-        config.load(playerItemConfigFile);
-        for(String key: config.getKeys()) {
-            Map<String, Object> map = config.getSection(key);
-            YamlConfiguration playerItemConfig = new YamlConfiguration(map);
-            playerItemConfigs.put(key, new PlayerItemConfig(playerItemConfig));
-        }
-        config = new YamlConfiguration();
-        config.load(viewConfigFile);
-        for(String key: config.getKeys()) {
-            Map<String, Object> map = config.getSection(key);
-            YamlConfiguration tabViewConfig = new YamlConfiguration(map);
-            String type = tabViewConfig.getString("type", "global");
-            createTabView(type, key, tabViewConfig);
-        }*/
     }
 
     public static void createTabView(String type, String key, YamlConfiguration tabViewConfig) {
@@ -113,21 +96,13 @@ public class TabViewManager implements Listener {
             Map<String, Object> map = config.getSection(key);
             YamlConfiguration tabViewConfig = new YamlConfiguration(map);
             ITabView view = tabViews.get(key);
-            /*if(view!=null) {
-                view.getConfig().reload(tabViewConfig);
-            } else {*/
-                String type = tabViewConfig.getString("type", "GlobalTabView");
-                createTabView(type, key, tabViewConfig);
-            //}
-        }
+            String type = tabViewConfig.getString("type", "GlobalTabView");
+            createTabView(type, key, tabViewConfig);
+            }
         for(Map.Entry<ProxiedPlayer,String> entry: playerViews.entrySet()) {
             setTabView(entry.getValue(),entry.getKey());
         }
     }
-
-    /*public static void updateViews() {
-        tabViews.forEach((identifier, tabView) -> tabView.update(PlayerItemManager.getPlayerItems()));
-    }*/
 
     @EventHandler
     public void onServerConnected(ServerSwitchEvent event) {
@@ -139,7 +114,6 @@ public class TabViewManager implements Listener {
             if(getTabView(player)==null || !getTabView(player).isViewerAllowed(player)) {
                 setTabView(null, player);
             }
-            Log.info("tab_packet","inject listener for "+player.getName());
             wrapper.getHandle().pipeline().addBefore(PipelineUtils.BOSS_HANDLER, "mcme-connect-packet-listener", packetListener);
         } catch (Exception ex) {
             Logger.getLogger(TabViewManager.class.getName()).log(Level.SEVERE, "Failed to inject packet listener", ex);
@@ -200,7 +174,6 @@ public class TabViewManager implements Listener {
     }
 
     public static void handleRemovePlayerPacket(ProxiedPlayer vanillaRecipient, PlayerListItem packet) {
-        //PacketListener.printListItemPacket(packet);
         Set<TabViewPlayerItem> items = PlayerItemManager.removePlayerItems(vanillaRecipient, packet);
         tabViews.forEach((identfier, tabView) -> tabView.handleRemovePlayer(vanillaRecipient, items));
     }
@@ -290,17 +263,14 @@ public class TabViewManager implements Listener {
         return footers.getOrDefault(identifier,"not found");
     }
 
+    public static void showTabViews() {
+        tabViews.forEach((server,view) -> {
+            Logger.getLogger("TabView").log(Level.INFO,"Server: "+server);
+            view.getViewers().forEach(uuid -> {
+                ProxiedPlayer player = ProxyServer.getInstance().getPlayer(uuid);
+                Logger.getLogger("TabView").log(Level.INFO,"   - Player: "+(player!=null?player.getName():uuid));
+            });
+        });
+    }
 
-    /*public static boolean setTabView(ProxiedPlayer player, String tabView) {
-        ITabView currentView = getTabView(player);
-        ITabView nextView = getTabView(tabView);
-        if(nextView!=null && nextView.isViewerAllowed(player)) {
-            if (currentView != null) {
-                currentView.removeViewer(player);
-            }
-            nextView.addViewer(player);
-            return true;
-        }
-        return false;
-    }*/
 }

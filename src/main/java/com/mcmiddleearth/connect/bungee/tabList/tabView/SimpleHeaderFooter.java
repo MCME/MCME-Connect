@@ -19,12 +19,6 @@ public class SimpleHeaderFooter implements IHeaderFooter {
     public SimpleHeaderFooter(String header, String footer) {
         this.header = header;
         this.footer = footer;
-        /*ProxyServer.getInstance().getScheduler().schedule(ConnectBungeePlugin.getInstance(), () -> {
-            animationCounter++;
-            if(animationCounter == Integer.MAX_VALUE) {
-                animationCounter = 0;
-            }
-        },1,1, TimeUnit.SECONDS);*/
     }
 
     @Override
@@ -32,8 +26,6 @@ public class SimpleHeaderFooter implements IHeaderFooter {
         PlayerListHeaderFooter packet = new PlayerListHeaderFooter();
         packet.setFooter("\""+replacePlaceholder(player, TabViewManager.getFooter(footer))+"\"");
         packet.setHeader("\""+replacePlaceholder(player, TabViewManager.getHeader(header))+"\"");
-        //Log.info("getDisplayname",packet.getHeader());
-        //Log.info("getDisplayname",packet.getFooter());
         player.unsafe().sendPacket(packet);
     }
 

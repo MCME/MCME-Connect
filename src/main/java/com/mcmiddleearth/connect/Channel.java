@@ -41,6 +41,7 @@ public class Channel {
     public static final String AFK     = "afk";
     public static final String SERVER_INFO  = "server_info";
     public static final String PLAYER   = "player";
+    public static final String GAMEMODE   = "gamemode";
 
 }
 
