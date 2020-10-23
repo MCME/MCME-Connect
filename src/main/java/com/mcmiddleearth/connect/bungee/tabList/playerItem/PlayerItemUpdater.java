@@ -65,17 +65,19 @@ if(TabViewCommand.showItems || TabViewCommand.showTabViews) {
                         out.writeShort(item.getGamemode());
 //Logger.getGlobal().info("sendGamemode: "+player.getName()+" "+player.isConnected()+" "+player.getServer().getInfo().getName()+" "+item.getGamemode()+" ");
                         player.getServer().getInfo().sendData(Channel.MAIN, out.toByteArray(),true);
+                    } else {
+//Logger.getGlobal().info("null player or not connected!!!!!!");
                     }
                 });
                 for (Map.Entry<String, ServerInfo> server : ProxyServer.getInstance().getServers().entrySet()) {
                     if (!server.getValue().getPlayers().isEmpty()) {
                         ProxiedPlayer sender = server.getValue().getPlayers().stream().findFirst().orElse(null);
                         List<PlayerListItem.Item> items = new ArrayList<>();
-                        for (ProxiedPlayer player : server.getValue().getPlayers()) {
-                            String serverName = server.getValue().getName();
-                            UUID uuid = player.getUniqueId();
-                            Map<UUID,TabViewPlayerItem> serverStoredItemMap = PlayerItemManager.getPlayerItems(serverName);
-                            if(serverStoredItemMap != null) {
+                        String serverName = server.getValue().getName();
+                        Map<UUID,TabViewPlayerItem> serverStoredItemMap = PlayerItemManager.getPlayerItems(serverName);
+                        if(serverStoredItemMap != null) {
+                            for (ProxiedPlayer player : server.getValue().getPlayers()) {
+                                UUID uuid = player.getUniqueId();
                                 TabViewPlayerItem stored = serverStoredItemMap.get(uuid);
                                 if (stored == null) {
                                     stored = removalCache.get(player.getUniqueId());
@@ -101,15 +103,15 @@ if(TabViewCommand.showItems || TabViewCommand.showTabViews) {
                         }
                     }
                 }
-                if (TabViewCommand.showItems || TabViewCommand.showTabViews) {
-                    Logger.getGlobal().info("*done*");
-                    if (TabViewCommand.showItems) {
-                        PlayerItemManager.showItems();
-                    }
-                    if (TabViewCommand.showTabViews) {
-                        TabViewManager.showTabViews();
-                    }
-                }
+if (TabViewCommand.showItems || TabViewCommand.showTabViews) {
+    Logger.getGlobal().info("*done*");
+    if (TabViewCommand.showItems) {
+        PlayerItemManager.showItems();
+    }
+    if (TabViewCommand.showTabViews) {
+        TabViewManager.showTabViews();
+    }
+}
             }, 500, TimeUnit.MILLISECONDS);
         }, 10, ConnectBungeePlugin.getConfig().getInt("TabListUpdateSeconds",2), TimeUnit.SECONDS);
     }

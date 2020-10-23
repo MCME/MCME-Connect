@@ -190,7 +190,7 @@ public class ConnectPluginListener implements PluginMessageListener {
         } else if(subchannel.equals(Channel.GAMEMODE)) {
             Player p = Bukkit.getPlayer(UUID.fromString(in.readUTF()));
             short gm = in.readShort();
-//Logger.getLogger("ConnectPluginListener").info("receiveGamemode: "+p.getName()+" "+gm+" ");
+Logger.getLogger("ConnectPluginListener").info("receiveGamemode: "+p.getName()+" "+gm+" ");
             switch(gm) {
                 case 0:
                     p.setGameMode(GameMode.SURVIVAL);

@@ -30,6 +30,7 @@ public class PacketListener extends MessageToMessageDecoder<PacketWrapper> {
                 if (packetWrapper.packet instanceof PlayerListItem) {
                     try {
                         PlayerListItem playerListPacket = (PlayerListItem) packetWrapper.packet;
+                        PacketLogger.receivePacked(playerListPacket);
                         switch (playerListPacket.getAction()) {
                             case ADD_PLAYER:
                                 //printListItemPacket(component + ".add", ((PlayerListItem) packetWrapper.packet));
@@ -48,8 +49,11 @@ public class PacketListener extends MessageToMessageDecoder<PacketWrapper> {
                                 TabViewManager.handleUpdateDisplayNamePacket(player, playerListPacket);
                                 break;
                             case REMOVE_PLAYER:
+
+                                // handled by PlayerItem Updater!!!
+
                                 //printListItemPacket(component + ".remove", ((PlayerListItem) packetWrapper.packet));
-                                TabViewManager.handleRemovePlayerPacket(player, playerListPacket);
+                                // TabViewManager.handleRemovePlayerPacket(player, playerListPacket);
                                 break;
                         }
                         return;

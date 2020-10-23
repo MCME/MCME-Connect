@@ -1,5 +1,6 @@
 package com.mcmiddleearth.connect.bungee.tabList.tabView;
 
+import com.mcmiddleearth.connect.bungee.tabList.PacketLogger;
 import com.mcmiddleearth.connect.bungee.tabList.playerItem.TabViewPlayerItem;
 import com.mcmiddleearth.connect.bungee.tabList.tabView.configuration.ViewableTabViewConfig;
 import com.mcmiddleearth.connect.bungee.vanish.VanishHandler;
@@ -59,9 +60,9 @@ public abstract class VanishSupportTabView extends AbstractViewableTabView {
             ProxiedPlayer player = ProxyServer.getInstance().getPlayer(uuid);
             if (player != null) {
                 if (!VanishHandler.hasVanishSeePermission(player)) {
-                    player.unsafe().sendPacket(packet);
+                    PacketLogger.sendItem(player,packet);
                 } else {
-                    player.unsafe().sendPacket(packetDisplay);
+                    PacketLogger.sendItem(player,packetDisplay);
                 }
             }
         });
@@ -96,13 +97,13 @@ public abstract class VanishSupportTabView extends AbstractViewableTabView {
         viewers.forEach(uuid -> {
             ProxiedPlayer player = ProxyServer.getInstance().getPlayer(uuid);
             if(player!=null && VanishHandler.hasVanishSeePermission(player)) {
-                player.unsafe().sendPacket(packet);
+                PacketLogger.sendItem(player,packet);
             }
         });
         viewers.forEach(uuid -> {
             ProxiedPlayer player = ProxyServer.getInstance().getPlayer(uuid);
             if(player!=null && !VanishHandler.hasVanishSeePermission(player)) {
-                player.unsafe().sendPacket(publicPacket);
+                PacketLogger.sendItem(player,publicPacket);
             }
         });
     }
