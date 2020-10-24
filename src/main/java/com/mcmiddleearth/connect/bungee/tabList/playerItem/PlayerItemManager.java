@@ -91,7 +91,7 @@ public class PlayerItemManager {
         }
         return updates;
     }
-    
+
     public static synchronized Set<TabViewPlayerItem> removePlayerItems(ProxiedPlayer vanillaRecipient, PlayerListItem packet) {
         if(vanillaRecipient!=null) {
             if(vanillaRecipient.getServer()==null) {
@@ -172,5 +172,17 @@ public class PlayerItemManager {
                                                 +entry2.getValue().getDisplayname()+" "+entry2.getValue().getGamemode());
             }));
         });
+    }
+
+    public static Map<String,Map<UUID, TabViewPlayerItem>> getSnapshot() {
+        Map<String,Map<UUID, TabViewPlayerItem>> result = new HashMap<>();
+        playerItems.forEach((server,map) -> {
+            Map<UUID, TabViewPlayerItem> items = new HashMap<>();
+            map.forEach((uuid,item) -> {
+                items.put(uuid, item.clone());
+            });
+            result.put(server,items);
+        });
+        return result;
     }
 }

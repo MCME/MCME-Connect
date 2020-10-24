@@ -35,6 +35,45 @@ global:
   # Format of player items as defined in playerItems.yml
   playerItem: default
 
+moderation:
+
+  # name of providing java class
+  type: GlobalTabView
+
+  # Permission to see this tablist
+  permission: "mcmemoderation.watchlist.see"
+
+  # Priority for players to connect
+  priority:
+    default: 20
+
+  # players on these servers will be displayed
+  displayedServers:
+    - world
+    - moria
+    - plotworld
+    - freebuild
+    - themedbuilds
+    - pvp
+
+  # servers where this tab view is available
+  viewerServers:
+    - world
+    - moria
+    - plotworld
+    - freebuild
+    - themedbuilds
+    - pvp
+
+  # supported placeholder {RoleColor], {Role}, {Player}, {Ping} "Server", {Time}, {CurrentTick},
+  # {PaperVersion}, {BukkitVersion}, {MinecraftVersion}, {ViewDistance}, {WorldType},
+  # {TPS_1}, {TPS_5}, {TPS_15}, {Welcome}
+  header: "§ePlayers in the MCME network"
+  footer: "§6Time: §e{Time} §4| §6Node: §e{Server}\n§6Ping: {Ping} §4| {TPS_1} tps"
+
+  # Format of player items as defined in playerItems.yml
+  playerItem: default
+
 # player tab list with only players on pvp server displayed.
 pvp:
 

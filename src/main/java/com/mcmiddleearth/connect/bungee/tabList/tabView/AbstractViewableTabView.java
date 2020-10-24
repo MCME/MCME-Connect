@@ -154,7 +154,8 @@ public abstract class AbstractViewableTabView implements ITabView{
 
     @Override
     public boolean isViewerAllowed(ProxiedPlayer player) {
-        return isViewerAllowedOn(player.getServer().getInfo().getName());
+        return isViewerAllowedOn(player.getServer().getInfo().getName())
+                && (config.getPermission().equals("") || player.hasPermission(config.getPermission()));
     }
 
     protected abstract boolean isDisplayed(TabViewPlayerItem item);

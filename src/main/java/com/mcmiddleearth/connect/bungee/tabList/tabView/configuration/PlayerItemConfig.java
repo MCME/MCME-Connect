@@ -4,6 +4,7 @@ import com.google.common.base.Joiner;
 import com.mcmiddleearth.connect.bungee.YamlConfiguration;
 import com.mcmiddleearth.connect.bungee.tabList.playerItem.TabViewPlayerItem;
 import com.mcmiddleearth.connect.bungee.tabList.util.JsonTextUtil;
+import com.mcmiddleearth.connect.bungee.tabList.util.ModerationUtil;
 import com.mcmiddleearth.connect.bungee.vanish.VanishHandler;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
@@ -45,6 +46,7 @@ public class PlayerItemConfig implements IPlayerItemConfig{
                 PlayerItemPartConfig playerItemPartConfig = new PlayerItemPartConfig();
                 playerItemPartConfig.setAfk((Boolean) itemConfig.getValue("afk"));
                 playerItemPartConfig.setVanished((Boolean) itemConfig.getValue("vanished"));
+                playerItemPartConfig.setWatched((Boolean) itemConfig.getValue("watched"));
                 playerItemPartConfig.setRequireAllPermissions(itemConfig.getBoolean("requireAllPermissions", false));
                 playerItemPartConfig.setShorten(itemConfig.getBoolean("shorten", false));
                 playerItemPartConfig.setText(itemConfig.getString("text", "No text found."));
@@ -69,6 +71,9 @@ public class PlayerItemConfig implements IPlayerItemConfig{
                     .filter(part ->
                             part.isVanished() == null
                                     || part.isVanished() == VanishHandler.isVanished(item.getUuid()))
+                    .filter(part ->
+                            part.isWatched() == null
+                                    || part.isWatched() == ModerationUtil.isWatched(player))
                     .filter(part ->
                             part.getServers() == null
                                     || part.getServers().isEmpty()
@@ -129,7 +134,8 @@ public class PlayerItemConfig implements IPlayerItemConfig{
 
     private String replacePlacholders(String text, ProxiedPlayer player) {
         String roleColor = getRankColor(player).replace("&", "§");
-        return text.replace("{RoleColor}",roleColor).replace("{Player}",player.getName());
+        return text.replace("{RoleColor}",roleColor).replace("{Player}",player.getName())
+                   .replace("{WatchlistPrefix}", ModerationUtil.getWatchlistPrefix());
     }
 
     private static int lengthWithoutFormatting(String formatted) {

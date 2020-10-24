@@ -11,6 +11,7 @@ public class PlayerItemPartConfig {
     private boolean requireAllPermissions;
     private List<String> servers;
     private Boolean vanished;
+    private Boolean watched;
 
     public String getText() {
         return text;
@@ -67,4 +68,8 @@ public class PlayerItemPartConfig {
     public void setVanished(Boolean vanished) {
         this.vanished = vanished;
     }
+
+    public Boolean isWatched() { return watched; }
+
+    public void setWatched(Boolean watched) { this.watched = watched; }
 }

@@ -131,4 +131,15 @@ public class TabViewPlayerItem {
         hash = 19 * hash + Objects.hashCode(this.uuid);
         return hash;
     }
+
+    public TabViewPlayerItem clone() {
+        TabViewPlayerItem clone =  new TabViewPlayerItem(uuid,username);
+        clone.setPing(this.ping);
+        clone.setGamemode(this.gamemode);
+        clone.setAfk(this.afk);
+        clone.setDisplayname(this.displayname);
+        clone.properties = this.getProperties();
+        clone.vanished = this.vanished;
+        return clone;
+    }
 }
