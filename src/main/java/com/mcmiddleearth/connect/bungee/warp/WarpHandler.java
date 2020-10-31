@@ -92,12 +92,13 @@ public class WarpHandler {
 
     public static void updateCache() {
         cache = ConnectBungeePlugin.getMyWarpConnector().getWarps();
+//cache.forEach(warp -> Logger.getGlobal().info(warp.getName()));
     }
 
     public static List<String> getSuggestions(String search, ProxiedPlayer player) {
         List<String> result = new ArrayList<>();
-        cache.stream().filter(warp -> warp.getName().startsWith(search)
-                                   && (warp.isVisible(player)))
+        cache.stream().filter(warp -> warp.isVisible(player)
+                                   && warp.getName().startsWith(search))
                       .sorted(Comparator.comparing(Warp::getName))
                       .forEachOrdered(warp -> result.add(warp.getName()));
         return result;

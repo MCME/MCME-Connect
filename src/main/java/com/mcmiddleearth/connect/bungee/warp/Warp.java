@@ -84,7 +84,11 @@ public class Warp {
     }
 
     public void setInvited(Set<UUID> invitedPlayers) {
-        invited = invitedPlayers;
+        if(invitedPlayers==null) {
+            invited = new HashSet<>();
+        } else {
+            invited = invitedPlayers;
+        }
     }
 
     public void setOwner(UUID owner) {
