@@ -20,9 +20,8 @@ import com.mcmiddleearth.connect.Permission;
 import com.mcmiddleearth.connect.bungee.ConnectBungeePlugin;
 import com.mcmiddleearth.connect.bungee.Handler.ChatMessageHandler;
 import com.mcmiddleearth.connect.bungee.Handler.TpposHandler;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+
+import java.util.*;
 import java.util.logging.Logger;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -36,6 +35,8 @@ public class WarpHandler {
 
     private static final Set<String> commands = new HashSet<>();
     private static final Set<String> subcommands = new HashSet<>();
+
+    private static Set<Warp> cache = new HashSet<>();
     
     static {
         commands.addAll(Arrays.asList(new String[]{"/warp","/to"}));
@@ -84,4 +85,22 @@ public class WarpHandler {
             && commands.contains(message[0].toLowerCase())
             && !subcommands.contains(message[1].toLowerCase());
     }
+
+    public static boolean matchesSubcommand(String message) {
+        return subcommands.stream().anyMatch(subcommand -> subcommand.startsWith(message));
+    }
+
+    public static void updateCache() {
+        cache = ConnectBungeePlugin.getMyWarpConnector().getWarps();
+    }
+
+    public static List<String> getSuggestions(String search, ProxiedPlayer player) {
+        List<String> result = new ArrayList<>();
+        cache.stream().filter(warp -> warp.getName().startsWith(search)
+                                   && (warp.isVisible(player)))
+                      .sorted(Comparator.comparing(Warp::getName))
+                      .forEachOrdered(warp -> result.add(warp.getName()));
+        return result;
+   }
+
 }

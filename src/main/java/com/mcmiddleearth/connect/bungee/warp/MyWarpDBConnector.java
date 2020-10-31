@@ -27,9 +27,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -51,9 +49,12 @@ public class MyWarpDBConnector {
     private final MySQLDataSource dataBase;
     
     private Connection dbConnection;
-    
+
     private PreparedStatement getWarp;
-    
+    private PreparedStatement getWarpList;
+    private PreparedStatement getPlayerList;
+    private PreparedStatement getInvitations;
+
     private File worldFile = new File(ConnectBungeePlugin.getInstance().getDataFolder(),"world.uuid");
         
     private Map<String, String> worldUUID = new HashMap<>();
@@ -79,6 +80,7 @@ public class MyWarpDBConnector {
         keepAliveTask = ProxyServer.getInstance().getScheduler()
                 .schedule(ConnectBungeePlugin.getInstance(), () -> {
             checkConnection();
+            WarpHandler.updateCache();
         },1,1,TimeUnit.MINUTES);
     }
     
@@ -121,22 +123,71 @@ public class MyWarpDBConnector {
         try {
             dbConnection = dataBase.getConnection(dbUser, dbPassword);
             getWarp = dbConnection.prepareStatement("SELECT warp.name, warp.x, warp.y, warp.z, "
-                                            + "warp.pitch, warp.yaw, warp.welcome_message, warp.visits, "
-                                            + "warp.type, world.uuid, owner.uuid, invited.uuid "
-                                            + "FROM warp JOIN player AS owner ON warp.player_id = owner.player_id "
-                                            +           "JOIN world ON warp.world_id = world.world_id "
-                                            +           "LEFT JOIN warp_player_map ON warp.warp_id = warp_player_map.warp_id "
-                                            +           "LEFT JOIN player AS invited ON warp_player_map.player_id = invited.player_id "
-                                            + "WHERE warp.name REGEXP ? "
-                                                + "AND (warp.type = 1 OR owner.uuid = ? OR invited.uuid = ?) "
-                                            + "ORDER BY warp.visits DESC");
+                    + "warp.pitch, warp.yaw, warp.welcome_message, warp.visits, "
+                    + "warp.type, world.uuid, owner.uuid, invited.uuid "
+                    + "FROM warp JOIN player AS owner ON warp.player_id = owner.player_id "
+                    +           "JOIN world ON warp.world_id = world.world_id "
+                    +           "LEFT JOIN warp_player_map ON warp.warp_id = warp_player_map.warp_id "
+                    +           "LEFT JOIN player AS invited ON warp_player_map.player_id = invited.player_id "
+                    + "WHERE warp.name REGEXP ? "
+                    + "AND (warp.type = 1 OR owner.uuid = ? OR invited.uuid = ?) "
+                    + "ORDER BY warp.visits DESC");
             getWarp.setQueryTimeout(1);
             getWarp.setFetchSize(1);
+            getWarpList = dbConnection.prepareStatement("SELECT warp.warp_id, warp.name, warp.player_id, warp.type "
+                    + "FROM warp");
+            getWarpList.setQueryTimeout(1);
+            getPlayerList = dbConnection.prepareStatement("SELECT player.player_id, player.uuid FROM player");
+            getPlayerList.setQueryTimeout(1);
+            getInvitations = dbConnection.prepareStatement("SELECT player_id, warp_id FROM warp_player_map");
+            getPlayerList.setQueryTimeout(1);
             connected = true;
         } catch (SQLException ex) {
             Logger.getLogger(MyWarpDBConnector.class.getName()).log(Level.SEVERE, null, ex);
             connected = false;
         }
+    }
+
+    public Set<Warp> getWarps() {
+        Set<Warp> result = new HashSet<>();
+        try {
+            ResultSet warpData = getWarpList.executeQuery();
+            ResultSet playerData = getPlayerList.executeQuery();
+            Map<Integer, UUID> players = new HashMap<>(); //player_id -> player UUID
+            if(playerData.first()) {
+                do {
+                    players.put(playerData.getInt("player.player_id"),
+                            UUID.fromString(playerData.getString("player.uuid")));
+                } while(playerData.next());
+            }
+            ResultSet invitationData = getInvitations.executeQuery();
+            Map<Integer, Set<UUID>> invitations = new HashMap<>(); // warp_id -> List of player UUID
+            if(invitationData.first()) {
+                do {
+                    int warpId = invitationData.getInt("warp_id");
+                    Set<UUID> invitedPlayers = invitations.get(warpId);
+                    if(invitedPlayers==null) {
+                        invitedPlayers = new HashSet<>();
+                        invitations.put(warpId,invitedPlayers);
+                    }
+                    invitedPlayers.add(players.get(invitationData.getInt("player_id")));
+                } while(invitationData.next());
+            }
+            if(warpData.first()) {
+                do {
+                    Warp warp = new Warp();
+                    warp.setName(warpData.getString("warp.name"));
+                    warp.setPublic(warpData.getInt("warp.type")==1);
+                    warp.setOwner(players.get(warpData.getInt("warp.player_id")));
+                    warp.setInvited(invitations.get(warpData.getInt("warp.warp_id")));
+                    result.add(warp);
+                } while(warpData.next());
+            }
+        } catch (SQLException throwables) {
+            Logger.getLogger(MyWarpDBConnector.class.getName()).log(Level.SEVERE, null, throwables);
+            connected = false;
+        }
+        return result;
     }
     
     public Warp getWarp(ProxiedPlayer player, String name) {
@@ -222,6 +273,8 @@ public class MyWarpDBConnector {
         return connected;
     }
 }
+
+
 /*
 
 SELECT warp.name, warp.x, warp.y, warp.z, warp.pitch, warp.yaw, warp.welcome_message, 

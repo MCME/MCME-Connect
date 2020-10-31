@@ -326,8 +326,17 @@ public class CommandListener implements Listener {
                                     .forEach(server -> event.getSuggestions().add(server));
                         } else {
                             event.getSuggestions().addAll(servers);
-                            
                         }
+                    break;
+                case "/warp":
+                    if(args.length == 2 && !WarpHandler.matchesSubcommand(args[1])) {
+                        event.getSuggestions().addAll(WarpHandler.getSuggestions(args[1],(ProxiedPlayer)event.getSender()));
+                    }
+                    break;
+                case "/vote":
+                    if(args.length == 2) {
+                        suggestAllOtherPlayers(event,args[1]);
+                    }
                     break;
                 default:
                     if(!args[0].startsWith("/")) {
