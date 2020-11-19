@@ -131,11 +131,11 @@ public class CommandListener implements Listener {
                                 .equals(player.getServer().getInfo().getName())) {
                         if(destination.hasPermission(Permission.WORLD+"."+player.getServer()
                                                                        .getInfo().getName())
-                                && isMvtpAllowed(player)) {
+                                && isMvtpAllowed(destination)) {
                             TpahereHandler.sendRequest(player,destination);
                         } else {
-                            player.sendMessage(new ComponentBuilder("You don't have permission to enter "
-                                                                      +destination.getName()+"'s world.")
+                            player.sendMessage(new ComponentBuilder(destination.getName()+" doesn't have permission to enter "
+                                                                      +"your world.")
                                                     .color(ChatColor.RED).create());
                         }
                         event.setCancelled(true);
