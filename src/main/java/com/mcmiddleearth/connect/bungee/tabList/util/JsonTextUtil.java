@@ -6,6 +6,7 @@ import net.md_5.bungee.api.ChatColor;
 
 import java.awt.*;
 import java.util.Random;
+import java.util.logging.Logger;
 
 public class JsonTextUtil {
 

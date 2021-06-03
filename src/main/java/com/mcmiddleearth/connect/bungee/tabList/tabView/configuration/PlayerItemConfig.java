@@ -14,6 +14,7 @@ import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.util.*;
+import java.util.logging.Logger;
 
 public class PlayerItemConfig implements IPlayerItemConfig{
 
@@ -185,7 +186,9 @@ public class PlayerItemConfig implements IPlayerItemConfig{
         if(!prefixes.isEmpty()) {
             color = prefixes.get(prefixes.firstKey());
             if(color.length()>1 && color.charAt(0) == '&') {
-                if(color.length()>3 && color.charAt(2) == '&') {
+                if(color.length()>6 && color.charAt(1) == '#') {
+                    color = color.substring(1,8);
+                } else if(color.length()>3 && color.charAt(2) == '&') {
                     color = color.substring(0, 4);
                 } else {
                     color = color.substring(0, 2);
