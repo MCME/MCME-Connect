@@ -16,7 +16,9 @@ public class ViewableTabViewConfig implements ITabViewConfig{
     private Map<String, Integer> priority = new HashMap<>();
     private String header;
     private String footer;
+    private String permission;
     private IPlayerItemConfig config;
+
 
     public ViewableTabViewConfig(YamlConfiguration config) {
         reload(config);
@@ -29,6 +31,7 @@ public class ViewableTabViewConfig implements ITabViewConfig{
         if(displayedServers==null) displayedServers = new ArrayList<>();
         header = config.getString("header", "§eWelcome to §6§lMCME §f{Player}");
         footer = config.getString("footer", "§6Time: §e{Time} §4| §6Node: §e{Server}\n§6Ping: {Ping} §4| {TPS_1} tps");
+        permission = config.getString("permission","");
         priority.clear();
         ((Map<String,Object>)config.getValue("priority")).forEach((server,serverPriority) -> {
             priority.put(server,(Integer)serverPriority);
@@ -66,5 +69,9 @@ public class ViewableTabViewConfig implements ITabViewConfig{
             }
         }
         return priority.get(server);
+    }
+
+    public String getPermission() {
+        return permission;
     }
 }

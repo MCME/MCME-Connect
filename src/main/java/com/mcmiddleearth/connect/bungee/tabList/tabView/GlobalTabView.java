@@ -5,11 +5,8 @@
  */
 package com.mcmiddleearth.connect.bungee.tabList.tabView;
 
-import com.mcmiddleearth.connect.bungee.tabList.playerItem.PlayerItemManager;
 import com.mcmiddleearth.connect.bungee.tabList.playerItem.TabViewPlayerItem;
 import com.mcmiddleearth.connect.bungee.tabList.tabView.configuration.ViewableTabViewConfig;
-
-import java.util.Set;
 
 /**
  *

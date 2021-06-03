@@ -16,6 +16,13 @@
  */
 package com.mcmiddleearth.connect.bungee.warp;
 
+import net.md_5.bungee.api.connection.ProxiedPlayer;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+
 /**
  *
  * @author Eriol_Eandur
@@ -27,6 +34,10 @@ public class Warp {
     private String name;
     private String location;
     private String welcomeMessage;
+    private boolean visibleToEveryone;
+    private UUID owner;
+    private Set<UUID> invited = new HashSet<>();
+
 
     public String getServer() {
         return server;
@@ -66,5 +77,25 @@ public class Warp {
 
     public void setWelcomeMessage(String welcomeMessage) {
         this.welcomeMessage = welcomeMessage;
+    }
+
+    public boolean isVisible(ProxiedPlayer player) {
+        return visibleToEveryone || player.getUniqueId().equals(owner) || invited.contains(player.getUniqueId());
+    }
+
+    public void setInvited(Set<UUID> invitedPlayers) {
+        if(invitedPlayers==null) {
+            invited = new HashSet<>();
+        } else {
+            invited = invitedPlayers;
+        }
+    }
+
+    public void setOwner(UUID owner) {
+        this.owner = owner;
+    }
+
+    public void setPublic(boolean isPublic) {
+        visibleToEveryone = isPublic;
     }
 }

@@ -53,6 +53,5 @@ public interface ITabView {
 
     int getPriority(String server);
 
-    //void update(Set<TabViewPlayerItem> items);
 
 }

@@ -1,15 +1,20 @@
 package com.mcmiddleearth.connect.bungee.tabList;
 
 import com.mcmiddleearth.connect.Permission;
+import com.mcmiddleearth.connect.bungee.ConnectBungeePlugin;
+import com.mcmiddleearth.connect.bungee.tabList.playerItem.PlayerItemManager;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.api.plugin.TabExecutor;
+import net.md_5.bungee.command.ConsoleCommandSender;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class TabViewCommand extends Command implements TabExecutor {
 
@@ -59,7 +64,22 @@ public class TabViewCommand extends Command implements TabExecutor {
                     "You are not allowed to use that command.")
                     .color(ChatColor.RED).create());
         }
+        if(commandSender instanceof ConsoleCommandSender) {
+            if(args.length > 0 && args[0].equalsIgnoreCase("showItems")) {
+                Logger.getLogger(ConnectBungeePlugin.class.getSimpleName()).log(Level.INFO,"************Show Items***********");
+                //PlayerItemManager.showItems();
+                showItems = !showItems;
+                return;
+            }
+            if(args.length > 0 && args[0].equalsIgnoreCase("showViews")) {
+                Logger.getLogger(ConnectBungeePlugin.class.getSimpleName()).log(Level.INFO,"************Show Views***********");
+                //TabViewManager.showTabViews();
+                showTabViews = !showTabViews;
+            }
+        }
     }
+public static boolean showItems;
+public static boolean showTabViews;
 
     @Override
     public Iterable<String> onTabComplete(CommandSender commandSender, String[] args) {

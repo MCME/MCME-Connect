@@ -1,4 +1,13 @@
 #bungee
+
+# synchronization of gamemode between servers, defaults to false
+syncGamemode:
+  world: true
+  moria: true
+  plotworld: true
+  freebuild: true
+  themedbuilds: true
+  newplayer: true
 legacyRedirect:
     enabled: true
     from: newplayer

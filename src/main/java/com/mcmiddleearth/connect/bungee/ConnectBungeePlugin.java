@@ -240,4 +240,8 @@ public class ConnectBungeePlugin extends Plugin {
     public TabViewCommand getTabViewCommand() {
         return tabViewCommand;
     }
+
+    public static boolean isGamemodeSyncEnabled(String server) {
+        return getConfig().getBoolean("syncGamemode."+server, false);
+    }
 }

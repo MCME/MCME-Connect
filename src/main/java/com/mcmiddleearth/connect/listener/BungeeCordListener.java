@@ -20,6 +20,7 @@ import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteStreams;
 import com.mcmiddleearth.connect.Channel;
 import com.mcmiddleearth.connect.statistics.StatisticsUpdater;
+import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.messaging.PluginMessageListener;
 
@@ -42,7 +43,9 @@ public class BungeeCordListener implements PluginMessageListener {
             byte[] msgbytes = new byte[len];
             in.readFully(msgbytes);
             StatisticsUpdater.updateStatistic(msgbytes);
-        }
+         }
     }
+
+
     
 }

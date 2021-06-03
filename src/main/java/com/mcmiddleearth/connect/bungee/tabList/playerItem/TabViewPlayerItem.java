@@ -5,15 +5,14 @@
  */
 package com.mcmiddleearth.connect.bungee.tabList.playerItem;
 
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.UUID;
-
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import com.mcmiddleearth.connect.Channel;
-import com.mcmiddleearth.connect.log.Log;
 import net.md_5.bungee.protocol.packet.PlayerListItem;
+
+import java.util.Arrays;
+import java.util.Objects;
+import java.util.UUID;
 
 /**
  *
@@ -33,9 +32,6 @@ public class TabViewPlayerItem {
     public TabViewPlayerItem(PlayerListItem.Item item) {
         uuid = item.getUuid();
         username = item.getUsername();
-        /*if(username==null) { //unsafe: Possibly access a player who just left!!! Makes other players get kicked from bungee
-            username = ProxyServer.getInstance().getPlayer(uuid).getName();
-        }*/
         displayname = item.getDisplayName();
         gamemode = item.getGamemode();
         ping = item.getPing();
@@ -44,7 +40,6 @@ public class TabViewPlayerItem {
         } else {
             properties = null;
         }
-        Log.info("ViewItem",item.getUsername()+" ");
         afk = false;
     }
 
@@ -61,14 +56,6 @@ public class TabViewPlayerItem {
                      || (displayname!=null && displayname.equals(other.displayname)))
                 && gamemode == other.gamemode
                 && ping == other.ping;
-//        if(!result) {
-/*Logger.getLogger(TabViewPlayerItem.class.getName()).info("uuuid: "+uuid+" "+other.uuid);
-Logger.getLogger(TabViewPlayerItem.class.getName()).info("username: "+username+" "+other.username);
-Logger.getLogger(TabViewPlayerItem.class.getName()).info("displayname: "+displayname+" "+other.displayname);
-Logger.getLogger(TabViewPlayerItem.class.getName()).info("displayname: "+gamemode+" "+other.gamemode);
-Logger.getLogger(TabViewPlayerItem.class.getName()).info("displayname: "+ping+" "+other.ping);*/
-            
-//        }
         return result;
     }
 
@@ -143,5 +130,16 @@ Logger.getLogger(TabViewPlayerItem.class.getName()).info("displayname: "+ping+" 
         int hash = 5;
         hash = 19 * hash + Objects.hashCode(this.uuid);
         return hash;
+    }
+
+    public TabViewPlayerItem clone() {
+        TabViewPlayerItem clone =  new TabViewPlayerItem(uuid,username);
+        clone.setPing(this.ping);
+        clone.setGamemode(this.gamemode);
+        clone.setAfk(this.afk);
+        clone.setDisplayname(this.displayname);
+        clone.properties = this.getProperties();
+        clone.vanished = this.vanished;
+        return clone;
     }
 }

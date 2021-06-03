@@ -131,11 +131,11 @@ public class CommandListener implements Listener {
                                 .equals(player.getServer().getInfo().getName())) {
                         if(destination.hasPermission(Permission.WORLD+"."+player.getServer()
                                                                        .getInfo().getName())
-                                && isMvtpAllowed(player)) {
+                                && isMvtpAllowed(destination)) {
                             TpahereHandler.sendRequest(player,destination);
                         } else {
-                            player.sendMessage(new ComponentBuilder("You don't have permission to enter "
-                                                                      +destination.getName()+"'s world.")
+                            player.sendMessage(new ComponentBuilder(destination.getName()+" doesn't have permission to enter "
+                                                                      +"your world.")
                                                     .color(ChatColor.RED).create());
                         }
                         event.setCancelled(true);
@@ -326,8 +326,17 @@ public class CommandListener implements Listener {
                                     .forEach(server -> event.getSuggestions().add(server));
                         } else {
                             event.getSuggestions().addAll(servers);
-                            
                         }
+                    break;
+                case "/warp":
+                    if(args.length == 2 && !WarpHandler.matchesSubcommand(args[1])) {
+                        event.getSuggestions().addAll(WarpHandler.getSuggestions(args[1],(ProxiedPlayer)event.getSender()));
+                    }
+                    break;
+                case "/vote":
+                    if(args.length == 2) {
+                        suggestAllOtherPlayers(event,args[1]);
+                    }
                     break;
                 default:
                     if(!args[0].startsWith("/")) {

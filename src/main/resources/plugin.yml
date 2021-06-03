@@ -46,3 +46,6 @@ permissions:
     mcmeconnect.restart:
         description: allows to restarts servers
         default: op
+    mcmeconnect.tablist:
+        description: allows to use tablist command
+        default: op
