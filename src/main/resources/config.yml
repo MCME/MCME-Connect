@@ -9,11 +9,11 @@ syncGamemode:
   themedbuilds: true
   newplayer: true
 legacyRedirect:
-    enabled: true
+    enabled: false
     from: newplayer
     to: build
 disableMVTP:
-- newPlayer
+- battle
 serverWatchdog: true
 connectDelay: 200
 premiumVanish: true

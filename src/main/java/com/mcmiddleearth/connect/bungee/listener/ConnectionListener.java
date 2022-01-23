@@ -70,7 +70,7 @@ public class ConnectionListener implements Listener {
         }
         ProxiedPlayer player = event.getPlayer();
         if(!VanishHandler.isPvSupport()) {
-            sendJoinMessage(player,false);
+            //sendJoinMessage(player,false);
         } else {
             VanishHandler.join(player);
         }
@@ -81,7 +81,7 @@ public class ConnectionListener implements Listener {
         ProxiedPlayer player = event.getPlayer();
         TpaHandler.removeRequests(player);
         if(!VanishHandler.isPvSupport()) {
-            sendLeaveMessage(player,false);
+            //sendLeaveMessage(player,false);
         } else {
             VanishHandler.quit(player);
         }
