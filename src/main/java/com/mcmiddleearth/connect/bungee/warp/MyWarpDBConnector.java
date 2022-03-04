@@ -197,7 +197,7 @@ public class MyWarpDBConnector {
                 getWarp.setString(2, player.getUniqueId().toString());
                 getWarp.setString(3, player.getUniqueId().toString());
                 ResultSet result = getWarp.executeQuery();
-                if(result.first()) {
+                if(result.next()) {
                     String world = worldUUID.get(result.getString("world.uuid"));
                     if(world==null) {
                         //world unknown

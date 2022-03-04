@@ -61,6 +61,7 @@ public class ConnectionListener implements Listener {
         //priorities.add("freebuild");
         //priorities.add("newplayerworld");
     }
+
     @EventHandler
     public void onJoin(PostLoginEvent event) {
         if(RestorestatsHandler.getBlacklist().contains(event.getPlayer().getUniqueId())) {
@@ -70,7 +71,7 @@ public class ConnectionListener implements Listener {
         }
         ProxiedPlayer player = event.getPlayer();
         if(!VanishHandler.isPvSupport()) {
-            //sendJoinMessage(player,false);
+            sendJoinMessage(player,false);
         } else {
             VanishHandler.join(player);
         }
@@ -81,7 +82,7 @@ public class ConnectionListener implements Listener {
         ProxiedPlayer player = event.getPlayer();
         TpaHandler.removeRequests(player);
         if(!VanishHandler.isPvSupport()) {
-            //sendLeaveMessage(player,false);
+            sendLeaveMessage(player,false);
         } else {
             VanishHandler.quit(player);
         }
@@ -112,18 +113,20 @@ public class ConnectionListener implements Listener {
                 p.sendMessage(new ComponentBuilder(player.getName()+" joined the game.")
                                             .color(ChatColor.YELLOW).create());
         });
-        Iterator<ProxiedPlayer> it = ProxyServer.getInstance().getPlayers().iterator();
-        if(it.hasNext()) {
-            ProxiedPlayer other = it.next();
-            if(other.getServer()==null) {
-                return;
+        ProxyServer.getInstance().getScheduler().schedule(ConnectBungeePlugin.getInstance(), () -> {
+            Iterator<ProxiedPlayer> it = ProxyServer.getInstance().getPlayers().iterator();
+            if(it.hasNext()) {
+                ProxiedPlayer other = it.next();
+                if(other.getServer()==null) {
+                    return;
+                }
+                ByteArrayDataOutput out = ByteStreams.newDataOutput();
+                out.writeUTF(Channel.DISCORD);
+                out.writeUTF("Global");
+                out.writeUTF(":bangbang: **"+player.getName()+" joined the game.**");
+                other.getServer().getInfo().sendData(Channel.MAIN, out.toByteArray(),true);
             }
-            ByteArrayDataOutput out = ByteStreams.newDataOutput();
-            out.writeUTF(Channel.DISCORD);
-            out.writeUTF("Global");
-            out.writeUTF(":bangbang: **"+player.getName()+" joined the game.**");
-            other.getServer().getInfo().sendData(Channel.MAIN, out.toByteArray(),true);
-        }
+        }, ConnectBungeePlugin.getConnectDelay(), TimeUnit.MILLISECONDS);
     }
     
     public static void sendLeaveMessage(ProxiedPlayer player, boolean fake) {
