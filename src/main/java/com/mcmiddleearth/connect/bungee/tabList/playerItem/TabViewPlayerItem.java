@@ -8,6 +8,7 @@ package com.mcmiddleearth.connect.bungee.tabList.playerItem;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import com.mcmiddleearth.connect.Channel;
+import net.md_5.bungee.protocol.Property;
 import net.md_5.bungee.protocol.packet.PlayerListItem;
 
 import java.util.Arrays;
@@ -24,7 +25,7 @@ public class TabViewPlayerItem {
     private String username;
     private String displayname;
     private int gamemode;
-    private String[][] properties;
+    private Property[] properties;
     private int ping;
     private boolean afk;
     private boolean vanished;
@@ -46,7 +47,7 @@ public class TabViewPlayerItem {
     public TabViewPlayerItem(UUID uuid, String username){
         this.username = username;
         this.uuid = uuid;
-        properties = new String[0][0];
+        properties = new Property[0];
     }
 
     public boolean sameData(TabViewPlayerItem other) {
@@ -89,7 +90,7 @@ public class TabViewPlayerItem {
         return displayname;
     }
 
-    public String[][] getProperties() {
+    public Property[] getProperties() {
         return properties;
     }
 

@@ -7,6 +7,7 @@ import com.mcmiddleearth.connect.bungee.tabList.playerItem.TabViewPlayerItem;
 import com.mcmiddleearth.connect.bungee.tabList.tabView.configuration.ViewableTabViewConfig;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.md_5.bungee.protocol.Property;
 import net.md_5.bungee.protocol.packet.PlayerListHeaderFooter;
 import net.md_5.bungee.protocol.packet.PlayerListItem;
 
@@ -170,7 +171,7 @@ public abstract class AbstractViewableTabView implements ITabView{
             switch(action) {
                 case ADD_PLAYER:
                     item.setUsername(playerItem.getUsername());
-                    String[][] prop = playerItem.getProperties();
+                    Property[] prop = playerItem.getProperties();
                     if (prop != null) {
                         item.setProperties(prop.clone());
                     }

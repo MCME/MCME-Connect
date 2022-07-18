@@ -49,15 +49,18 @@ public class TestListener implements Listener {
     public void onPreLogin(PreLoginEvent event) {
         log("PreLogin name: "+event.getConnection().getName());
         log("PreLogin Cancel Reasons: "+concat(event.getCancelReasonComponents()));
+        log("PreLogin version: "+event.getConnection().getVersion());
     }
     @EventHandler
     public void onLogin(LoginEvent event) {
         log("Login name: "+event.getConnection().getName());
         log("Login Cancel Reasons: "+concat(event.getCancelReasonComponents()));
+        log("PostLogin version: "+event.getConnection().getVersion());
     }
     public void onPostLogin(PostLoginEvent event) {
         log("PostLogin name: "+event.getPlayer().getName());
         log("PostLogin reconnect: "+event.getPlayer().getReconnectServer());
+        log("PostLogin version: "+event.getPlayer().getPendingConnection().getVersion());
     }
     public void onPlayerDisconnect(PlayerDisconnectEvent event) {
         log("Disconnect name: "+event.getPlayer().getName());
@@ -95,8 +98,10 @@ public class TestListener implements Listener {
     
     private String concat(BaseComponent[] messages) {
         String result = "";
-        for(BaseComponent comp: messages) {
-            result = result+" "+comp.toPlainText();
+        if(messages != null) {
+            for(BaseComponent comp: messages) {
+                result = result+" "+comp.toPlainText();
+            }
         }
         return result;
     }

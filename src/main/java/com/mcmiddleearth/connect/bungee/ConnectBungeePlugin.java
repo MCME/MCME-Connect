@@ -28,6 +28,7 @@ import com.mcmiddleearth.connect.bungee.Handler.TpahereHandler;
 import com.mcmiddleearth.connect.bungee.listener.CommandListener;
 import com.mcmiddleearth.connect.bungee.listener.ConnectionListener;
 import com.mcmiddleearth.connect.bungee.listener.PluginMessageListener;
+import com.mcmiddleearth.connect.bungee.listener.TestListener;
 import com.mcmiddleearth.connect.bungee.tabList.TabViewCommand;
 import com.mcmiddleearth.connect.bungee.tabList.TabViewManager;
 import com.mcmiddleearth.connect.bungee.tabList.playerItem.PlayerItemUpdater;
@@ -105,6 +106,7 @@ public class ConnectBungeePlugin extends Plugin {
             getProxy().getPluginManager().registerListener(this, new VanishListener());
         }
         ProxyServer.getInstance().registerChannel(Channel.MAIN);
+        //getProxy().getPluginManager().registerListener(this, new TestListener());
         getProxy().getPluginManager().registerListener(this, new PluginMessageListener());
         getProxy().getPluginManager().registerListener(this, new CommandListener());
         getProxy().getPluginManager().registerListener(this, 
