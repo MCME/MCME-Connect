@@ -18,12 +18,15 @@ package com.mcmiddleearth.connect.bungee.Handler;
 
 import com.mcmiddleearth.connect.Channel;
 import com.mcmiddleearth.connect.bungee.ConnectBungeePlugin;
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.platform.bungeecord.BungeeAudiences;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
+
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.concurrent.TimeUnit;
-import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 /**
  *
@@ -47,8 +50,12 @@ public class ChatMessageHandler {
                     players.add(player);
                 }
             }
-            players.forEach(player ->
-                    player.sendMessage(new ComponentBuilder(message).create()));
+            Audience audience = BungeeAudiences.create(ConnectBungeePlugin.getInstance()).players();
+            audience.sendMessage(LegacyComponentSerializer.builder().build().deserialize(message));
+
+            /*players.forEach(player -> {
+                player.sendMessage(new ComponentBuilder(message).create());
+            });*/
         }, delay, TimeUnit.MILLISECONDS);
         return true;
     }
