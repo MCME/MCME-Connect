@@ -18,22 +18,9 @@ package com.mcmiddleearth.connect.bungee.listener;
 
 import com.mcmiddleearth.connect.Permission;
 import com.mcmiddleearth.connect.bungee.ConnectBungeePlugin;
-import com.mcmiddleearth.connect.bungee.Handler.ConnectHandler;
-import com.mcmiddleearth.connect.bungee.Handler.TpHandler;
-import com.mcmiddleearth.connect.bungee.Handler.MvtpHandler;
-import com.mcmiddleearth.connect.bungee.Handler.RestartHandler;
-import com.mcmiddleearth.connect.bungee.Handler.RestorestatsHandler;
-import com.mcmiddleearth.connect.bungee.Handler.ThemeHandler;
-import com.mcmiddleearth.connect.bungee.Handler.TpaHandler;
-import com.mcmiddleearth.connect.bungee.Handler.TpahereHandler;
-import com.mcmiddleearth.connect.bungee.tabList.TabViewManager;
+import com.mcmiddleearth.connect.bungee.Handler.*;
 import com.mcmiddleearth.connect.bungee.vanish.VanishHandler;
 import com.mcmiddleearth.connect.bungee.warp.WarpHandler;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -42,7 +29,9 @@ import net.md_5.bungee.api.event.ChatEvent;
 import net.md_5.bungee.api.event.TabCompleteEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
-import sun.tools.jconsole.Tab;
+
+import java.util.Arrays;
+import java.util.Collection;
 
 /**
  *

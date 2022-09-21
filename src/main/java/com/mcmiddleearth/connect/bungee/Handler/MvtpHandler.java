@@ -20,12 +20,12 @@ import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import com.mcmiddleearth.connect.Channel;
 import com.mcmiddleearth.connect.bungee.ConnectBungeePlugin;
-import java.util.concurrent.TimeUnit;
-import java.util.logging.Logger;
 import net.md_5.bungee.api.Callback;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  *

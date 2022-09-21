@@ -38,7 +38,10 @@ import com.mcmiddleearth.connect.bungee.warp.MyWarpDBConnector;
 import com.mcmiddleearth.connect.bungee.watchdog.ServerWatchdog;
 import com.mcmiddleearth.connect.log.BungeeLog;
 import com.mcmiddleearth.connect.log.Log;
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.platform.bungeecord.BungeeAudiences;
 import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.api.scheduler.ScheduledTask;
 
@@ -79,6 +82,8 @@ public class ConnectBungeePlugin extends Plugin {
 
     private final Map<String,ServerInformation> serverInformation = new HashMap<>();
 
+    private static BungeeAudiences audiences;
+
     private Log logger;
     
     @Override
@@ -88,6 +93,7 @@ public class ConnectBungeePlugin extends Plugin {
         saveDefaultConfig(configFile, "config.yml");
         loadConfig();
         logger = new BungeeLog();
+        audiences = BungeeAudiences.create(ConnectBungeePlugin.getInstance());
         RestartHandler.init();
         tpaCleanupScheduler = TpaHandler.startCleanupScheduler();
         tpahereCleanupScheduler = TpahereHandler.startCleanupScheduler();
@@ -126,6 +132,7 @@ public class ConnectBungeePlugin extends Plugin {
         tpaCleanupScheduler.cancel();
         tpahereCleanupScheduler.cancel();
         playerItemUpdater.disable();
+        audiences.close();
         logger.disable();
     }
     
@@ -246,4 +253,13 @@ public class ConnectBungeePlugin extends Plugin {
     public static boolean isGamemodeSyncEnabled(String server) {
         return getConfig().getBoolean("syncGamemode."+server, false);
     }
+
+    public static BungeeAudiences getAudiences() {
+        return audiences;
+    }
+
+    public static Audience getAudience(ProxiedPlayer player) {
+        return audiences.player(player);
+    }
+
 }

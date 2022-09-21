@@ -35,15 +35,23 @@
                         </goals>
                         <configuration>
                             <minimizeJar>false</minimizeJar>
-                            <!--<artifactSet>
+                            <artifactSet>
                                 <includes>
                                     <include>org.mariadb.jdbc:mariadb-java-client</include>
                                     <include>com.github.mryurihi:tbnbt</include>
                                     <include>net.kyori:adventure-api</include>
                                     <include>net.kyori:examination-api</include>
                                     <include>net.kyori:adventure-platform-bungeecord</include>
+                                    <include>net.kyori:adventure-text-serializer-gson</include>
+                                    <include>net.kyori:adventure-key</include>
+                                    <include>net.kyori:examination-string</include>
+                                    <include>net.kyori:adventure-text-serializer-legacy</include>
+                                    <include>net.kyori:adventure-platform-api</include>
+                                    <include>net.kyori:adventure-text-serializer-bungeecord</include>
+                                    <include>net.kyori:adventure-platform-facet</include>
+                                    <include>net.kyori:adventure-nbt</include>
                                 </includes>
-                            </artifactSet>-->
+                            </artifactSet>
                             <relocations>
                                 <relocation>
                                     <pattern>net.kyori.adventure</pattern>

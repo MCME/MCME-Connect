@@ -33,7 +33,7 @@ import java.util.concurrent.TimeUnit;
  * @author Eriol_Eandur
  */
 public class ChatMessageHandler {
-    
+
     public static boolean handle(String server, String recipient, String message, int delay) {
         ProxyServer.getInstance().getScheduler().schedule(ConnectBungeePlugin.getInstance(), () -> {
             Collection<ProxiedPlayer> players = new HashSet<>();
@@ -50,7 +50,9 @@ public class ChatMessageHandler {
                     players.add(player);
                 }
             }
-            Audience audience = BungeeAudiences.create(ConnectBungeePlugin.getInstance()).players();
+            Collection<ProxiedPlayer> finalPlayers = new HashSet<>(players);
+            Audience audience = ConnectBungeePlugin.getAudiences()
+                    .filter(player->player instanceof ProxiedPlayer && finalPlayers.contains((ProxiedPlayer) player));
             audience.sendMessage(LegacyComponentSerializer.builder().build().deserialize(message));
 
             /*players.forEach(player -> {

@@ -17,21 +17,13 @@
 package com.mcmiddleearth.connect.bungee.listener;
 
 import com.mcmiddleearth.connect.bungee.ConnectBungeePlugin;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.event.LoginEvent;
-import net.md_5.bungee.api.event.PlayerDisconnectEvent;
-import net.md_5.bungee.api.event.PlayerHandshakeEvent;
-import net.md_5.bungee.api.event.PostLoginEvent;
-import net.md_5.bungee.api.event.PreLoginEvent;
-import net.md_5.bungee.api.event.ServerConnectEvent;
-import net.md_5.bungee.api.event.ServerConnectedEvent;
-import net.md_5.bungee.api.event.ServerDisconnectEvent;
-import net.md_5.bungee.api.event.ServerKickEvent;
-import net.md_5.bungee.api.event.ServerSwitchEvent;
+import net.md_5.bungee.api.event.*;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *

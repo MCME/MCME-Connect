@@ -17,6 +17,8 @@
 package com.mcmiddleearth.connect.bungee.Handler;
 
 import com.mcmiddleearth.connect.bungee.ConnectBungeePlugin;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -40,22 +42,29 @@ public class TpaHandler {
     public static void sendRequest(ProxiedPlayer sender, ProxiedPlayer target) {
         if(requests.stream().anyMatch(request -> request.getSender().getName().equalsIgnoreCase(sender.getName())
                                               && request.getTarget().getName().equalsIgnoreCase(target.getName()))) {
-            sender.sendMessage(new ComponentBuilder("You already sent "+target.getName()+" a teleport request.")
-                .color(ChatColor.RED).create());  
+            ConnectBungeePlugin.getAudience(sender)
+                    .sendMessage(Component.text("You already sent "+target.getName()+" a teleport request.")
+                                    .color(NamedTextColor.RED));
             return;
         }
         removeRequestsForSender(sender);
         requests.add(new TpaRequest(sender, target));
-        sender.sendMessage(new ComponentBuilder("Teleport request sent to "
-                +ChatColor.RED+target.getName()+ChatColor.GOLD+".\n"
-                +"To cancel this request, type "+ChatColor.RED+"/tpacancel"+ChatColor.GOLD+".")
-            .color(ChatColor.GOLD).create());  
-        target.sendMessage(new ComponentBuilder(ChatColor.RED+sender.getName()
-                + ChatColor.GOLD+" has requested to teleport to you.\n"
-                +"To teleport, type "+ChatColor.RED+"/tpaccept"+ChatColor.GOLD+"\n"
-                +"To deny this request, type "+ChatColor.RED+"/tpdeny"+ChatColor.GOLD+"\n"
-                +"This request will timeout after "+ChatColor.RED+"120 seconds"+ChatColor.GOLD+".")
-            .color(ChatColor.GOLD).create());  
+        ConnectBungeePlugin.getAudience(sender)
+                .sendMessage(Component.text("Teleport request sent to ").color(NamedTextColor.GOLD)
+                                .append(Component.text(target.getName()).color(NamedTextColor.RED))
+                                .append(Component.text(".\nTo cancel this request, type ").color(NamedTextColor.GOLD))
+                                .append(Component.text("/tpacancel").color(NamedTextColor.RED))
+                                .append(Component.text(".").color(NamedTextColor.GOLD)));
+        ConnectBungeePlugin.getAudience(target)
+                .sendMessage(Component.text(sender.getName()).color(NamedTextColor.RED)
+                        .append(Component.text(" has requested to teleport to you.\n").color(NamedTextColor.GOLD))
+                        .append(Component.text("To teleport, type ").color(NamedTextColor.GOLD))
+                        .append(Component.text("/tpaccept").color(NamedTextColor.RED))
+                        .append(Component.text("\nTo deny this request, type ").color(NamedTextColor.GOLD))
+                        .append(Component.text("/tpdeny").color(NamedTextColor.RED))
+                        .append(Component.text("\nThis request will timeout after ").color(NamedTextColor.GOLD))
+                        .append(Component.text("120 seconds").color(NamedTextColor.RED))
+                        .append(Component.text(".").color(NamedTextColor.GOLD)));
     }
     
     public static boolean accept(ProxiedPlayer player) {
@@ -67,11 +76,16 @@ public class TpaHandler {
             if(!TpHandler.handle(request.getSender().getName(), 
                                  request.getTarget().getServer().getInfo().getName(), 
                                  request.getTarget().getName())) {
-                request.getSender().sendMessage(new ComponentBuilder("There was an error with your teleportation!")
-                    .color(ChatColor.RED).create());  
+                ConnectBungeePlugin.getAudience(request.getSender())
+                        .sendMessage(Component.text("There was an error with your teleportation!")
+                                        .color(NamedTextColor.RED));
             } else {
-                request.getTarget().sendMessage(new ComponentBuilder("Teleport request accepted.")
-                    .color(ChatColor.GOLD).create());  
+                ConnectBungeePlugin.getAudience(request.getTarget())
+                        .sendMessage(Component.text("Teleport request accepted.")
+                                .color(NamedTextColor.GOLD));
+                ConnectBungeePlugin.getAudience(request.getSender())
+                        .sendMessage(Component.text(request.getTarget().getName()).color(NamedTextColor.RED)
+                                .append(Component.text(" accepted your teleport request.").color(NamedTextColor.GOLD)));
                 request.getSender().sendMessage(new ComponentBuilder(ChatColor.RED+""+request.getTarget().getName()
                         +ChatColor.GOLD+" accepted your teleport request.")
                         //+"Teleporting to "+ChatColor.RED+request.getTarget().getName()+ChatColor.GOLD+".")

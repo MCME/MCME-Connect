@@ -25,14 +25,6 @@ import com.mcmiddleearth.connect.bungee.Handler.LegacyPlayerHandler;
 import com.mcmiddleearth.connect.bungee.Handler.RestorestatsHandler;
 import com.mcmiddleearth.connect.bungee.Handler.TpaHandler;
 import com.mcmiddleearth.connect.bungee.vanish.VanishHandler;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-import java.util.logging.Logger;
-
-import com.mcmiddleearth.connect.util.ConnectUtil;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -44,6 +36,12 @@ import net.md_5.bungee.api.event.ServerConnectEvent;
 import net.md_5.bungee.api.event.ServerConnectedEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  *

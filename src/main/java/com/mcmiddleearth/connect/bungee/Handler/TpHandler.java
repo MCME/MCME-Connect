@@ -21,6 +21,8 @@ import com.google.common.io.ByteStreams;
 import com.mcmiddleearth.connect.Channel;
 import com.mcmiddleearth.connect.bungee.ConnectBungeePlugin;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
+
 import net.md_5.bungee.api.Callback;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -35,6 +37,7 @@ public class TpHandler {
         Callback<Boolean> callback = (connected, error) -> {
             if(connected) {
                 ProxyServer.getInstance().getScheduler().schedule(ConnectBungeePlugin.getInstance(), () -> {
+//Logger.getGlobal().info("TP callback: "+sender+" "+server+" "+target);
                     ProxiedPlayer player = ProxyServer.getInstance().getPlayer(sender);
                     ByteArrayDataOutput out = ByteStreams.newDataOutput();
                     out.writeUTF(Channel.TP);
