@@ -19,9 +19,7 @@ package com.mcmiddleearth.connect.bungee.Handler;
 import com.mcmiddleearth.connect.bungee.ConnectBungeePlugin;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.scheduler.ScheduledTask;
 
@@ -86,10 +84,6 @@ public class TpaHandler {
                 ConnectBungeePlugin.getAudience(request.getSender())
                         .sendMessage(Component.text(request.getTarget().getName()).color(NamedTextColor.RED)
                                 .append(Component.text(" accepted your teleport request.").color(NamedTextColor.GOLD)));
-                request.getSender().sendMessage(new ComponentBuilder(ChatColor.RED+""+request.getTarget().getName()
-                        +ChatColor.GOLD+" accepted your teleport request.")
-                        //+"Teleporting to "+ChatColor.RED+request.getTarget().getName()+ChatColor.GOLD+".")
-                    .color(ChatColor.GOLD).create());  
             }
         });
         removeRequestsForTarget(player);
@@ -102,12 +96,12 @@ public class TpaHandler {
         }
         requests.stream().filter(request->request.getTarget().getName().equalsIgnoreCase(player.getName()))
                          .forEach(request-> {
-            request.getSender().sendMessage(new ComponentBuilder(""+ChatColor.RED+request.getTarget().getName()
-                    +ChatColor.GOLD+" denied your teleport request.")
-                .color(ChatColor.GOLD).create());  
+             ConnectBungeePlugin.getAudience(request.getSender())
+                     .sendMessage(Component.text(request.getTarget().getName()).color(NamedTextColor.RED)
+                     .append(Component.text(" denied your teleport request.").color(NamedTextColor.GOLD)));
         });
-        player.sendMessage(new ComponentBuilder("Teleport request denied.")
-            .color(ChatColor.GOLD).create());  
+        ConnectBungeePlugin.getAudience(player).sendMessage(Component.text("Teleport request denied.")
+                .color(NamedTextColor.GOLD));
         removeRequestsForTarget(player);
         return true;
     }
@@ -117,8 +111,8 @@ public class TpaHandler {
             return false;
         }
         removeRequestsForSender(player);
-        player.sendMessage(new ComponentBuilder("All outstanding teleport requests cancelled.")
-            .color(ChatColor.GOLD).create());  
+        ConnectBungeePlugin.getAudience(player).sendMessage(Component.text("All outstanding teleport requests cancelled.")
+                .color(NamedTextColor.GOLD));
         removeRequestsForTarget(player);
         return true;
     }
@@ -157,8 +151,9 @@ public class TpaHandler {
                 requests.stream().filter(request -> request.getTimestamp()+REQUEST_PERIOD<time)
                      .forEach(request -> {
                          removal.add(request);
-                         request.getSender().sendMessage(new ComponentBuilder("Your teleportation request timed out!")
-                              .color(ChatColor.RED).create());  
+                         ConnectBungeePlugin.getAudience(request.getSender())
+                                 .sendMessage(Component.text("Your teleportation request timed out!")
+                                         .color(NamedTextColor.RED));
                        });
                 requests.removeAll(removal);
         }, 20, 20, TimeUnit.SECONDS);
