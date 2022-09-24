@@ -27,19 +27,16 @@ import com.mcmiddleearth.connect.tabList.ConnectedPlayer;
 import com.mcmiddleearth.connect.tabList.PlayerList;
 import com.mcmiddleearth.connect.util.ConnectUtil;
 import com.onarandombox.MultiverseCore.MultiverseCore;
-import github.scarsz.discordsrv.DiscordSRV;
-import github.scarsz.discordsrv.dependencies.jda.api.entities.TextChannel;
-import github.scarsz.discordsrv.util.DiscordUtil;
+import org.bukkit.*;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.messaging.PluginMessageListener;
+import org.bukkit.scheduler.BukkitRunnable;
+
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
-
-import org.bukkit.*;
-import org.bukkit.entity.Player;
-import org.bukkit.plugin.messaging.PluginMessageListener;
-import org.bukkit.scheduler.BukkitRunnable;
 
 /**
  *
@@ -190,7 +187,7 @@ public class ConnectPluginListener implements PluginMessageListener {
         } else if(subchannel.equals(Channel.GAMEMODE)) {
             Player p = Bukkit.getPlayer(UUID.fromString(in.readUTF()));
             short gm = in.readShort();
-Logger.getLogger("ConnectPluginListener").info("receiveGamemode: "+p.getName()+" "+gm+" ");
+//Logger.getLogger("ConnectPluginListener").info("receiveGamemode: "+p.getName()+" "+gm+" ");
             switch(gm) {
                 case 0:
                     p.setGameMode(GameMode.SURVIVAL);
@@ -209,6 +206,7 @@ Logger.getLogger("ConnectPluginListener").info("receiveGamemode: "+p.getName()+"
     }
 
     private void runAfterArrival(String playerName, Consumer<Player> callback) {
+//Logger.getGlobal().info("Run after arrival: "+playerName);
         new BukkitRunnable() {
             int counter = 40;
             @Override

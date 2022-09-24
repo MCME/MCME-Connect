@@ -17,21 +17,13 @@
 package com.mcmiddleearth.connect.bungee.listener;
 
 import com.mcmiddleearth.connect.bungee.ConnectBungeePlugin;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.event.LoginEvent;
-import net.md_5.bungee.api.event.PlayerDisconnectEvent;
-import net.md_5.bungee.api.event.PlayerHandshakeEvent;
-import net.md_5.bungee.api.event.PostLoginEvent;
-import net.md_5.bungee.api.event.PreLoginEvent;
-import net.md_5.bungee.api.event.ServerConnectEvent;
-import net.md_5.bungee.api.event.ServerConnectedEvent;
-import net.md_5.bungee.api.event.ServerDisconnectEvent;
-import net.md_5.bungee.api.event.ServerKickEvent;
-import net.md_5.bungee.api.event.ServerSwitchEvent;
+import net.md_5.bungee.api.event.*;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -49,15 +41,18 @@ public class TestListener implements Listener {
     public void onPreLogin(PreLoginEvent event) {
         log("PreLogin name: "+event.getConnection().getName());
         log("PreLogin Cancel Reasons: "+concat(event.getCancelReasonComponents()));
+        log("PreLogin version: "+event.getConnection().getVersion());
     }
     @EventHandler
     public void onLogin(LoginEvent event) {
         log("Login name: "+event.getConnection().getName());
         log("Login Cancel Reasons: "+concat(event.getCancelReasonComponents()));
+        log("PostLogin version: "+event.getConnection().getVersion());
     }
     public void onPostLogin(PostLoginEvent event) {
         log("PostLogin name: "+event.getPlayer().getName());
         log("PostLogin reconnect: "+event.getPlayer().getReconnectServer());
+        log("PostLogin version: "+event.getPlayer().getPendingConnection().getVersion());
     }
     public void onPlayerDisconnect(PlayerDisconnectEvent event) {
         log("Disconnect name: "+event.getPlayer().getName());
@@ -95,8 +90,10 @@ public class TestListener implements Listener {
     
     private String concat(BaseComponent[] messages) {
         String result = "";
-        for(BaseComponent comp: messages) {
-            result = result+" "+comp.toPlainText();
+        if(messages != null) {
+            for(BaseComponent comp: messages) {
+                result = result+" "+comp.toPlainText();
+            }
         }
         return result;
     }

@@ -4,13 +4,13 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.mcmiddleearth</groupId>
     <artifactId>MCME-Connect</artifactId>
-    <version>1.4.5</version>
+    <version>1.5.4</version>
     <packaging>jar</packaging>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-        <bungeecord.version>1.16-R0.4-SNAPSHOT</bungeecord.version>
+        <bungeecord.version>1.19-R0.1-SNAPSHOT</bungeecord.version>
     </properties>
     <build>
         <plugins>
@@ -26,7 +26,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>2.4.3</version>
+                <version>3.2.4</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -39,8 +39,26 @@
                                 <includes>
                                     <include>org.mariadb.jdbc:mariadb-java-client</include>
                                     <include>com.github.mryurihi:tbnbt</include>
+                                    <include>net.kyori:adventure-api</include>
+                                    <include>net.kyori:examination-api</include>
+                                    <include>net.kyori:adventure-platform-bungeecord</include>
+                                    <include>net.kyori:adventure-text-serializer-gson</include>
+                                    <include>net.kyori:adventure-key</include>
+                                    <include>net.kyori:examination-string</include>
+                                    <include>net.kyori:adventure-text-serializer-legacy</include>
+                                    <include>net.kyori:adventure-platform-api</include>
+                                    <include>net.kyori:adventure-text-serializer-bungeecord</include>
+                                    <include>net.kyori:adventure-platform-facet</include>
+                                    <include>net.kyori:adventure-nbt</include>
                                 </includes>
                             </artifactSet>
+                            <relocations>
+                                <relocation>
+                                    <pattern>net.kyori.adventure</pattern>
+                                    <shadedPattern>com.mcmiddleearth.connect.adventure</shadedPattern>
+                                </relocation>
+                            </relocations>
+                            <createDependencyReducedPom>false</createDependencyReducedPom>
                         </configuration>
                     </execution>
                 </executions>
@@ -76,7 +94,7 @@
         </repository>
         <repository>
             <id>multiverse</id>
-            <url>http://repo.onarandombox.com/content/repositories/multiverse/</url>
+            <url>https://repo.onarandombox.com/content/repositories/multiverse/</url>
         </repository>
         <repository>
             <id>Scarsz-Nexus</id>
@@ -86,19 +104,32 @@
             <id>papermc</id>
             <url>https://papermc.io/repo/repository/maven-public/</url>
         </repository>
+        <repository>
+            <id>essentials-releases</id>
+            <url>https://repo.essentialsx.net/releases/</url>
+        </repository>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
     </repositories>
     <dependencies>
-        <!-- SuperVanish -->
         <dependency>
-            <groupId>de.myzelyam</groupId>
+            <groupId>io.papermc.paper</groupId>
+            <artifactId>paper-api</artifactId>
+            <version>1.18.2-R0.1-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.LeonMangler</groupId>
             <artifactId>SuperVanish</artifactId>
-            <version>6.1.0</version>
+            <version>6.2.6-4</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.onarandombox.multiversecore</groupId>
             <artifactId>Multiverse-Core</artifactId>
-            <version>4.0.1</version>
+            <version>4.3.1</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -106,23 +137,24 @@
             <artifactId>PremiumVanishAPI</artifactId>
             <scope>system</scope>
             <version>2.5.11</version>
-            <systemPath>D:\SystemRepository\PremiumVanishAPI.jar</systemPath>
+            <systemPath>D:/SystemRepository/PremiumVanishAPI.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>net.luckperms</groupId>
             <artifactId>api</artifactId>
-            <version>5.0</version>
+            <version>5.4</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>net.ess3</groupId>
-            <artifactId>Essentials</artifactId>
-            <version>2.13-SNAPSHOT</version>
+            <groupId>net.essentialsx</groupId>
+            <artifactId>EssentialsX</artifactId>
+            <version>2.19.0</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mariadb.jdbc</groupId>
             <artifactId>mariadb-java-client</artifactId>
-            <version>1.1.7</version>
+            <version>3.0.6</version>
         </dependency>
         <dependency>
             <groupId>net.md-5</groupId>
@@ -155,16 +187,10 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>net.md-5</groupId>
-            <artifactId>bungeecord-api</artifactId>
-            <version>${bungeecord.version}</version>
-            <type>javadoc</type>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
             <groupId>org.yaml</groupId>
             <artifactId>snakeyaml</artifactId>
-            <version>1.21</version>
+            <version>1.32</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.discordsrv</groupId>
@@ -179,10 +205,19 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>com.destroystokyo.paper</groupId>
-            <artifactId>paper-api</artifactId>
-            <version>1.16.1-R0.1-SNAPSHOT</version>
-            <scope>provided</scope>
+            <groupId>net.kyori</groupId>
+            <artifactId>adventure-api</artifactId>
+            <version>4.11.0</version>
+        </dependency>
+        <dependency>
+            <groupId>net.kyori</groupId>
+            <artifactId>adventure-text-serializer-legacy</artifactId>
+            <version>4.11.0</version>
+        </dependency>
+        <dependency>
+            <groupId>net.kyori</groupId>
+            <artifactId>adventure-platform-bungeecord</artifactId>
+            <version>4.1.2</version>
         </dependency>
     </dependencies>
 

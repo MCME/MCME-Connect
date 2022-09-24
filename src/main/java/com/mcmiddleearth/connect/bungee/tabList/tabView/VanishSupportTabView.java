@@ -7,6 +7,7 @@ import com.mcmiddleearth.connect.bungee.vanish.VanishHandler;
 import com.mcmiddleearth.connect.log.Log;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.md_5.bungee.protocol.Property;
 import net.md_5.bungee.protocol.packet.PlayerListItem;
 
 import java.util.Arrays;
@@ -41,7 +42,7 @@ public abstract class VanishSupportTabView extends AbstractViewableTabView {
         item.setUsername(tabViewItem.getUsername());
         item.setDisplayName(getConfig().getDisplayName(tabViewItem));
         item.setGamemode(tabViewItem.getGamemode());
-        String[][] prop = tabViewItem.getProperties();
+        Property[] prop = tabViewItem.getProperties();
         if(prop != null) {
             item.setProperties(prop.clone());
         }
@@ -121,9 +122,9 @@ public abstract class VanishSupportTabView extends AbstractViewableTabView {
             level = Log.LogLevel.FREQUENT;
             if(item.getProperties()!=null) {
                 Log.log(component,level,"Properties: "+item.getProperties().length);
-                for (String[] propertie : item.getProperties()) {
-                    Log.log(component,level,"Name: " + propertie[0]);
-                    Log.log(component,level,"Value: " + propertie[1]);
+                for (Property propertie : item.getProperties()) {
+                    Log.log(component,level,"Name: " + propertie.getName());
+                    Log.log(component,level,"Value: " + propertie.getValue());
                 }
             }
         }

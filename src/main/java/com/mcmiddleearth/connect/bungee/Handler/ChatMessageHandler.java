@@ -18,19 +18,22 @@ package com.mcmiddleearth.connect.bungee.Handler;
 
 import com.mcmiddleearth.connect.Channel;
 import com.mcmiddleearth.connect.bungee.ConnectBungeePlugin;
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.platform.bungeecord.BungeeAudiences;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
+
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.concurrent.TimeUnit;
-import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 /**
  *
  * @author Eriol_Eandur
  */
 public class ChatMessageHandler {
-    
+
     public static boolean handle(String server, String recipient, String message, int delay) {
         ProxyServer.getInstance().getScheduler().schedule(ConnectBungeePlugin.getInstance(), () -> {
             Collection<ProxiedPlayer> players = new HashSet<>();
@@ -42,13 +45,19 @@ public class ChatMessageHandler {
                 }
             } else {
                 ProxiedPlayer player = ProxyServer.getInstance().getPlayer(recipient);
-                if(server.equals(Channel.ALL)
-                        || player.getServer().getInfo().getName().equals(server)) {
+                if(player != null && (server.equals(Channel.ALL)
+                        || player.getServer().getInfo().getName().equals(server))) {
                     players.add(player);
                 }
             }
-            players.forEach(player ->
-                    player.sendMessage(new ComponentBuilder(message).create()));
+            Collection<ProxiedPlayer> finalPlayers = new HashSet<>(players);
+            Audience audience = ConnectBungeePlugin.getAudiences()
+                    .filter(player->player instanceof ProxiedPlayer && finalPlayers.contains((ProxiedPlayer) player));
+            audience.sendMessage(LegacyComponentSerializer.builder().build().deserialize(message));
+
+            /*players.forEach(player -> {
+                player.sendMessage(new ComponentBuilder(message).create());
+            });*/
         }, delay, TimeUnit.MILLISECONDS);
         return true;
     }

@@ -19,6 +19,9 @@ package com.mcmiddleearth.connect.bungee.Handler;
 import com.mcmiddleearth.connect.bungee.ConnectBungeePlugin;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
+
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.md_5.bungee.api.Callback;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ProxyServer;
@@ -35,8 +38,9 @@ public class ThemeHandler {
         Callback<Boolean> callback = (connected, error) -> {
             if(connected) {
                 ProxyServer.getInstance().getScheduler().schedule(ConnectBungeePlugin.getInstance(), () -> {
-                    sender.sendMessage(new ComponentBuilder("All Themed-build commands need to be issued from Themed-build world. You were teleported there.")
-                                            .color(ChatColor.RED).create());
+                    ConnectBungeePlugin.getAudience(sender).sendMessage(Component
+                            .text("All Themed-build commands need to be issued from Themed-build world. You were teleported there.")
+                                    .color(NamedTextColor.RED));
                     CommandHandler.handle(server, sender.getName(),command);
                 }, ConnectBungeePlugin.getConnectDelay(), TimeUnit.MILLISECONDS);
             }

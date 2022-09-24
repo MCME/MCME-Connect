@@ -7,6 +7,7 @@ import com.mcmiddleearth.connect.bungee.tabList.playerItem.TabViewPlayerItem;
 import com.mcmiddleearth.connect.bungee.tabList.tabView.configuration.ViewableTabViewConfig;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.md_5.bungee.protocol.Property;
 import net.md_5.bungee.protocol.packet.PlayerListHeaderFooter;
 import net.md_5.bungee.protocol.packet.PlayerListItem;
 
@@ -162,15 +163,15 @@ public abstract class AbstractViewableTabView implements ITabView{
 
     private PlayerListItem.Item[] createTabviewItems(Set<TabViewPlayerItem> playerItems, PlayerListItem.Action action) {
         List<PlayerListItem.Item> itemList = new ArrayList<>();
-        playerItems.stream().filter(this::isDisplayed)
-                            .sorted((first,second) -> first.getUsername().toLowerCase().compareTo(second.getUsername().toLowerCase()))
+        playerItems.stream().filter(item -> item.getUsername()!=null && isDisplayed(item))
+                            .sorted(Comparator.comparing(tabViewPlayerItem -> tabViewPlayerItem.getUsername().toLowerCase()))
                    .forEachOrdered(playerItem -> {
             PlayerListItem.Item item = new PlayerListItem.Item();
             item.setUuid(playerItem.getUuid());
             switch(action) {
                 case ADD_PLAYER:
                     item.setUsername(playerItem.getUsername());
-                    String[][] prop = playerItem.getProperties();
+                    Property[] prop = playerItem.getProperties();
                     if (prop != null) {
                         item.setProperties(prop.clone());
                     }

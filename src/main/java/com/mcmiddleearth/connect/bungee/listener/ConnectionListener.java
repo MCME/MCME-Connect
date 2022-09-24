@@ -25,14 +25,6 @@ import com.mcmiddleearth.connect.bungee.Handler.LegacyPlayerHandler;
 import com.mcmiddleearth.connect.bungee.Handler.RestorestatsHandler;
 import com.mcmiddleearth.connect.bungee.Handler.TpaHandler;
 import com.mcmiddleearth.connect.bungee.vanish.VanishHandler;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-import java.util.logging.Logger;
-
-import com.mcmiddleearth.connect.util.ConnectUtil;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -44,6 +36,12 @@ import net.md_5.bungee.api.event.ServerConnectEvent;
 import net.md_5.bungee.api.event.ServerConnectedEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  *
@@ -61,6 +59,7 @@ public class ConnectionListener implements Listener {
         //priorities.add("freebuild");
         //priorities.add("newplayerworld");
     }
+
     @EventHandler
     public void onJoin(PostLoginEvent event) {
         if(RestorestatsHandler.getBlacklist().contains(event.getPlayer().getUniqueId())) {
@@ -112,18 +111,20 @@ public class ConnectionListener implements Listener {
                 p.sendMessage(new ComponentBuilder(player.getName()+" joined the game.")
                                             .color(ChatColor.YELLOW).create());
         });
-        Iterator<ProxiedPlayer> it = ProxyServer.getInstance().getPlayers().iterator();
-        if(it.hasNext()) {
-            ProxiedPlayer other = it.next();
-            if(other.getServer()==null) {
-                return;
+        ProxyServer.getInstance().getScheduler().schedule(ConnectBungeePlugin.getInstance(), () -> {
+            Iterator<ProxiedPlayer> it = ProxyServer.getInstance().getPlayers().iterator();
+            if(it.hasNext()) {
+                ProxiedPlayer other = it.next();
+                if(other.getServer()==null) {
+                    return;
+                }
+                ByteArrayDataOutput out = ByteStreams.newDataOutput();
+                out.writeUTF(Channel.DISCORD);
+                out.writeUTF("Global");
+                out.writeUTF(":bangbang: **"+player.getName()+" joined the game.**");
+                other.getServer().getInfo().sendData(Channel.MAIN, out.toByteArray(),true);
             }
-            ByteArrayDataOutput out = ByteStreams.newDataOutput();
-            out.writeUTF(Channel.DISCORD);
-            out.writeUTF("Global");
-            out.writeUTF(":bangbang: **"+player.getName()+" joined the game.**");
-            other.getServer().getInfo().sendData(Channel.MAIN, out.toByteArray(),true);
-        }
+        }, ConnectBungeePlugin.getConnectDelay(), TimeUnit.MILLISECONDS);
     }
     
     public static void sendLeaveMessage(ProxiedPlayer player, boolean fake) {

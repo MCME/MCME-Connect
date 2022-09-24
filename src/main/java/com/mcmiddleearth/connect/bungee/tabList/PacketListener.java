@@ -6,6 +6,7 @@ import io.netty.handler.codec.MessageToMessageDecoder;
 import net.md_5.bungee.ServerConnection;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.protocol.PacketWrapper;
+import net.md_5.bungee.protocol.Property;
 import net.md_5.bungee.protocol.packet.PlayerListHeaderFooter;
 import net.md_5.bungee.protocol.packet.PlayerListItem;
 
@@ -89,9 +90,9 @@ public class PacketListener extends MessageToMessageDecoder<PacketWrapper> {
             Log.verbose(component,"------ pingpong: " + item.getPing());
             if (item.getProperties() != null) {
                 Log.frequent(component,"Properties: " + item.getProperties().length);
-                for (String[] propertie : item.getProperties()) {
-                    Log.frequent(component,"------Name: " + propertie[0]);
-                    Log.frequent(component,"------Value: " + propertie[1]);
+                for (Property propertie : item.getProperties()) {
+                    Log.frequent(component,"------Name: " + propertie.getName());
+                    Log.frequent(component,"------Value: " + propertie.getValue());
                 }
             }
         }

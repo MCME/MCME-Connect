@@ -1,8 +1,6 @@
 package com.mcmiddleearth.connect.log;
 
 import com.mcmiddleearth.connect.ConnectPlugin;
-import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -15,7 +13,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 public class SpigotLog extends Log implements CommandExecutor, Listener {
 
@@ -50,6 +47,6 @@ public class SpigotLog extends Log implements CommandExecutor, Listener {
 
     @Override
     public void sendToDeveloper(String component, LogLevel level, String message) {
-        developer.forEach(dev -> dev.sendMessage(new ComponentBuilder(message).color(net.md_5.bungee.api.ChatColor.WHITE).create()));
+        developer.forEach(dev -> dev.sendMessage(message));//new ComponentBuilder(message).color(net.md_5.bungee.api.ChatColor.WHITE).create()));
     }
 }
