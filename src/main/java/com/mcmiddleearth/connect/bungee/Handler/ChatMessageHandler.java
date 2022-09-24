@@ -45,8 +45,8 @@ public class ChatMessageHandler {
                 }
             } else {
                 ProxiedPlayer player = ProxyServer.getInstance().getPlayer(recipient);
-                if(server.equals(Channel.ALL)
-                        || player.getServer().getInfo().getName().equals(server)) {
+                if(player != null && (server.equals(Channel.ALL)
+                        || player.getServer().getInfo().getName().equals(server))) {
                     players.add(player);
                 }
             }
