@@ -163,8 +163,8 @@ public abstract class AbstractViewableTabView implements ITabView{
 
     private PlayerListItem.Item[] createTabviewItems(Set<TabViewPlayerItem> playerItems, PlayerListItem.Action action) {
         List<PlayerListItem.Item> itemList = new ArrayList<>();
-        playerItems.stream().filter(this::isDisplayed)
-                            .sorted((first,second) -> first.getUsername().toLowerCase().compareTo(second.getUsername().toLowerCase()))
+        playerItems.stream().filter(item -> item.getUsername()!=null && isDisplayed(item))
+                            .sorted(Comparator.comparing(tabViewPlayerItem -> tabViewPlayerItem.getUsername().toLowerCase()))
                    .forEachOrdered(playerItem -> {
             PlayerListItem.Item item = new PlayerListItem.Item();
             item.setUuid(playerItem.getUuid());
