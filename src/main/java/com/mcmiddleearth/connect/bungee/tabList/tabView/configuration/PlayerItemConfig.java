@@ -78,7 +78,7 @@ public class PlayerItemConfig implements IPlayerItemConfig{
                     .filter(part ->
                             part.getServers() == null
                                     || part.getServers().isEmpty()
-                                    || part.getServers().contains(player.getServer().getInfo().getName()))
+                                    || player.getServer()!=null && part.getServers().contains(player.getServer().getInfo().getName()))
                     .forEach(part -> {
                         displayNameParts.add(replacePlacholders(part.getText(),player));
                         displayNameShortenParts.add(part.isShorten());
