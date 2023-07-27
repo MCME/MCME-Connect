@@ -23,10 +23,10 @@ import com.mcmiddleearth.connect.bungee.ConnectBungeePlugin;
 import com.mcmiddleearth.connect.bungee.Handler.*;
 import com.mcmiddleearth.connect.bungee.tabList.TabViewManager;
 import com.mcmiddleearth.connect.bungee.tabList.playerItem.PlayerItemManager;
-import net.md_5.bungee.ServerConnection;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.md_5.bungee.api.connection.Server;
 import net.md_5.bungee.api.event.PluginMessageEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
@@ -103,7 +103,7 @@ public class PluginMessageListener implements Listener {
                     RestartHandler.handle(ProxyServer.getInstance().getPlayer(player), servers, shutdown);
                     break;
                 case Channel.SERVER_INFO:
-                    String server = ((ServerConnection)event.getSender()).getInfo().getName();
+                    String server = ((Server)event.getSender()).getInfo().getName();
                     ConnectBungeePlugin.getInstance().getServerInformation(server).updateFromPluginMessage(in);
                     break;
                 case Channel.AFK:

@@ -39,11 +39,11 @@ public class WarpHandler {
     private static Set<Warp> cache = new HashSet<>();
     
     static {
-        commands.addAll(Arrays.asList(new String[]{"/warp","/to"}));
-        subcommands.addAll(Arrays.asList(new String[]{"list","pcreate","create","delete",
-                        "public","private","invite","uninvite","give",
-                        "info","stats","limits","assets","welcome","update",
-                        "import","reload","player","point","help"}));
+        commands.addAll(Arrays.asList("/warp","/to"));
+        subcommands.addAll(Arrays.asList("list","pcreate","create","delete",
+                "public","private","invite","uninvite","give",
+                "info","stats","limits","assets","welcome","update",
+                "import","reload","player","point","help"));
     }
     
     
@@ -92,7 +92,6 @@ public class WarpHandler {
 
     public static void updateCache() {
         cache = ConnectBungeePlugin.getMyWarpConnector().getWarps();
-//cache.forEach(warp -> Logger.getGlobal().info(warp.getName()));
     }
 
     public static List<String> getSuggestions(String search, ProxiedPlayer player) {

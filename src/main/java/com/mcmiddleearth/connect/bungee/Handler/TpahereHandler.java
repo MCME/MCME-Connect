@@ -24,8 +24,10 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.scheduler.ScheduledTask;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -33,7 +35,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class TpahereHandler {
     
-    private final static List<TpaRequest> requests = new ArrayList<>();
+    private final static List<TpahereRequest> requests = new ArrayList<>();
    
     private final static long REQUEST_PERIOD = 120000; // in milliseconds
     
@@ -45,7 +47,7 @@ public class TpahereHandler {
             return;
         }
         //removeRequestsForSender(sender);
-        requests.add(new TpaRequest(sender, target));
+        requests.add(new TpahereRequest(sender, target));
         ConnectBungeePlugin.getAudience(sender)
                 .sendMessage(Component.text("Teleport request sent to ").color(NamedTextColor.GOLD)
                         .append(Component.text(target.getName()).color(NamedTextColor.RED))
@@ -74,7 +76,7 @@ public class TpahereHandler {
                                  request.getSender().getServer().getInfo().getName(), 
                                  request.getSender().getName())) {
                 ConnectBungeePlugin.getAudience(request.getSender())
-                        .sendMessage(Component.text("There was an error with your teleportation!")
+                        .sendMessage(Component.text("There was an error with your teleportation request!")
                                 .color(NamedTextColor.RED));
             } else {
                 ConnectBungeePlugin.getAudience(request.getTarget())
@@ -117,16 +119,16 @@ public class TpahereHandler {
     }
         
     public static void removeRequestsForSender(ProxiedPlayer sender) {
-        List<TpaRequest> removal = new ArrayList<>();
+        List<TpahereRequest> removal = new ArrayList<>();
         requests.stream().filter(request->request.getSender().getName().equalsIgnoreCase(sender.getName()))
-                         .forEach(request->removal.add(request));
+                         .forEach(removal::add);
         requests.removeAll(removal);
     }
     
     public static void removeRequestsForTarget(ProxiedPlayer target) {
-        List<TpaRequest> removal = new ArrayList<>();
+        List<TpahereRequest> removal = new ArrayList<>();
         requests.stream().filter(request->request.getTarget().getName().equalsIgnoreCase(target.getName()))
-                         .forEach(request->removal.add(request));
+                         .forEach(removal::add);
         requests.removeAll(removal);
     }
     
@@ -144,7 +146,7 @@ public class TpahereHandler {
     }
     
     public static ScheduledTask startCleanupScheduler() {
-        List<TpaRequest> removal = new ArrayList<>();
+        List<TpahereRequest> removal = new ArrayList<>();
         return ProxyServer.getInstance().getScheduler().schedule(ConnectBungeePlugin.getInstance(), () -> {
                 long time = System.currentTimeMillis();
                 requests.stream().filter(request -> request.getTimestamp()+REQUEST_PERIOD<time)
@@ -157,13 +159,18 @@ public class TpahereHandler {
                 requests.removeAll(removal);
         }, 20, 20, TimeUnit.SECONDS);
     }
-    
-    public static class TpaRequest {
+
+    public static Collection<ProxiedPlayer> getRequestSender(ProxiedPlayer target) {
+        return requests.stream().filter(request->request.getTarget().getName().equalsIgnoreCase(target.getName()))
+                .map(TpahereHandler.TpahereRequest::getSender).collect(Collectors.toSet());
+    }
+
+    public static class TpahereRequest {
         
         private ProxiedPlayer sender, target;
         private long timestamp;
 
-        public TpaRequest(ProxiedPlayer sender, ProxiedPlayer target) {
+        public TpahereRequest(ProxiedPlayer sender, ProxiedPlayer target) {
             this.sender = sender;
             this.target = target;
             timestamp = System.currentTimeMillis();

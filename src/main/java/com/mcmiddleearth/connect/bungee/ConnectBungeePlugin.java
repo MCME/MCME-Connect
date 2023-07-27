@@ -117,8 +117,8 @@ public class ConnectBungeePlugin extends Plugin {
         getProxy().getPluginManager().registerListener(this, new CommandListener());
         getProxy().getPluginManager().registerListener(this, 
                          new ConnectionListener());
-        getProxy().getPluginManager().registerListener(this, new TabViewManager());
-        playerItemUpdater = new PlayerItemUpdater();
+        //getProxy().getPluginManager().registerListener(this, new TabViewManager());
+        //playerItemUpdater = new PlayerItemUpdater();
         TabViewManager.init();
         tabViewCommand = new TabViewCommand();
         ProxyServer.getInstance().getPluginManager().registerCommand(this, tabViewCommand);
@@ -131,7 +131,7 @@ public class ConnectBungeePlugin extends Plugin {
         restartScheduler.cancel();
         tpaCleanupScheduler.cancel();
         tpahereCleanupScheduler.cancel();
-        playerItemUpdater.disable();
+        //playerItemUpdater.disable();
         audiences.close();
         logger.disable();
     }
