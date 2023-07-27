@@ -21,7 +21,6 @@ import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
-import org.mariadb.jdbc.MySQLDataSource;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -29,6 +28,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashSet;
@@ -131,13 +131,16 @@ public class RestorestatsHandler {
             String dbName = (String) config.get("dbName");
             String dbIp = (String) config.get("ip");
             int port = (Integer) config.get("port");
-            MySQLDataSource dataBase = new MySQLDataSource(dbIp,port,dbName);
-            try (Connection dbConnection = dataBase.getConnection(dbUser, dbPassword)) {
+            //MySQLDataSource dataBase = new MySQLDataSource(dbIp,port,dbName);
+            try (Connection dbConnection = DriverManager.getConnection(
+                    "jdbc:mysql://"+dbIp+":"+port+"/"+dbName,
+                    dbUser, dbPassword)) {
                 ResultSet result = dbConnection.createStatement()
                         .executeQuery("SELECT id FROM mcmeconnect_statistic "
                                 + "WHERE uuid = '"+player.getUniqueId().toString()+"'");
                 if(result.first()) {
                     int id = result.getInt(1);
+                    result.close();
                     dbConnection.createStatement()
                             .execute("DELETE FROM mcmeconnect_statistic "
                                     + "WHERE uuid = '"+player.getUniqueId().toString()+"'");

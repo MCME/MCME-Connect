@@ -17,10 +17,8 @@
 package com.mcmiddleearth.connect.statistics;
 
 import com.mcmiddleearth.connect.ConnectPlugin;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+
+import java.sql.*;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -30,7 +28,6 @@ import java.util.logging.Logger;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.MemoryConfiguration;
 import org.bukkit.entity.Player;
-import org.mariadb.jdbc.MySQLDataSource;
 import org.bukkit.Statistic;
 import org.bukkit.Material;
 import org.bukkit.scheduler.BukkitTask;
@@ -47,8 +44,6 @@ public class StatisticDBConnector {
     private final String dbName;
     private final String dbIp;
     private final int port;
-
-    private final MySQLDataSource dataBase;
 
     private Connection dbConnection;
 
@@ -83,7 +78,7 @@ public class StatisticDBConnector {
         dbName = config.getString("dbName", "development");
         dbIp = config.getString("ip", "localhost");
         port = config.getInt("port", 3306);
-        dataBase = new MySQLDataSource(dbIp, port, dbName);
+
         connect();
         keepAliveTask = new BukkitRunnable() {
             @Override
@@ -137,7 +132,9 @@ public class StatisticDBConnector {
 
     private synchronized void connect() {
         try {
-            dbConnection = dataBase.getConnection(dbUser, dbPassword);
+            dbConnection = DriverManager.getConnection(
+                    "jdbc:mysql://"+dbIp+":"+port+"/"+dbName,
+                    dbUser, dbPassword);
 
             checkTables();
 
@@ -236,6 +233,14 @@ public class StatisticDBConnector {
         }
         if (dbConnection != null) {
             try {
+                updatePlayerStats.close();
+                insertPlayerStats.close();
+                selectPlayerStats.close();
+                selectPlayerMatStats.close();
+                selectPlayerAllMatStats.close();
+                selectPlayerEntityStats.close();
+                selectPlayerAllEntityStats.close();
+                selectPlayerId.close();
                 dbConnection.close();
             } catch (SQLException ex) {
                 Logger.getLogger(StatisticDBConnector.class.getName()).log(Level.SEVERE, null, ex);
@@ -271,6 +276,7 @@ public class StatisticDBConnector {
                     }
                 }
             }
+            result.close();
 
             statement = new StringBuilder("CREATE TABLE IF NOT EXISTS mcmeconnect_statistic_material (id INT, material VARCHAR(50)");
             for (Statistic stat : Statistic.values()) {
@@ -301,6 +307,7 @@ public class StatisticDBConnector {
                     }
                 }
             }
+            result.close();
 
             statement = new StringBuilder("CREATE TABLE IF NOT EXISTS mcmeconnect_statistic_entity (id INT, entity VARCHAR(50)");
             for (Statistic stat : Statistic.values()) {
@@ -327,6 +334,7 @@ public class StatisticDBConnector {
                     }
                 }
             }
+            result.close();
         } catch (SQLException ex) {
             Logger.getLogger(StatisticDBConnector.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -351,11 +359,14 @@ public class StatisticDBConnector {
                                         player.setStatistic(stat, value);
                                     }
                                 }
+                                result.close();
                             } catch (SQLException ex) {
                                 Logger.getLogger(StatisticDBConnector.class.getName()).log(Level.SEVERE, null, ex);
                             }
                         }
                     }.runTask(ConnectPlugin.getInstance());
+                } else {
+                    result.close();
                 }
                 int id = getPlayerId(player.getUniqueId());
                 if(id>=0) {
@@ -401,11 +412,14 @@ public class StatisticDBConnector {
                                             }
                                         }
                                     } while(matResult.next());
+                                    matResult.close();
                                 } catch (SQLException ex) {
                                     Logger.getLogger(StatisticDBConnector.class.getName()).log(Level.SEVERE, null, ex);
                                 }
                             }
                         }.runTask(ConnectPlugin.getInstance());
+                    } else {
+                        result.close();
                     }
                     selectPlayerAllEntityStats.setInt(1, id);
                     ResultSet entityResult = selectPlayerAllEntityStats.executeQuery();
@@ -425,11 +439,14 @@ public class StatisticDBConnector {
                                             }
                                         }
                                     } while(entityResult.next());
+                                    entityResult.close();
                                 } catch (SQLException ex) {
                                     Logger.getLogger(StatisticDBConnector.class.getName()).log(Level.SEVERE, null, ex);
                                 }
                             }
                         }.runTask(ConnectPlugin.getInstance());
+                    } else {
+                        result.close();
                     }
                 }
             } catch (SQLException ex) {
@@ -463,6 +480,7 @@ public class StatisticDBConnector {
             } else {
                 insertStats(player);
             }
+            result.close();
         } catch (SQLException ex) {
             Logger.getLogger(StatisticDBConnector.class.getName()).log(Level.SEVERE, null, ex);
             connected = false;
@@ -526,6 +544,7 @@ public class StatisticDBConnector {
                 } else {
                     insertMatStat(id, stat, mat, value);
                 }
+                result.close();
             }
         } catch (SQLException ex) {
             Logger.getLogger(StatisticDBConnector.class.getName()).log(Level.SEVERE, null, ex);
@@ -565,8 +584,10 @@ public class StatisticDBConnector {
                 selectPlayerEntityStats.setString(2, entity.name());
                 ResultSet result = selectPlayerEntityStats.executeQuery();
                 if(result.next()) {
+                    result.close();
                     updateEntityStat(id, stat, entity, value);
                 } else {
+                    result.close();
                     insertEntityStat(id, stat, entity, value);
                 }
             }
@@ -596,11 +617,12 @@ public class StatisticDBConnector {
     private synchronized int getPlayerId(UUID uuid) throws SQLException {
         selectPlayerId.setString(1, uuid.toString());
         ResultSet result = selectPlayerId.executeQuery();
+        int playerId = -1;
         if (result.next()) {
-            return result.getInt("id");
-        } else {
-            return -1;
+            playerId = result.getInt("id");
         }
+        result.close();
+        return playerId;
     }
     
     public String getName(Statistic stat) throws IllegalArgumentException{

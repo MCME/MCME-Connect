@@ -157,7 +157,7 @@ public class ConnectionListener implements Listener {
         return other;
     }
     
-    private Map<ProxiedPlayer, ServerConnectEvent.Reason> connectReasons = new HashMap<>();
+    private final Map<ProxiedPlayer, ServerConnectEvent.Reason> connectReasons = new HashMap<>();
     
     @EventHandler
     public void onServerConnect(ServerConnectEvent event) {
@@ -168,13 +168,16 @@ public class ConnectionListener implements Listener {
     public void onServerConnected(ServerConnectedEvent event) {
         ProxyServer.getInstance().getScheduler().schedule(ConnectBungeePlugin.getInstance(), () -> {
             ProxiedPlayer player = event.getPlayer();
-            ServerInfo dest = event.getServer().getInfo();
-            ByteArrayDataOutput out = ByteStreams.newDataOutput();
-            out.writeUTF(Channel.JOIN);
-            out.writeUTF(player.getName());
-            out.writeUTF(connectReasons.get(player).name());
-            connectReasons.remove(player);
-            dest.sendData(Channel.MAIN, out.toByteArray(),true);   
+            ServerConnectEvent.Reason reason = connectReasons.get(player);
+            if(reason!=null) {
+                ServerInfo dest = event.getServer().getInfo();
+                ByteArrayDataOutput out = ByteStreams.newDataOutput();
+                out.writeUTF(Channel.JOIN);
+                out.writeUTF(player.getName());
+                out.writeUTF(reason.name());
+                connectReasons.remove(player);
+                dest.sendData(Channel.MAIN, out.toByteArray(), true);
+            }
         }, ConnectBungeePlugin.getConnectDelay(), TimeUnit.MILLISECONDS);
     }
 

@@ -21,6 +21,8 @@ import com.mcmiddleearth.connect.bungee.ConnectBungeePlugin;
 import com.mcmiddleearth.connect.bungee.Handler.*;
 import com.mcmiddleearth.connect.bungee.vanish.VanishHandler;
 import com.mcmiddleearth.connect.bungee.warp.WarpHandler;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -32,6 +34,7 @@ import net.md_5.bungee.event.EventHandler;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.logging.Logger;
 
 /**
  *
@@ -135,9 +138,35 @@ public class CommandListener implements Listener {
                     event.setCancelled(true);
                 }
             } else if((message[0].equalsIgnoreCase("/tpaccept") || message[0].equalsIgnoreCase("/tpyes"))) {
-                if(TpaHandler.accept(player) || TpahereHandler.accept(player)) {
-                    event.setCancelled(true);
-                }
+                //todo: also handle in server requests?
+                TpaHandler.getRequestSender(player).forEach(sender-> {
+                        if(sender!=null) {
+                            if (sender.hasPermission(Permission.WORLD + "." + player.getServer().getInfo().getName())
+                                    && isMvtpAllowed(sender)) {
+                                TpaHandler.accept(player);
+                            } else {
+                                ConnectBungeePlugin.getAudience(sender)
+                                        .sendMessage(Component.text(player.getName() + " accepted your request but have no permission to enter his world!")
+                                                .color(NamedTextColor.RED));
+                                TpaHandler.removeRequests(player);
+                            }
+                            event.setCancelled(true);
+                        }
+                    });
+                TpahereHandler.getRequestSender(player).forEach(sender -> {
+                    if(sender!=null) {
+                        if (player.hasPermission(Permission.WORLD + "." + sender.getServer().getInfo().getName())
+                                && isMvtpAllowed(player)) {
+                            TpahereHandler.accept(player);
+                        } else {
+                            ConnectBungeePlugin.getAudience(sender)
+                                    .sendMessage(Component.text(player.getName() + " accepted your request but he has no permission to enter your!")
+                                            .color(NamedTextColor.RED));
+                            TpahereHandler.removeRequests(player);
+                        }
+                        event.setCancelled(true);
+                    }
+                });
             } else if((message[0].equalsIgnoreCase("/tpdeny") || message[0].equalsIgnoreCase("/tpno"))) {
                 if(TpaHandler.deny(player) || TpahereHandler.deny(player)) {
                     event.setCancelled(true);

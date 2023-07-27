@@ -6,6 +6,7 @@ import com.mcmiddleearth.connect.bungee.tabList.PacketLogger;
 import com.mcmiddleearth.connect.bungee.tabList.TabViewManager;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.md_5.bungee.api.connection.Server;
 import net.md_5.bungee.protocol.packet.PlayerListHeaderFooter;
 
 import java.time.LocalDateTime;
@@ -31,8 +32,12 @@ public class SimpleHeaderFooter implements IHeaderFooter {
     }
 
     private String replacePlaceholder(ProxiedPlayer player, String content) {
+        Server server = player.getServer();
+        if(server == null) {
+            return content;
+        }
         ServerInformation info = ConnectBungeePlugin.getInstance()
-                .getServerInformation(player.getServer().getInfo().getName());
+                .getServerInformation(server.getInfo().getName());
         for(Placeholder search: Placeholder.values()) {
             String searchString = "{"+search.getPlaceholderString()+"}";
             switch(search) {

@@ -24,8 +24,10 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.scheduler.ScheduledTask;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -138,6 +140,11 @@ public class TpaHandler {
     
     public static boolean hasPendingRequest(ProxiedPlayer target) {
         return requests.stream().anyMatch(request->request.getTarget().getName().equalsIgnoreCase(target.getName()));
+    }
+
+    public static Collection<ProxiedPlayer> getRequestSender(ProxiedPlayer target) {
+        return requests.stream().filter(request->request.getTarget().getName().equalsIgnoreCase(target.getName()))
+                .map(TpaRequest::getSender).collect(Collectors.toSet());
     }
     
     public static boolean hasOutstandingRequest(ProxiedPlayer sender) {

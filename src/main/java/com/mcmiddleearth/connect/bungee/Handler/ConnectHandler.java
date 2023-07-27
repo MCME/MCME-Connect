@@ -20,6 +20,7 @@ import com.mcmiddleearth.connect.bungee.ConnectBungeePlugin;
 import net.md_5.bungee.api.Callback;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.connection.Server;
 
@@ -31,13 +32,14 @@ public class ConnectHandler {
     
     public static boolean handle(String sender, String server, boolean welcomeMsg, Callback<Boolean> callback) {
         ProxiedPlayer source = ProxyServer.getInstance().getPlayer(sender);
+        ServerInfo target = ProxyServer.getInstance().getServerInfo(server);
         Server origin = source.getServer();
-        if(!origin.getInfo().getName().equals(server)) {
+        if(target!=null && !origin.getInfo().getName().equals(server)) {
             if(welcomeMsg) {
                 ChatMessageHandler.handle(server, sender, ChatColor.YELLOW+"Welcome to '"+server+"'!", 
                                           ConnectBungeePlugin.getConnectDelay());
             }
-            source.connect(ProxyServer.getInstance().getServerInfo(server),callback);
+            source.connect(target,callback);
             return true;
         }
         return false;

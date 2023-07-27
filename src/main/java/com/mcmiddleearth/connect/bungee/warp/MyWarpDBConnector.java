@@ -20,13 +20,9 @@ import com.mcmiddleearth.connect.bungee.ConnectBungeePlugin;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.scheduler.ScheduledTask;
-import org.mariadb.jdbc.MySQLDataSource;
 
 import java.io.*;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -45,8 +41,6 @@ public class MyWarpDBConnector {
     private final String dbName;
     private final String dbIp;
     private final int port;
-    
-    private final MySQLDataSource dataBase;
     
     private Connection dbConnection;
 
@@ -74,14 +68,14 @@ public class MyWarpDBConnector {
         dbName = (String) config.get("dbName");//,"mywarp");
         dbIp = (String) config.get("ip");//, "localhost");
         port = (Integer) config.get("port");//,3306);
-        dataBase = new MySQLDataSource(dbIp,port,dbName);
+
         loadWorldUUIDs();
         connect();
         keepAliveTask = ProxyServer.getInstance().getScheduler()
                 .schedule(ConnectBungeePlugin.getInstance(), () -> {
             checkConnection();
             WarpHandler.updateCache();
-        },1,1,TimeUnit.MINUTES);
+        },10,60,TimeUnit.SECONDS);
     }
     
     public void disconnect() {
@@ -121,7 +115,10 @@ public class MyWarpDBConnector {
     
     private void connect() {
         try {
-            dbConnection = dataBase.getConnection(dbUser, dbPassword);
+            dbConnection = DriverManager.getConnection(
+                    "jdbc:mysql://"+dbIp+":"+port+"/"+dbName,
+                    dbUser, dbPassword);
+
             getWarp = dbConnection.prepareStatement("SELECT warp.name, warp.x, warp.y, warp.z, "
                     + "warp.pitch, warp.yaw, warp.welcome_message, warp.visits, "
                     + "warp.type, world.uuid, owner.uuid, invited.uuid "
@@ -154,15 +151,16 @@ public class MyWarpDBConnector {
             ResultSet warpData = getWarpList.executeQuery();
             ResultSet playerData = getPlayerList.executeQuery();
             Map<Integer, UUID> players = new HashMap<>(); //player_id -> player UUID
-            if(playerData.first()) {
+            if(playerData.next()) {
                 do {
                     players.put(playerData.getInt("player.player_id"),
                             UUID.fromString(playerData.getString("player.uuid")));
                 } while(playerData.next());
             }
+            playerData.close();
             ResultSet invitationData = getInvitations.executeQuery();
             Map<Integer, Set<UUID>> invitations = new HashMap<>(); // warp_id -> List of player UUID
-            if(invitationData.first()) {
+            if(invitationData.next()) {
                 do {
                     int warpId = invitationData.getInt("warp_id");
                     Set<UUID> invitedPlayers = invitations.get(warpId);
@@ -173,7 +171,7 @@ public class MyWarpDBConnector {
                     invitedPlayers.add(players.get(invitationData.getInt("player_id")));
                 } while(invitationData.next());
             }
-            if(warpData.first()) {
+            if(warpData.next()) {
                 do {
                     Warp warp = new Warp();
                     warp.setName(warpData.getString("warp.name"));
@@ -183,6 +181,7 @@ public class MyWarpDBConnector {
                     result.add(warp);
                 } while(warpData.next());
             }
+            warpData.close();
         } catch (SQLException throwables) {
             Logger.getLogger(MyWarpDBConnector.class.getName()).log(Level.SEVERE, null, throwables);
             connected = false;
@@ -216,6 +215,7 @@ public class MyWarpDBConnector {
 
                     return warp;
                 }
+                result.close();
             } catch (SQLException ex) {
                 Logger.getLogger(MyWarpDBConnector.class.getName()).log(Level.SEVERE, null, ex);
                 connected = false;
