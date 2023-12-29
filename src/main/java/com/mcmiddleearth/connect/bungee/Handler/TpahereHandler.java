@@ -56,7 +56,7 @@ public class TpahereHandler {
                         .append(Component.text(".").color(NamedTextColor.GOLD)));
         ConnectBungeePlugin.getAudience(target)
                 .sendMessage(Component.text(sender.getName()).color(NamedTextColor.RED)
-                        .append(Component.text(" has requested that you teleport to him.\n").color(NamedTextColor.GOLD))
+                        .append(Component.text(" has requested that you teleport to them.\n").color(NamedTextColor.GOLD))
                         .append(Component.text("To teleport, type ").color(NamedTextColor.GOLD))
                         .append(Component.text("/tpaccept").color(NamedTextColor.RED))
                         .append(Component.text("\nTo deny this request, type ").color(NamedTextColor.GOLD))

@@ -9,10 +9,12 @@ import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.protocol.Property;
 import net.md_5.bungee.protocol.packet.PlayerListHeaderFooter;
-import net.md_5.bungee.protocol.packet.PlayerListItem;
+import net.md_5.bungee.protocol.packet.PlayerListItemUpdate;
+import net.md_5.bungee.protocol.packet.PlayerListItemRemove;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public abstract class AbstractViewableTabView implements ITabView{
 
@@ -46,13 +48,25 @@ public abstract class AbstractViewableTabView implements ITabView{
     }
 
     @Override
+    public void handleUpdate(ProxiedPlayer vanillaRecipient, Set<TabViewPlayerItem> tabViewItems, EnumSet<PlayerListItemUpdate.Action> actions) {
+        if(tabViewItems.isEmpty()) {
+            return;
+        }
+        PlayerListItemUpdate packet = new PlayerListItemUpdate();
+        packet.setItems(createTabviewItems(tabViewItems,actions));
+        packet.setActions(actions);
+
+        sendToViewers(viewers, packet);
+    }
+
+    @Override
     public void handleAddPlayer(ProxiedPlayer vanillaRecipient, Set<TabViewPlayerItem> tabViewItems) {
         if(tabViewItems.isEmpty()) {
             return;
         }
-        PlayerListItem packet = new PlayerListItem();
-        packet.setItems(createTabviewItems(tabViewItems,PlayerListItem.Action.ADD_PLAYER));
-        packet.setAction(PlayerListItem.Action.ADD_PLAYER);
+        PlayerListItemUpdate packet = new PlayerListItemUpdate();
+        packet.setItems(createTabviewItems(tabViewItems,PlayerListItemUpdate.Action.ADD_PLAYER));
+        packet.setActions(EnumSet.of(PlayerListItemUpdate.Action.ADD_PLAYER));
 
         sendToViewers(viewers, packet);
     }
@@ -62,9 +76,9 @@ public abstract class AbstractViewableTabView implements ITabView{
         if(tabViewItems.isEmpty()) {
             return;
         }
-        PlayerListItem packet = new PlayerListItem();
-        packet.setItems(createTabviewItems(tabViewItems,PlayerListItem.Action.UPDATE_GAMEMODE));
-        packet.setAction(PlayerListItem.Action.UPDATE_GAMEMODE);
+        PlayerListItemUpdate packet = new PlayerListItemUpdate();
+        packet.setItems(createTabviewItems(tabViewItems,PlayerListItemUpdate.Action.UPDATE_GAMEMODE));
+        packet.setActions(EnumSet.of(PlayerListItemUpdate.Action.UPDATE_GAMEMODE));
 
         sendToViewers(viewers, packet);
     }
@@ -74,9 +88,9 @@ public abstract class AbstractViewableTabView implements ITabView{
         if(tabViewItems.isEmpty()) {
             return;
         }
-        PlayerListItem packet = new PlayerListItem();
-        packet.setItems(createTabviewItems(tabViewItems,PlayerListItem.Action.UPDATE_LATENCY));
-        packet.setAction(PlayerListItem.Action.UPDATE_LATENCY);
+        PlayerListItemUpdate packet = new PlayerListItemUpdate();
+        packet.setItems(createTabviewItems(tabViewItems,PlayerListItemUpdate.Action.UPDATE_LATENCY));
+        packet.setActions(EnumSet.of(PlayerListItemUpdate.Action.UPDATE_LATENCY));
 
         sendToViewers(viewers, packet);
     }
@@ -86,9 +100,9 @@ public abstract class AbstractViewableTabView implements ITabView{
         if(tabViewItems.isEmpty()) {
             return;
         }
-        PlayerListItem packet = new PlayerListItem();
-        packet.setItems(createTabviewItems(tabViewItems,PlayerListItem.Action.UPDATE_DISPLAY_NAME));
-        packet.setAction(PlayerListItem.Action.UPDATE_DISPLAY_NAME);
+        PlayerListItemUpdate packet = new PlayerListItemUpdate();
+        packet.setItems(createTabviewItems(tabViewItems,PlayerListItemUpdate.Action.UPDATE_DISPLAY_NAME));
+        packet.setActions(EnumSet.of(PlayerListItemUpdate.Action.UPDATE_DISPLAY_NAME));
 
         sendToViewers(viewers, packet);
     }
@@ -98,9 +112,10 @@ public abstract class AbstractViewableTabView implements ITabView{
         if(tabViewItems.isEmpty()) {
             return;
         }
-        PlayerListItem packet = new PlayerListItem();
-        packet.setItems(createTabviewItems(tabViewItems,PlayerListItem.Action.REMOVE_PLAYER));
-        packet.setAction(PlayerListItem.Action.REMOVE_PLAYER);
+        PlayerListItemRemove packet = new PlayerListItemRemove();
+        packet.setUuids(tabViewItems.stream().map(TabViewPlayerItem::getUuid).toArray(UUID[]::new));
+        //packet.setItems(createTabviewItems(tabViewItems,PlayerListItem.Action.REMOVE_PLAYER));
+        //packet.setActions(EnumSet.of(PlayerListItemUpdate.Action.REMOVE_PLAYER));
 
         sendToViewers(viewers, packet);
     }
@@ -116,9 +131,9 @@ public abstract class AbstractViewableTabView implements ITabView{
             viewers.add(player.getUniqueId());
             Set<TabViewPlayerItem> tabViewItems = PlayerItemManager.getPlayerItems();
             if(!tabViewItems.isEmpty()) {
-                PlayerListItem packet = new PlayerListItem();
-                packet.setItems(createTabviewItems(tabViewItems,PlayerListItem.Action.ADD_PLAYER));
-                packet.setAction(PlayerListItem.Action.ADD_PLAYER);
+                PlayerListItemUpdate packet = new PlayerListItemUpdate();
+                packet.setItems(createTabviewItems(tabViewItems,PlayerListItemUpdate.Action.ADD_PLAYER));
+                packet.setActions(EnumSet.of(PlayerListItemUpdate.Action.ADD_PLAYER));
 
                 sendToViewers(Sets.newHashSet(player.getUniqueId()), packet);
             }
@@ -132,9 +147,10 @@ public abstract class AbstractViewableTabView implements ITabView{
         if(player.getUniqueId()!=null) {
             Set<TabViewPlayerItem> tabViewItems = PlayerItemManager.getPlayerItems();
             if(!tabViewItems.isEmpty()) {
-                PlayerListItem packet = new PlayerListItem();
-                packet.setItems(createTabviewItems(tabViewItems,PlayerListItem.Action.REMOVE_PLAYER));
-                packet.setAction(PlayerListItem.Action.REMOVE_PLAYER);
+                PlayerListItemRemove packet = new PlayerListItemRemove();
+                packet.setUuids(tabViewItems.stream().map(TabViewPlayerItem::getUuid).toArray(UUID[]::new));
+                //packet.setItems(createTabviewItems(tabViewItems,PlayerListItemUpdate.Action.REMOVE_PLAYER));
+                //packet.setActions(EnumSet(PlayerListItemUpdate.Action.REMOVE_PLAYER);
 
                 sendToViewers(Sets.newHashSet(player.getUniqueId()), packet);
             }
@@ -146,7 +162,8 @@ public abstract class AbstractViewableTabView implements ITabView{
         return viewers.contains(player.getUniqueId());
     }
 
-    protected abstract void sendToViewers(Set<UUID> viewers, PlayerListItem packet);
+    protected abstract void sendToViewers(Set<UUID> viewers, PlayerListItemUpdate packet);
+    protected abstract void sendToViewers(Set<UUID> viewers, PlayerListItemRemove packet);
 
     @Override
     public boolean isViewerAllowedOn(String server) {
@@ -161,37 +178,45 @@ public abstract class AbstractViewableTabView implements ITabView{
 
     protected abstract boolean isDisplayed(TabViewPlayerItem item);
 
-    private PlayerListItem.Item[] createTabviewItems(Set<TabViewPlayerItem> playerItems, PlayerListItem.Action action) {
-        List<PlayerListItem.Item> itemList = new ArrayList<>();
+    private net.md_5.bungee.protocol.packet.PlayerListItem.Item[] createTabviewItems(Set<TabViewPlayerItem> playerItems, PlayerListItemUpdate.Action action) {
+        return createTabviewItems(playerItems, EnumSet.of(action));
+    }
+
+    private net.md_5.bungee.protocol.packet.PlayerListItem.Item[] createTabviewItems(Set<TabViewPlayerItem> playerItems, EnumSet<PlayerListItemUpdate.Action> actions) {
+        List<net.md_5.bungee.protocol.packet.PlayerListItem.Item> itemList = new ArrayList<>();
         playerItems.stream().filter(item -> item.getUsername()!=null && isDisplayed(item))
                             .sorted(Comparator.comparing(tabViewPlayerItem -> tabViewPlayerItem.getUsername().toLowerCase()))
                    .forEachOrdered(playerItem -> {
-            PlayerListItem.Item item = new PlayerListItem.Item();
+            net.md_5.bungee.protocol.packet.PlayerListItem.Item item = new net.md_5.bungee.protocol.packet.PlayerListItem.Item();
             item.setUuid(playerItem.getUuid());
-            switch(action) {
-                case ADD_PLAYER:
-                    item.setUsername(playerItem.getUsername());
-                    Property[] prop = playerItem.getProperties();
-                    if (prop != null) {
-                        item.setProperties(prop.clone());
-                    }
-                    item.setDisplayName(config.getDisplayName(playerItem));
-                    item.setGamemode(playerItem.getGamemode());
-                    item.setPing(playerItem.getPing());
-                    break;
-                case UPDATE_DISPLAY_NAME:
-                    item.setDisplayName(config.getDisplayName(playerItem));
-                    break;
-                case UPDATE_LATENCY:
-                    item.setPing(playerItem.getPing());
-                    break;
-                case UPDATE_GAMEMODE:
-                    item.setGamemode(playerItem.getGamemode());
-                    break;
+            for(PlayerListItemUpdate.Action action: actions) {
+                switch (action) {
+                    case ADD_PLAYER:
+                        item.setUsername(playerItem.getUsername());
+                        Property[] prop = playerItem.getProperties();
+                        if (prop != null) {
+                            item.setProperties(prop.clone());
+                        }
+                        item.setDisplayName(config.getDisplayName(playerItem));
+                        item.setGamemode(playerItem.getGamemode());
+                        item.setPing(playerItem.getPing());
+                        break;
+                    case UPDATE_DISPLAY_NAME:
+                        item.setDisplayName(config.getDisplayName(playerItem));
+                        break;
+                    case UPDATE_LATENCY:
+                        item.setPing(playerItem.getPing());
+                        break;
+                    case UPDATE_GAMEMODE:
+                        item.setGamemode(playerItem.getGamemode());
+                        break;
+                    case UPDATE_LISTED:
+                        item.setListed(!playerItem.isVanished());
+                }
             }
             itemList.add(item);
         });
-        return itemList.toArray(new PlayerListItem.Item[0]);
+        return itemList.toArray(new net.md_5.bungee.protocol.packet.PlayerListItem.Item[0]);
     }
 
     public Set<UUID> getViewers() {

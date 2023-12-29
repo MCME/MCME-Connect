@@ -15,7 +15,6 @@ import net.md_5.bungee.protocol.packet.PlayerListItem;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class PlayerItemUpdater {
@@ -63,7 +62,7 @@ if(TabViewCommand.showItems || TabViewCommand.showTabViews) {
                     for (TabViewPlayerItem item : itemMap.values()) {
                         ProxiedPlayer search = ProxyServer.getInstance().getPlayer(item.getUuid());
 
-                        if (search == null || !search.getServer().getInfo().getName().equals(server.getValue().getName())) {
+                        if (search == null || !search.isConnected() || !search.getServer().getInfo().getName().equals(server.getValue().getName())) {
                             PlayerListItem.Item removalItem = new PlayerListItem.Item();
                             removalItem.setUuid(item.getUuid());
                             removal.add(removalItem);

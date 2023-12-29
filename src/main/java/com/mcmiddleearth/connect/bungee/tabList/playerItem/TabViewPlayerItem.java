@@ -10,10 +10,12 @@ import com.google.common.io.ByteStreams;
 import com.mcmiddleearth.connect.Channel;
 import net.md_5.bungee.protocol.Property;
 import net.md_5.bungee.protocol.packet.PlayerListItem;
+import org.bukkit.GameMode;
 
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.logging.Logger;
 
 /**
  *
@@ -31,11 +33,16 @@ public class TabViewPlayerItem {
     private boolean vanished;
     
     public TabViewPlayerItem(PlayerListItem.Item item) {
+//Logger.getGlobal().info("uuid: "+item.getUuid().toString());
         uuid = item.getUuid();
+//Logger.getGlobal().info("username: "+item.getUsername());
         username = item.getUsername();
+//Logger.getGlobal().info("displayname: "+item.getDisplayName());
         displayname = item.getDisplayName();
-        gamemode = item.getGamemode();
-        ping = item.getPing();
+//Logger.getGlobal().info("gamemode: "+item.getGamemode());
+        gamemode = (item.getGamemode()!=null?item.getGamemode():2);
+//Logger.getGlobal().info("ping: "+item.getPing());
+        ping = (item.getPing()!=null?item.getPing():-1);
         if(item.getProperties()!=null) {
             properties = Arrays.copyOf(item.getProperties(),item.getProperties().length);
         } else {
@@ -52,7 +59,8 @@ public class TabViewPlayerItem {
 
     public boolean sameData(TabViewPlayerItem other) {
         boolean result =  equals(other) 
-                && username.equals(other.username)
+                && ((username == null && other.username == null)
+                     || (username!=null && username.equals(other.username)))
                 && ((displayname==null && other.displayname==null)
                      || (displayname!=null && displayname.equals(other.displayname)))
                 && gamemode == other.gamemode
@@ -117,6 +125,14 @@ public class TabViewPlayerItem {
     public boolean getAfk() { return this.afk; }
 
     public void setAfk(boolean afk) { this.afk = afk; }
+
+    public boolean isVanished() {
+        return vanished;
+    }
+
+    public void setVanished(boolean vanished) {
+        this.vanished = vanished;
+    }
 
     @Override
     public boolean equals(Object other) {

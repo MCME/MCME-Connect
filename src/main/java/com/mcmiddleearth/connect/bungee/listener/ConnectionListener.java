@@ -25,6 +25,8 @@ import com.mcmiddleearth.connect.bungee.Handler.LegacyPlayerHandler;
 import com.mcmiddleearth.connect.bungee.Handler.RestorestatsHandler;
 import com.mcmiddleearth.connect.bungee.Handler.TpaHandler;
 import com.mcmiddleearth.connect.bungee.vanish.VanishHandler;
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -37,10 +39,7 @@ import net.md_5.bungee.api.event.ServerConnectedEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -50,7 +49,8 @@ import java.util.concurrent.TimeUnit;
 public class ConnectionListener implements Listener {
 
     ArrayList<String> priorities = new ArrayList<>();
-    
+    ArrayList<UUID> welcomedPlayers = new ArrayList<>();
+
     public ConnectionListener() {
         //priorities.add("world");
         //priorities.add("moria");
@@ -68,21 +68,29 @@ public class ConnectionListener implements Listener {
                                     .color(ChatColor.WHITE).create());
         }
         ProxiedPlayer player = event.getPlayer();
-        if(!VanishHandler.isPvSupport()) {
-            sendJoinMessage(player,false);
-        } else {
-            VanishHandler.join(player);
-        }
+        ProxyServer.getInstance().getScheduler().schedule(ConnectBungeePlugin.getInstance(), () -> {
+            if(player.isConnected()) {
+                if (!VanishHandler.isPvSupport()) {
+                    sendJoinMessage(player, false);
+                } else {
+                    VanishHandler.join(player);
+                }
+                welcomedPlayers.add(player.getUniqueId());
+            }
+        }, 2, TimeUnit.SECONDS);
     }
     
     @EventHandler
     public void onDisconnect(PlayerDisconnectEvent event) {
         ProxiedPlayer player = event.getPlayer();
-        TpaHandler.removeRequests(player);
-        if(!VanishHandler.isPvSupport()) {
-            sendLeaveMessage(player,false);
-        } else {
-            VanishHandler.quit(player);
+        if(welcomedPlayers.contains(player.getUniqueId())) {
+            TpaHandler.removeRequests(player);
+            if (!VanishHandler.isPvSupport()) {
+                sendLeaveMessage(player, false);
+            } else {
+                VanishHandler.quit(player);
+            }
+            welcomedPlayers.remove(player.getUniqueId());
         }
     }
     

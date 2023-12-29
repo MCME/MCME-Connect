@@ -122,6 +122,7 @@ public class ConnectBungeePlugin extends Plugin {
         TabViewManager.init();
         tabViewCommand = new TabViewCommand();
         ProxyServer.getInstance().getPluginManager().registerCommand(this, tabViewCommand);
+
     }
     
     @Override

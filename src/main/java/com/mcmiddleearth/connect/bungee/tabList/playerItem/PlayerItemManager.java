@@ -11,6 +11,8 @@ import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.protocol.packet.PlayerListItem;
 import net.md_5.bungee.protocol.packet.PlayerListItem.Item;
+import net.md_5.bungee.protocol.packet.PlayerListItemRemove;
+import net.md_5.bungee.protocol.packet.PlayerListItemUpdate;
 
 import java.util.*;
 import java.util.logging.Logger;
@@ -58,7 +60,32 @@ public class PlayerItemManager {
         }
         return updates;
     }
-    
+
+        public static synchronized Set<TabViewPlayerItem> addPlayerItems(ProxiedPlayer vanillaRecipient, PlayerListItemUpdate packet) {
+            Map<UUID,TabViewPlayerItem> items = getPlayerItems(vanillaRecipient.getServer().getInfo().getName());
+            if(items==null) {
+                items =  new HashMap<>();
+                playerItems.put(vanillaRecipient.getServer().getInfo().getName(), items);
+            }
+            Set<TabViewPlayerItem> updates = new HashSet<>();
+            for(Item packetItem: packet.getItems()) {
+                if(packetItem.getUuid()!=null) {
+                    TabViewPlayerItem item = new TabViewPlayerItem(packetItem);
+                    TabViewPlayerItem storedItem = items.get(item.getUuid());
+                    if (storedItem == null
+                            || !storedItem.sameData(item)) { //edit "NOT"??
+                        if(storedItem != null) {
+                            item.setAfk(storedItem.getAfk());
+                        }
+                        items.put(item.getUuid(), item);
+                        sendPlayerListUpdate(item, false);
+                        updates.add(item);
+                    }
+                }
+            }
+            return updates;
+        }
+
     public static synchronized Set<TabViewPlayerItem> updatePlayerItems(ProxiedPlayer vanillaRecipient, PlayerListItem packet) {
         Map<UUID,TabViewPlayerItem> storedItems = getPlayerItems(vanillaRecipient.getServer().getInfo().getName());
         Set<TabViewPlayerItem> updates = new HashSet<>();
@@ -91,6 +118,39 @@ public class PlayerItemManager {
         }
         return updates;
     }
+
+        public static synchronized Set<TabViewPlayerItem> updatePlayerItems(ProxiedPlayer vanillaRecipient, PlayerListItemUpdate packet, PlayerListItemUpdate.Action action) {
+            Map<UUID,TabViewPlayerItem> storedItems = getPlayerItems(vanillaRecipient.getServer().getInfo().getName());
+            Set<TabViewPlayerItem> updates = new HashSet<>();
+            if(storedItems!=null) {
+                for(Item packetItem: packet.getItems()) {
+                    TabViewPlayerItem item = new TabViewPlayerItem(packetItem);
+                    if(storedItems.containsKey(item.getUuid())) {
+                        TabViewPlayerItem storedItem = storedItems.get(item.getUuid());
+                        boolean update = false;
+                        switch(action) {
+                            case UPDATE_GAMEMODE:
+                                update = storedItem.getGamemode() != item.getGamemode();
+                                storedItem.setGamemode(item.getGamemode());
+                                break;
+                            case UPDATE_LATENCY:
+                                update = storedItem.getPing() != item.getPing();
+                                storedItem.setPing(item.getPing());
+                                break;
+                            case UPDATE_DISPLAY_NAME:
+                                update = storedItem.getDisplayname()==null || !storedItem.getDisplayname().equals(item.getDisplayname());
+                                storedItem.setDisplayname(item.getDisplayname());
+                                sendPlayerListUpdate(storedItem,false);
+                                break;
+                        }
+                        if(update) {
+                            updates.add(storedItem);
+                        }
+                    }
+                }
+            }
+            return updates;
+        }
 
     public static synchronized Set<TabViewPlayerItem> removePlayerItems(ProxiedPlayer vanillaRecipient, PlayerListItem packet) {
         if(vanillaRecipient!=null) {

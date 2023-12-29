@@ -21,6 +21,8 @@ import net.md_5.bungee.netty.ChannelWrapper;
 import net.md_5.bungee.netty.PipelineUtils;
 import net.md_5.bungee.protocol.packet.PlayerListHeaderFooter;
 import net.md_5.bungee.protocol.packet.PlayerListItem;
+import net.md_5.bungee.protocol.packet.PlayerListItemRemove;
+import net.md_5.bungee.protocol.packet.PlayerListItemUpdate;
 
 import java.io.File;
 import java.util.*;
@@ -153,25 +155,50 @@ public class TabViewManager implements Listener {
         tabViews.forEach((identfier, tabView) -> tabView.handleUpdateDisplayName(vanillaRecipient, items));
     }
 
+    public static void handleUpdate(ProxiedPlayer vanillaRecipient, PlayerListItemUpdate packet) {
+        Set<TabViewPlayerItem> items = PlayerItemManager.addPlayerItems(vanillaRecipient, packet);
+        tabViews.forEach((identifier, tabView) -> tabView.handleUpdate(vanillaRecipient, items, packet.getActions()));
+    }
+
     public static void handleAddPlayerPacket(ProxiedPlayer vanillaRecipient, PlayerListItem packet) {
         Set<TabViewPlayerItem> items = PlayerItemManager.addPlayerItems(vanillaRecipient, packet);
         tabViews.forEach((identfier,tabView) -> tabView.handleAddPlayer(vanillaRecipient,items));
     }
-    
+
+        /*public static void handleAddPlayerPacket(ProxiedPlayer vanillaRecipient, PlayerListItemUpdate packet) {
+            Set<TabViewPlayerItem> items = PlayerItemManager.addPlayerItems(vanillaRecipient, packet);
+            tabViews.forEach((identfier,tabView) -> tabView.handleAddPlayer(vanillaRecipient,items));
+        }*/
+
     public static void handleUpdateGamemodePacket(ProxiedPlayer vanillaRecipient, PlayerListItem packet) {
         Set<TabViewPlayerItem> items = PlayerItemManager.updatePlayerItems(vanillaRecipient, packet);
         tabViews.forEach((identfier,tabView) -> tabView.handleUpdateGamemode(vanillaRecipient,items));
     }
-    
+
+        /*public static void handleUpdateGamemodePacket(ProxiedPlayer vanillaRecipient, PlayerListItemUpdate packet) {
+            Set<TabViewPlayerItem> items = PlayerItemManager.updatePlayerItems(vanillaRecipient, packet, PlayerListItemUpdate.Action.UPDATE_GAMEMODE);
+            tabViews.forEach((identfier,tabView) -> tabView.handleUpdateGamemode(vanillaRecipient,items));
+        }*/
+
     public synchronized static void handleUpdateLatencyPacket(ProxiedPlayer vanillaRecipient, PlayerListItem packet) {
         Set<TabViewPlayerItem> items = PlayerItemManager.updatePlayerItems(vanillaRecipient, packet);
         tabViews.forEach((identfier,tabView) -> tabView.handleUpdateLatency(vanillaRecipient,items));
     }
-    
+
+        /*public synchronized static void handleUpdateLatencyPacket(ProxiedPlayer vanillaRecipient, PlayerListItemUpdate packet) {
+            Set<TabViewPlayerItem> items = PlayerItemManager.updatePlayerItems(vanillaRecipient, packet, PlayerListItemUpdate.Action.UPDATE_LATENCY);
+            tabViews.forEach((identfier,tabView) -> tabView.handleUpdateLatency(vanillaRecipient,items));
+        }*/
+
     public static void handleUpdateDisplayNamePacket(ProxiedPlayer vanillaRecipient, PlayerListItem packet) {
         Set<TabViewPlayerItem> items = PlayerItemManager.updatePlayerItems(vanillaRecipient, packet);
         tabViews.forEach((identfier,tabView) -> tabView.handleUpdateDisplayName(vanillaRecipient,items));
     }
+
+        /*public static void handleUpdateDisplayNamePacket(ProxiedPlayer vanillaRecipient, PlayerListItemUpdate packet) {
+            Set<TabViewPlayerItem> items = PlayerItemManager.updatePlayerItems(vanillaRecipient, packet, PlayerListItemUpdate.Action.UPDATE_DISPLAY_NAME);
+            tabViews.forEach((identfier,tabView) -> tabView.handleUpdateDisplayName(vanillaRecipient,items));
+        }*/
 
     public static void handleRemovePlayerPacket(ProxiedPlayer vanillaRecipient, PlayerListItem packet) {
         Set<TabViewPlayerItem> items = PlayerItemManager.removePlayerItems(vanillaRecipient, packet);
