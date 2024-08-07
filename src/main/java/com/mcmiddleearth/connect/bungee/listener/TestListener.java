@@ -16,7 +16,7 @@
  */
 package com.mcmiddleearth.connect.bungee.listener;
 
-import com.mcmiddleearth.connect.bungee.ConnectBungeePlugin;
+import com.mcmiddleearth.connect.proxy.bungee.ConnectBungeePlugin;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.event.*;
 import net.md_5.bungee.api.plugin.Listener;

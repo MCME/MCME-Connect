@@ -14,11 +14,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.mcmiddleearth.connect.bungee.warp;
+package com.mcmiddleearth.connect.proxy.core.warp;
 
-import com.mcmiddleearth.connect.bungee.ConnectBungeePlugin;
+import com.mcmiddleearth.base.core.player.McmeProxyPlayer;
+import com.mcmiddleearth.connect.proxy.bungee.ConnectBungeePlugin;
 import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.scheduler.ScheduledTask;
 
 import java.io.*;
@@ -49,15 +49,15 @@ public class MyWarpDBConnector {
     private PreparedStatement getPlayerList;
     private PreparedStatement getInvitations;
 
-    private File worldFile = new File(ConnectBungeePlugin.getInstance().getDataFolder(),"world.uuid");
+    private final File worldFile = new File(ConnectBungeePlugin.getInstance().getDataFolder(),"world.uuid");
         
-    private Map<String, String> worldUUID = new HashMap<>();
+    private final Map<String, String> worldUUID = new HashMap<>();
     
     private boolean connected = false;
     
-    private ExecutorService executor = Executors.newSingleThreadExecutor();
+    private final ExecutorService executor = Executors.newSingleThreadExecutor();
     
-    private ScheduledTask keepAliveTask;
+    private final ScheduledTask keepAliveTask;
     
     public MyWarpDBConnector(Map config) {
         if(config==null) {
@@ -145,8 +145,8 @@ public class MyWarpDBConnector {
         }
     }
 
-    public Set<Warp> getWarps() {
-        Set<Warp> result = new HashSet<>();
+    public Set<WarpData> getWarps() {
+        Set<WarpData> result = new HashSet<>();
         try {
             ResultSet warpData = getWarpList.executeQuery();
             ResultSet playerData = getPlayerList.executeQuery();
@@ -163,17 +163,13 @@ public class MyWarpDBConnector {
             if(invitationData.next()) {
                 do {
                     int warpId = invitationData.getInt("warp_id");
-                    Set<UUID> invitedPlayers = invitations.get(warpId);
-                    if(invitedPlayers==null) {
-                        invitedPlayers = new HashSet<>();
-                        invitations.put(warpId,invitedPlayers);
-                    }
+                    Set<UUID> invitedPlayers = invitations.computeIfAbsent(warpId, k -> new HashSet<>());
                     invitedPlayers.add(players.get(invitationData.getInt("player_id")));
                 } while(invitationData.next());
             }
             if(warpData.next()) {
                 do {
-                    Warp warp = new Warp();
+                    WarpData warp = new WarpData();
                     warp.setName(warpData.getString("warp.name"));
                     warp.setPublic(warpData.getInt("warp.type")==1);
                     warp.setOwner(players.get(warpData.getInt("warp.player_id")));
@@ -189,7 +185,7 @@ public class MyWarpDBConnector {
         return result;
     }
     
-    public Warp getWarp(ProxiedPlayer player, String name) {
+    public WarpData getWarp(McmeProxyPlayer player, String name) {
         if(connected) {
             try {
                 getWarp.setString(1, addWildcards(name));
@@ -202,7 +198,7 @@ public class MyWarpDBConnector {
                         //world unknown
                         world = "_unknown";
                     }
-                    Warp warp = new Warp();
+                    WarpData warp = new WarpData();
                     warp.setName(result.getString("warp.name"));
                     warp.setWorld(world);
                     warp.setServer(world);
@@ -259,11 +255,7 @@ public class MyWarpDBConnector {
     
     private void saveWorldUUIDs() {
         try(PrintWriter fw = new PrintWriter(new FileWriter(worldFile))) {
-            worldUUID.entrySet().forEach((entry) -> {
-                fw.println(entry.getKey()+";"+entry.getValue());
-            });
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(MyWarpDBConnector.class.getName()).log(Level.SEVERE, null, ex);
+            worldUUID.forEach((key, value) -> fw.println(key + ";" + value));
         } catch (IOException ex) {
             Logger.getLogger(MyWarpDBConnector.class.getName()).log(Level.SEVERE, null, ex);
         }

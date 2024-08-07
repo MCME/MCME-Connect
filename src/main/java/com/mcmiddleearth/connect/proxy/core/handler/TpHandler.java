@@ -14,18 +14,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.mcmiddleearth.connect.bungee.Handler;
+package com.mcmiddleearth.connect.proxy.core.handler;
 
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
+import com.mcmiddleearth.base.core.player.McmeProxyPlayer;
 import com.mcmiddleearth.connect.Channel;
-import com.mcmiddleearth.connect.bungee.ConnectBungeePlugin;
-import java.util.concurrent.TimeUnit;
-import java.util.logging.Logger;
-
+import com.mcmiddleearth.connect.bungee.Handler.ConnectHandler;
+import com.mcmiddleearth.connect.proxy.core.McmeConnect;
 import net.md_5.bungee.api.Callback;
 import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  *
@@ -36,15 +36,15 @@ public class TpHandler {
     public static boolean handle(String sender, String server, String target) {
         Callback<Boolean> callback = (connected, error) -> {
             if(connected) {
-                ProxyServer.getInstance().getScheduler().schedule(ConnectBungeePlugin.getInstance(), () -> {
+                ProxyServer.getInstance().getScheduler().schedule(McmeConnect.getProxyPlugin(), () -> {
 //Logger.getGlobal().info("TP callback: "+sender+" "+server+" "+target);
-                    ProxiedPlayer player = ProxyServer.getInstance().getPlayer(sender);
+                    McmeProxyPlayer player = McmeConnect.getProxyPlugin().getPlayer(sender);
                     ByteArrayDataOutput out = ByteStreams.newDataOutput();
                     out.writeUTF(Channel.TP);
                     out.writeUTF(sender);
                     out.writeUTF(target);
                     ProxyServer.getInstance().getServerInfo(server).sendData(Channel.MAIN, out.toByteArray(),true);   
-                }, ConnectBungeePlugin.getConnectDelay(), TimeUnit.MILLISECONDS);
+                }, McmeConnect.getConfig().getConnectDelay(), TimeUnit.MILLISECONDS);
             }
         };
         return (ConnectHandler.handle(sender, server, true, callback));

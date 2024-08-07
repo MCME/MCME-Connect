@@ -3,7 +3,7 @@ package com.mcmiddleearth.connect.bungee.tabList.tabView;
 import com.mcmiddleearth.connect.bungee.tabList.PacketLogger;
 import com.mcmiddleearth.connect.bungee.tabList.playerItem.TabViewPlayerItem;
 import com.mcmiddleearth.connect.bungee.tabList.tabView.configuration.ViewableTabViewConfig;
-import com.mcmiddleearth.connect.bungee.vanish.VanishHandler;
+import com.mcmiddleearth.connect.proxy.core.handler.VanishHandler;
 import com.mcmiddleearth.connect.log.Log;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;

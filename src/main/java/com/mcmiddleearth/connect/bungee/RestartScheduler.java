@@ -16,7 +16,8 @@
  */
 package com.mcmiddleearth.connect.bungee;
 
-import com.mcmiddleearth.connect.bungee.Handler.RestartHandler;
+import com.mcmiddleearth.connect.proxy.bungee.ConnectBungeePlugin;
+import com.mcmiddleearth.connect.proxy.core.handler.RestartHandler;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.ComponentBuilder;

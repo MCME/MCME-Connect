@@ -14,12 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.mcmiddleearth.connect.bungee.warp;
+package com.mcmiddleearth.connect.proxy.core.warp;
 
-import net.md_5.bungee.api.connection.ProxiedPlayer;
+import com.mcmiddleearth.base.core.player.McmeProxyPlayer;
 
 import java.util.HashSet;
-import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
@@ -27,7 +27,7 @@ import java.util.UUID;
  *
  * @author Eriol_Eandur
  */
-public class Warp {
+public class WarpData {
     
     private String server;
     private String world;
@@ -79,16 +79,12 @@ public class Warp {
         this.welcomeMessage = welcomeMessage;
     }
 
-    public boolean isVisible(ProxiedPlayer player) {
+    public boolean isVisible(McmeProxyPlayer player) {
         return visibleToEveryone || player.getUniqueId().equals(owner) || invited.contains(player.getUniqueId());
     }
 
     public void setInvited(Set<UUID> invitedPlayers) {
-        if(invitedPlayers==null) {
-            invited = new HashSet<>();
-        } else {
-            invited = invitedPlayers;
-        }
+        invited = Objects.requireNonNullElseGet(invitedPlayers, HashSet::new);
     }
 
     public void setOwner(UUID owner) {

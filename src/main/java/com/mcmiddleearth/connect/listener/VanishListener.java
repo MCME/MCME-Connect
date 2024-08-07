@@ -14,8 +14,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.mcmiddleearth.connect.bungee.vanish;
+package com.mcmiddleearth.connect.listener;
 
+import com.mcmiddleearth.connect.proxy.bungee.ConnectBungeePlugin;
+import com.mcmiddleearth.connect.proxy.core.handler.VanishHandler;
 import de.myzelyam.api.vanish.BungeePlayerHideEvent;
 import de.myzelyam.api.vanish.BungeePlayerShowEvent;
 import net.md_5.bungee.api.plugin.Listener;
@@ -29,12 +31,12 @@ public class VanishListener implements Listener {
     
     @EventHandler
     public void onVanish(BungeePlayerHideEvent event) {
-        VanishHandler.vanish(event.getPlayer());
+        VanishHandler.vanish(ConnectBungeePlugin.getInstance().getPlayer(event.getPlayer()));
     }
     
     @EventHandler
     public void onVanish(BungeePlayerShowEvent event) {
-        VanishHandler.unvanish(event.getPlayer());
+        VanishHandler.unvanish(ConnectBungeePlugin.getInstance().getPlayer(event.getPlayer()));
     }
     
     

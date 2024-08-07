@@ -1,6 +1,6 @@
 package com.mcmiddleearth.connect.bungee.tabList.tabView;
 
-import com.mcmiddleearth.connect.bungee.ConnectBungeePlugin;
+import com.mcmiddleearth.connect.proxy.bungee.ConnectBungeePlugin;
 import com.mcmiddleearth.connect.bungee.ServerInformation;
 import com.mcmiddleearth.connect.bungee.tabList.PacketLogger;
 import com.mcmiddleearth.connect.bungee.tabList.TabViewManager;

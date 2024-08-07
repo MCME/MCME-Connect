@@ -1,5 +1,5 @@
 name: ${project.artifactId}
-main: com.mcmiddleearth.connect.bungee.ConnectBungeePlugin
+main: com.mcmiddleearth.connect.proxy.bungee.ConnectBungeePlugin
 version: ${project.version}
 author: Eriol_Eandur
 

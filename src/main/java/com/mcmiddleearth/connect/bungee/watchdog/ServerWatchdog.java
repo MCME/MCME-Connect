@@ -17,7 +17,7 @@
 package com.mcmiddleearth.connect.bungee.watchdog;
 
 import com.mcmiddleearth.connect.Permission;
-import com.mcmiddleearth.connect.bungee.ConnectBungeePlugin;
+import com.mcmiddleearth.connect.proxy.bungee.ConnectBungeePlugin;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.ComponentBuilder;

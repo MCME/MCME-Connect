@@ -1,7 +1,7 @@
 package com.mcmiddleearth.connect.bungee.tabList.tabView;
 
 import com.google.common.collect.Sets;
-import com.mcmiddleearth.connect.bungee.ConnectBungeePlugin;
+import com.mcmiddleearth.connect.proxy.bungee.ConnectBungeePlugin;
 import com.mcmiddleearth.connect.bungee.tabList.playerItem.PlayerItemManager;
 import com.mcmiddleearth.connect.bungee.tabList.playerItem.TabViewPlayerItem;
 import com.mcmiddleearth.connect.bungee.tabList.tabView.configuration.ViewableTabViewConfig;
@@ -14,7 +14,6 @@ import net.md_5.bungee.protocol.packet.PlayerListItemRemove;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 public abstract class AbstractViewableTabView implements ITabView{
 

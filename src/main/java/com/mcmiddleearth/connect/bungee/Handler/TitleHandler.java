@@ -19,7 +19,7 @@ package com.mcmiddleearth.connect.bungee.Handler;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import com.mcmiddleearth.connect.Channel;
-import com.mcmiddleearth.connect.bungee.ConnectBungeePlugin;
+import com.mcmiddleearth.connect.proxy.bungee.ConnectBungeePlugin;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.concurrent.TimeUnit;

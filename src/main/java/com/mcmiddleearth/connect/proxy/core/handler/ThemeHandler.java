@@ -14,19 +14,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.mcmiddleearth.connect.bungee.Handler;
+package com.mcmiddleearth.connect.proxy.core.handler;
 
-import com.mcmiddleearth.connect.bungee.ConnectBungeePlugin;
-import java.util.concurrent.TimeUnit;
-import java.util.logging.Logger;
-
+import com.mcmiddleearth.base.core.player.McmeProxyPlayer;
+import com.mcmiddleearth.connect.bungee.Handler.CommandHandler;
+import com.mcmiddleearth.connect.bungee.Handler.ConnectHandler;
+import com.mcmiddleearth.connect.proxy.core.McmeConnect;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.md_5.bungee.api.Callback;
-import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  *
@@ -34,15 +33,15 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
  */
 public class ThemeHandler {
     
-    public static boolean handle(ProxiedPlayer sender, String server, String command) {
+    public static boolean handle(McmeProxyPlayer sender, String server, String command) {
         Callback<Boolean> callback = (connected, error) -> {
             if(connected) {
                 ProxyServer.getInstance().getScheduler().schedule(ConnectBungeePlugin.getInstance(), () -> {
-                    ConnectBungeePlugin.getAudience(sender).sendMessage(Component
+                   sender.sendMessage(Component
                             .text("All Themed-build commands need to be issued from Themed-build world. You were teleported there.")
                                     .color(NamedTextColor.RED));
                     CommandHandler.handle(server, sender.getName(),command);
-                }, ConnectBungeePlugin.getConnectDelay(), TimeUnit.MILLISECONDS);
+                }, McmeConnect.getConfig().getConnectDelay(), TimeUnit.MILLISECONDS);
             }
         };
         return (ConnectHandler.handle(sender.getName(), server, true, callback)); //if {

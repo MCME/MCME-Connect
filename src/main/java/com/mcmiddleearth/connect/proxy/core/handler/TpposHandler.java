@@ -14,16 +14,19 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.mcmiddleearth.connect.bungee.Handler;
+package com.mcmiddleearth.connect.proxy.core.handler;
 
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
+import com.mcmiddleearth.base.core.player.McmeProxyPlayer;
 import com.mcmiddleearth.connect.Channel;
-import com.mcmiddleearth.connect.bungee.ConnectBungeePlugin;
-import java.util.concurrent.TimeUnit;
+import com.mcmiddleearth.connect.bungee.Handler.ChatMessageHandler;
+import com.mcmiddleearth.connect.bungee.Handler.ConnectHandler;
+import com.mcmiddleearth.connect.proxy.core.McmeConnect;
 import net.md_5.bungee.api.Callback;
 import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  *
@@ -33,7 +36,7 @@ public class TpposHandler {
     
     public static boolean handle(String sender, String server, String world, 
                                  String location, String message) {
-        ProxiedPlayer player = ProxyServer.getInstance().getPlayer(sender);
+        McmeProxyPlayer player = McmeConnect.getProxyPlugin().getPlayer(sender);
         if(player!=null) {
             Callback<Boolean> callback = (connected, error) -> {
                 if(connected) {
@@ -47,10 +50,10 @@ public class TpposHandler {
                         if(!message.equals("")) {
                             ChatMessageHandler.handle(server, sender, message, 400);
                         }
-                    }, ConnectBungeePlugin.getConnectDelay(), TimeUnit.MILLISECONDS);
+                    }, McmeConnect.getConfig().getConnectDelay(), TimeUnit.MILLISECONDS);
                 }
             };
-            if(!player.getServer().getInfo().getName().equals(server)) {
+            if(!player.getServerInfo().getName().equals(server)) {
                 ConnectHandler.handle(sender, server, true, callback);
             } else {
                 callback.done(Boolean.TRUE, null);

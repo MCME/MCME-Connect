@@ -14,16 +14,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.mcmiddleearth.connect.bungee.Handler;
+package com.mcmiddleearth.connect.proxy.core.handler;
 
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
+import com.mcmiddleearth.base.core.player.McmeProxyPlayer;
+import com.mcmiddleearth.base.core.server.McmeServerInfo;
 import com.mcmiddleearth.connect.Channel;
-import com.mcmiddleearth.connect.bungee.ConnectBungeePlugin;
+import com.mcmiddleearth.connect.bungee.Handler.ConnectHandler;
+import com.mcmiddleearth.connect.proxy.core.McmeConnect;
 import net.md_5.bungee.api.Callback;
-import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,7 +40,7 @@ import java.util.logging.Logger;
  */
 public class RestartHandler {
     
-    private static File restartFile = new File(ConnectBungeePlugin.getInstance().getDataFolder(),"restart.nfo");
+    private static final File restartFile = new File(McmeConnect.getProxyPlugin().getDataFolder(),"restart.nfo");
 
     public static void init() {
         if(restartFile.exists()) {
@@ -47,20 +48,20 @@ public class RestartHandler {
         }
     }
     
-    public static void handle(ProxiedPlayer player, String[] message) {
+    public static void handle(McmeProxyPlayer player, String[] message) {
         handle(player,message,false);
     }
     
-    public static void handle(ProxiedPlayer player, String[] message, boolean shutdown) {
+    public static void handle(McmeProxyPlayer player, String[] message, boolean shutdown) {
         List<String> servers = new ArrayList<>();
         if(message[0].equalsIgnoreCase("all")) {
-            servers.addAll(ProxyServer.getInstance().getServers().keySet());
+            servers.addAll(McmeConnect.getProxy().getAllServerInfo().stream().map(McmeServerInfo::getName).toList());
             servers.add("proxy");
         } else {
-            for(int i = 0; i<message.length;i++) {
-                if(ProxyServer.getInstance().getServers().keySet().contains(message[i])
-                        || message[i].equals("proxy")) {
-                    servers.add(message[i]);
+            for (String s : message) {
+                if (McmeConnect.getProxy().getAllServerInfo().stream().anyMatch(info -> info.getName().equals(s))
+                        || s.equals("proxy")) {
+                    servers.add(s);
                 }
             }
         }
@@ -86,14 +87,14 @@ public class RestartHandler {
             Callback<Boolean> callback = (connected, error) -> {
                 if(connected) {
                     ProxyServer.getInstance().getScheduler().schedule(ConnectBungeePlugin.getInstance(), () -> {
-                        ServerInfo dest = ProxyServer.getInstance().getServerInfo(finalNext);
+                        McmeServerInfo dest = McmeConnect.getProxy().getServerInfo(finalNext);
                         ByteArrayDataOutput out = ByteStreams.newDataOutput();
                         out.writeUTF(Channel.RESTART);
                         out.writeBoolean(shutdown);
                         out.writeUTF(player.getName());
                         out.writeUTF(otherServers);
                         dest.sendData(Channel.MAIN, out.toByteArray(),true);   
-                    }, ConnectBungeePlugin.getConnectDelay(), TimeUnit.MILLISECONDS);
+                    }, McmeConnect.getConfig().getConnectDelay(), TimeUnit.MILLISECONDS);
                 }
             };
             if(!ConnectHandler.handle(player.getName(), next, false, callback)) {

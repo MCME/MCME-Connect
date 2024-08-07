@@ -14,35 +14,40 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.mcmiddleearth.connect.bungee;
+package com.mcmiddleearth.connect.proxy.bungee;
 
 /**
  *
  * @author Eriol_Eandur
  */
 
+import com.mcmiddleearth.base.bungee.AbstractBungeePlugin;
 import com.mcmiddleearth.connect.Channel;
-import com.mcmiddleearth.connect.bungee.Handler.RestartHandler;
-import com.mcmiddleearth.connect.bungee.Handler.TpaHandler;
-import com.mcmiddleearth.connect.bungee.Handler.TpahereHandler;
-import com.mcmiddleearth.connect.bungee.listener.CommandListener;
+import com.mcmiddleearth.connect.bungee.RestartScheduler;
+import com.mcmiddleearth.connect.bungee.ServerInformation;
+import com.mcmiddleearth.connect.bungee.YamlConfiguration;
 import com.mcmiddleearth.connect.bungee.listener.ConnectionListener;
 import com.mcmiddleearth.connect.bungee.listener.PluginMessageListener;
-import com.mcmiddleearth.connect.bungee.listener.TestListener;
 import com.mcmiddleearth.connect.bungee.tabList.TabViewCommand;
 import com.mcmiddleearth.connect.bungee.tabList.TabViewManager;
 import com.mcmiddleearth.connect.bungee.tabList.playerItem.PlayerItemUpdater;
-import com.mcmiddleearth.connect.bungee.vanish.VanishHandler;
-import com.mcmiddleearth.connect.bungee.vanish.VanishListener;
-import com.mcmiddleearth.connect.bungee.warp.MyWarpDBConnector;
 import com.mcmiddleearth.connect.bungee.watchdog.ServerWatchdog;
+import com.mcmiddleearth.connect.listener.VanishListener;
 import com.mcmiddleearth.connect.log.BungeeLog;
 import com.mcmiddleearth.connect.log.Log;
+import com.mcmiddleearth.connect.proxy.bungee.listener.CommandListener;
+import com.mcmiddleearth.connect.proxy.core.McmeConnect;
+import com.mcmiddleearth.connect.proxy.core.McmeConnectConfig;
+import com.mcmiddleearth.connect.proxy.core.handler.RestartHandler;
+import com.mcmiddleearth.connect.proxy.core.handler.TpaHandler;
+import com.mcmiddleearth.connect.proxy.core.handler.TpahereHandler;
+import com.mcmiddleearth.connect.proxy.core.handler.VanishHandler;
+import com.mcmiddleearth.connect.proxy.core.warp.MyWarpDBConnector;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.platform.bungeecord.BungeeAudiences;
+import net.kyori.adventure.text.Component;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
-import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.api.scheduler.ScheduledTask;
 
 import java.io.*;
@@ -50,24 +55,18 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class ConnectBungeePlugin extends Plugin {
+public class ConnectBungeePlugin extends AbstractBungeePlugin implements McmeConnectConfig {
     
     private static ConnectBungeePlugin instance;
     
-    private static int connectDelay = 200;
     private static Set<UUID> legacyPlayers = new HashSet<>();
-    private static boolean legacyRedirectEnabled = true;
-    private static String legacyRedirectFrom = "newplayerworld";
-    private static String legacyRedirectTo = "world";
-    
+
     private static ServerWatchdog watcher;
     
     private static final YamlConfiguration config = new YamlConfiguration();
             
     private static File configFile;
     
-    private static final Set<String> noMVTP = new HashSet<>();
-          
     private static PlayerItemUpdater playerItemUpdater;
 
     private static MyWarpDBConnector myWarpConnector;
@@ -80,7 +79,7 @@ public class ConnectBungeePlugin extends Plugin {
 
     private TabViewCommand tabViewCommand;
 
-    private final Map<String,ServerInformation> serverInformation = new HashMap<>();
+    private final Map<String, ServerInformation> serverInformation = new HashMap<>();
 
     private static BungeeAudiences audiences;
 
@@ -88,12 +87,14 @@ public class ConnectBungeePlugin extends Plugin {
     
     @Override
     public void onEnable() {
+        super.onEnable();
         instance = this;
         configFile = new File(getDataFolder(),"config.yml");
         saveDefaultConfig(configFile, "config.yml");
         loadConfig();
         logger = new BungeeLog();
-        audiences = BungeeAudiences.create(ConnectBungeePlugin.getInstance());
+        audiences = getAdventure();//BungeeAudiences.create(ConnectBungeePlugin.getInstance());
+        McmeConnect.setProxyPlugin(this);
         RestartHandler.init();
         tpaCleanupScheduler = TpaHandler.startCleanupScheduler();
         tpahereCleanupScheduler = TpahereHandler.startCleanupScheduler();
@@ -127,20 +128,22 @@ public class ConnectBungeePlugin extends Plugin {
     
     @Override
     public void onDisable() {
+        super.onDisable();
         watcher.stopWatchdog();
         myWarpConnector.disconnect();
         restartScheduler.cancel();
         tpaCleanupScheduler.cancel();
         tpahereCleanupScheduler.cancel();
         //playerItemUpdater.disable();
-        audiences.close();
+        //audiences.close();
         logger.disable();
     }
-    
-    public static boolean isMvtpDisabled(String server) {
-        return noMVTP.contains(server);
+
+    @Override
+    public Component getMessagePrefix() {
+        return Component.text("[MCME-Connect]");
     }
-    
+
     private void loadLegacyPlayers() {
         if(!getDataFolder().exists()) {
             getDataFolder().mkdir();
@@ -198,24 +201,8 @@ public class ConnectBungeePlugin extends Plugin {
         return instance;
     }
 
-    public static int getConnectDelay() {
-        return connectDelay;
-    }
-
     public static Set<UUID> getLegacyPlayers() {
         return legacyPlayers;
-    }
-
-    public static boolean isLegacyRedirectEnabled() {
-        return legacyRedirectEnabled;
-    }
-
-    public static String getLegacyRedirectFrom() {
-        return legacyRedirectFrom;
-    }
-
-    public static String getLegacyRedirectTo() {
-        return legacyRedirectTo;
     }
 
     public static ServerWatchdog getWatcher() {
@@ -249,10 +236,6 @@ public class ConnectBungeePlugin extends Plugin {
 
     public TabViewCommand getTabViewCommand() {
         return tabViewCommand;
-    }
-
-    public static boolean isGamemodeSyncEnabled(String server) {
-        return getConfig().getBoolean("syncGamemode."+server, false);
     }
 
     public static BungeeAudiences getAudiences() {
