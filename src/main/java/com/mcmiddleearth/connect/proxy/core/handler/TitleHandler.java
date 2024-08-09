@@ -50,7 +50,7 @@ public class TitleHandler {
             out.writeInt(show);
             out.writeInt(extro);
             servers.forEach(info ->
-                    info.sendData(Channel.MAIN, out.toByteArray(),false));
+                    McmeConnect.getProxy().sendPluginMessage(info, Channel.MAIN, out.toByteArray(),false));
         }).schedule(delay, TimeUnit.MILLISECONDS);
         return true;
     }

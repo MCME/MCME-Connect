@@ -17,9 +17,8 @@
 package com.mcmiddleearth.connect.proxy.core.warp;
 
 import com.mcmiddleearth.base.core.player.McmeProxyPlayer;
-import com.mcmiddleearth.connect.proxy.bungee.ConnectBungeePlugin;
-import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.scheduler.ScheduledTask;
+import com.mcmiddleearth.base.core.taskScheduling.Task;
+import com.mcmiddleearth.connect.proxy.core.McmeConnect;
 
 import java.io.*;
 import java.sql.*;
@@ -27,8 +26,6 @@ import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -49,7 +46,7 @@ public class MyWarpDBConnector {
     private PreparedStatement getPlayerList;
     private PreparedStatement getInvitations;
 
-    private final File worldFile = new File(ConnectBungeePlugin.getInstance().getDataFolder(),"world.uuid");
+    private final File worldFile = new File(McmeConnect.getProxyPlugin().getDataFolder(),"world.uuid");
         
     private final Map<String, String> worldUUID = new HashMap<>();
     
@@ -57,7 +54,7 @@ public class MyWarpDBConnector {
     
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     
-    private final ScheduledTask keepAliveTask;
+    private final Task keepAliveTask;
     
     public MyWarpDBConnector(Map config) {
         if(config==null) {
@@ -71,11 +68,11 @@ public class MyWarpDBConnector {
 
         loadWorldUUIDs();
         connect();
-        keepAliveTask = ProxyServer.getInstance().getScheduler()
-                .schedule(ConnectBungeePlugin.getInstance(), () -> {
+        keepAliveTask = McmeConnect.getProxyPlugin().getTask( () -> {
             checkConnection();
             WarpHandler.updateCache();
-        },10,60,TimeUnit.SECONDS);
+        });
+        keepAliveTask.scheduleRepeating(10,60,TimeUnit.SECONDS);
     }
     
     public void disconnect() {
@@ -86,28 +83,26 @@ public class MyWarpDBConnector {
         try {
             dbConnection.close();
         } catch (SQLException ex) {
-            Logger.getLogger(MyWarpDBConnector.class.getName()).log(Level.SEVERE, null, ex);
+            McmeConnect.getProxyPlugin().getMcmeLogger().error("SQLException", ex);
         }
     }
     
     private boolean checkConnection() {
         try {
             if(connected && dbConnection.isValid(5)) {
-                ConnectBungeePlugin.getInstance().getLogger().log(Level.INFO, 
-                        "Successfully checked connection to myWarp database.");
+                McmeConnect.getProxyPlugin().getMcmeLogger().info("Successfully checked connection to myWarp database.");
                 connected = true;
             } else {
                 //throw new SQLException();
                 if(dbConnection!=null) {
                     dbConnection.close();
                 }
-                ConnectBungeePlugin.getInstance().getLogger().log(Level.INFO, 
-                        "Reconnecting to myWarp database.");
+                McmeConnect.getProxyPlugin().getMcmeLogger().warn("Reconnecting to myWarp database.");
                 connect();
             }
             return true;
         } catch (SQLException ex) {
-            Logger.getLogger(MyWarpDBConnector.class.getName()).log(Level.SEVERE, "No DB connection!!", ex);
+            McmeConnect.getProxyPlugin().getMcmeLogger().error("No DB connection!!",ex);
             connected = false;
             return false;
         }
@@ -140,7 +135,7 @@ public class MyWarpDBConnector {
             getPlayerList.setQueryTimeout(1);
             connected = true;
         } catch (SQLException ex) {
-            Logger.getLogger(MyWarpDBConnector.class.getName()).log(Level.SEVERE, null, ex);
+            McmeConnect.getProxyPlugin().getMcmeLogger().error("SQLException", ex);
             connected = false;
         }
     }
@@ -178,8 +173,8 @@ public class MyWarpDBConnector {
                 } while(warpData.next());
             }
             warpData.close();
-        } catch (SQLException throwables) {
-            Logger.getLogger(MyWarpDBConnector.class.getName()).log(Level.SEVERE, null, throwables);
+        } catch (SQLException ex) {
+            McmeConnect.getProxyPlugin().getMcmeLogger().error("SQLException", ex);
             connected = false;
         }
         return result;
@@ -213,7 +208,7 @@ public class MyWarpDBConnector {
                 }
                 result.close();
             } catch (SQLException ex) {
-                Logger.getLogger(MyWarpDBConnector.class.getName()).log(Level.SEVERE, null, ex);
+                McmeConnect.getProxyPlugin().getMcmeLogger().error("SQLException", ex);
                 connected = false;
             }
         }
@@ -249,7 +244,8 @@ public class MyWarpDBConnector {
                 worldUUID.put(line[0], line[1]);
             }
         } catch (FileNotFoundException ex) {
-            Logger.getLogger(MyWarpDBConnector.class.getName()).log(Level.SEVERE, null, ex);
+            McmeConnect.getProxyPlugin().getMcmeLogger().error("FileNotFoundException", ex);
+
         }
     }
     
@@ -257,7 +253,7 @@ public class MyWarpDBConnector {
         try(PrintWriter fw = new PrintWriter(new FileWriter(worldFile))) {
             worldUUID.forEach((key, value) -> fw.println(key + ";" + value));
         } catch (IOException ex) {
-            Logger.getLogger(MyWarpDBConnector.class.getName()).log(Level.SEVERE, null, ex);
+            McmeConnect.getProxyPlugin().getMcmeLogger().error("IOException", ex);
         }
     }
 

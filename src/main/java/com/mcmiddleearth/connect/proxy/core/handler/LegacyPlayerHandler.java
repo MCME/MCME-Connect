@@ -20,9 +20,15 @@ import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import com.mcmiddleearth.base.core.player.McmeProxyPlayer;
 import com.mcmiddleearth.connect.Channel;
-import com.mcmiddleearth.connect.proxy.bungee.ConnectBungeePlugin;
 import com.mcmiddleearth.connect.proxy.core.McmeConnect;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Scanner;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -30,13 +36,15 @@ import java.util.concurrent.TimeUnit;
  * @author Eriol_Eandur
  */
 public class LegacyPlayerHandler {
-    
+
+    private static final Set<UUID> legacyPlayers = new HashSet<>();
+
     public static void handle(McmeProxyPlayer player, String joinedServer) {
         if(!McmeConnect.getConfig().isLegacyRedirectEnabled()) {
             return;
         }
         String redirectServer = McmeConnect.getConfig().getLegacyRedirectFrom();
-        if(ConnectBungeePlugin.getLegacyPlayers().contains(player.getUniqueId())
+        if(legacyPlayers.contains(player.getUniqueId())
                 && joinedServer.equals(redirectServer)) {
             String target = McmeConnect.getConfig().getLegacyRedirectTo();
             McmeConnect.getProxyPlugin().getTask(() -> {
@@ -44,8 +52,32 @@ public class LegacyPlayerHandler {
                 out.writeUTF(Channel.LEGACY);
                 out.writeUTF(player.getName());
                 out.writeUTF(target);
-                McmeConnect.getProxy().getServerInfo(redirectServer).sendData(Channel.MAIN, out.toByteArray(), true);
+                McmeConnect.getProxy().sendPluginMessage(McmeConnect.getProxy().getServerInfo(redirectServer),
+                                                         Channel.MAIN, out.toByteArray(), true);
             }).schedule(McmeConnect.getConfig().getConnectDelay(), TimeUnit.MILLISECONDS);
         }
     }
+
+    public static void loadLegacyPlayers() {
+        if(!McmeConnect.getProxyPlugin().getDataFolder().exists()) {
+            McmeConnect.getProxyPlugin().getDataFolder().mkdir();
+        }
+        File file = new File(McmeConnect.getProxyPlugin().getDataFolder(),"legacyPlayer.uid");
+        if(!file.exists()) {
+            try {
+                file.createNewFile();
+            } catch (IOException ex) {
+                McmeConnect.getLogger().error("IOException", ex);
+            }
+        }
+        try(Scanner scanner = new Scanner(file))
+        {
+            while(scanner.hasNext()) {
+                legacyPlayers.add(UUID.fromString(scanner.nextLine()));
+            }
+        } catch (FileNotFoundException ex) {
+            McmeConnect.getLogger().error("FileNotFoundException", ex);
+        }
+    }
+
 }

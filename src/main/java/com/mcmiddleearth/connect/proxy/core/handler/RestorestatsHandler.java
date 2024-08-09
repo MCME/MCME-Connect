@@ -36,8 +36,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -117,7 +115,7 @@ public class RestorestatsHandler {
                     resetStatistics(player);
                 }
             } catch (IOException ex) {
-                Logger.getLogger(RestorestatsHandler.class.getName()).log(Level.SEVERE, null, ex);
+                McmeConnect.getProxyPlugin().getMcmeLogger().error( "IOException", ex);
             }
             blacklist.remove(player.getUniqueId());
         }).schedule(5, TimeUnit.SECONDS);
@@ -153,7 +151,7 @@ public class RestorestatsHandler {
                 }
             }
         } catch (SQLException ex) {
-            Logger.getLogger(RestorestatsHandler.class.getName()).log(Level.SEVERE, null, ex);
+            McmeConnect.getProxyPlugin().getMcmeLogger().error( "SQLException", ex);
         }
         
     }

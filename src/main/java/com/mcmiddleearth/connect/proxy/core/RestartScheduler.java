@@ -17,7 +17,6 @@
 package com.mcmiddleearth.connect.proxy.core;
 
 import com.mcmiddleearth.base.core.taskScheduling.Task;
-import com.mcmiddleearth.connect.proxy.bungee.ConnectBungeePlugin;
 import com.mcmiddleearth.connect.proxy.core.handler.RestartHandler;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -47,7 +46,7 @@ public class RestartScheduler {
     
     private final Task task;
     
-    private static final File restartScheduleFile = new File(ConnectBungeePlugin.getInstance().getDataFolder(),"restartSchedule.yml");
+    private static final File restartScheduleFile = new File(McmeConnect.getProxyPlugin().getDataFolder(),"restartSchedule.yml");
 
     public RestartScheduler() {
         loadConfig();
@@ -80,8 +79,7 @@ public class RestartScheduler {
     }
     
     public final void loadConfig() {
-        List<String> restarts = ConnectBungeePlugin.getConfig()
-                                             .getStringList("scheduledRestarts");
+        List<String> restarts = McmeConnect.getConfig().getScheduledRestarts();
         restartDays.clear();
         restartTimes.clear();
 

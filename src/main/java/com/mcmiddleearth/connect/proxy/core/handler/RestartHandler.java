@@ -30,8 +30,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -92,7 +90,7 @@ public class RestartHandler {
                         out.writeBoolean(shutdown);
                         out.writeUTF(player.getName());
                         out.writeUTF(otherServers);
-                        dest.sendData(Channel.MAIN, out.toByteArray(),true);   
+                        McmeConnect.getProxy().sendPluginMessage(dest,Channel.MAIN, out.toByteArray(),true);
                     }).schedule(McmeConnect.getConfig().getConnectDelay(), TimeUnit.MILLISECONDS);
                 }
             };
@@ -108,7 +106,7 @@ public class RestartHandler {
                 try {
                     restartFile.createNewFile();
                 } catch (IOException ex) {
-                    Logger.getLogger(RestartHandler.class.getName()).log(Level.SEVERE, null, ex);
+                    McmeConnect.getProxyPlugin().getMcmeLogger().error("IOException", ex);
                 }
                 McmeConnect.getProxy().stop(Component.text("MCME network is restarting."));
             } else {

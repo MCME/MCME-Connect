@@ -1,7 +1,8 @@
 package com.mcmiddleearth.connect.bungee.tabList.tabView;
 
 import com.mcmiddleearth.connect.proxy.bungee.ConnectBungeePlugin;
-import com.mcmiddleearth.connect.bungee.ServerInformation;
+import com.mcmiddleearth.connect.proxy.core.McmeConnect;
+import com.mcmiddleearth.connect.proxy.core.ServerInformation;
 import com.mcmiddleearth.connect.bungee.tabList.PacketLogger;
 import com.mcmiddleearth.connect.bungee.tabList.TabViewManager;
 import net.md_5.bungee.api.ChatColor;
@@ -36,8 +37,7 @@ public class SimpleHeaderFooter implements IHeaderFooter {
         if(server == null) {
             return content;
         }
-        ServerInformation info = ConnectBungeePlugin.getInstance()
-                .getServerInformation(server.getInfo().getName());
+        ServerInformation info = McmeConnect.getServerInformation(server.getInfo().getName());
         for(Placeholder search: Placeholder.values()) {
             String searchString = "{"+search.getPlaceholderString()+"}";
             switch(search) {

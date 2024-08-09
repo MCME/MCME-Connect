@@ -18,7 +18,6 @@ package com.mcmiddleearth.connect.proxy.core.handler;
 
 import com.mcmiddleearth.base.core.player.McmeProxyPlayer;
 import com.mcmiddleearth.connect.Permission;
-import com.mcmiddleearth.connect.proxy.bungee.listener.ConnectionListener;
 import com.mcmiddleearth.connect.bungee.tabList.TabViewManager;
 import com.mcmiddleearth.connect.proxy.core.McmeConnect;
 import net.kyori.adventure.text.Component;
@@ -29,8 +28,6 @@ import java.util.HashSet;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -56,7 +53,7 @@ public class VanishHandler {
                                             .color(NamedTextColor.GREEN));
             });
         } else {
-            ConnectionListener.sendJoinMessage(player, false);
+            ConnectionHandler.sendJoinMessage(player, false);
         }
     }
     
@@ -68,7 +65,7 @@ public class VanishHandler {
                                                 .color(NamedTextColor.GREEN));
             });
         } else {
-            ConnectionListener.sendLeaveMessage(player, false);
+            ConnectionHandler.sendLeaveMessage(player, false);
         }
     }
     
@@ -80,7 +77,7 @@ public class VanishHandler {
                 p.sendMessage(Component.text(player.getName()+" vanished.")
                                             .color(NamedTextColor.GREEN));
         });
-        ConnectionListener.sendLeaveMessage(player,true);
+        ConnectionHandler.sendLeaveMessage(player,true);
         TabViewManager.handlePlayerVanish(player);
     }
     
@@ -92,7 +89,7 @@ public class VanishHandler {
                 p.sendMessage(Component.text(player.getName()+" unvanished.")
                                             .color(NamedTextColor.GREEN));
         });
-        ConnectionListener.sendJoinMessage(player,true);
+        ConnectionHandler.sendJoinMessage(player,true);
         TabViewManager.handlePlayerUnvanish(player);
     }
     
@@ -109,13 +106,13 @@ public class VanishHandler {
             try {
                 vanishFile.createNewFile();
             } catch (IOException ex) {
-                Logger.getLogger(VanishHandler.class.getName()).log(Level.SEVERE, null, ex);
+                McmeConnect.getProxyPlugin().getMcmeLogger().error( "IOException", ex);
             }
         }
         try(PrintWriter out = new PrintWriter(new FileWriter(vanishFile))) {
             vanishedPlayers.forEach(uuid -> out.println(uuid.toString()));
         } catch (IOException ex) {
-            Logger.getLogger(VanishHandler.class.getName()).log(Level.SEVERE, null, ex);
+            McmeConnect.getProxyPlugin().getMcmeLogger().error( "IOException", ex);
         }
     }
     
@@ -126,7 +123,7 @@ public class VanishHandler {
                 vanishedPlayers.add(UUID.fromString(scanner.nextLine()));
             }
         } catch (FileNotFoundException ex) {
-            Logger.getLogger(VanishHandler.class.getName()).log(Level.WARNING, "No vanished player file found.");
+            McmeConnect.getProxyPlugin().getMcmeLogger().warn("No vanished player file found.");
         }
     }
 

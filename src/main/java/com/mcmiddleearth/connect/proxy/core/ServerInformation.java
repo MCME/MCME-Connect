@@ -1,4 +1,4 @@
-package com.mcmiddleearth.connect.bungee;
+package com.mcmiddleearth.connect.proxy.core;
 
 import com.google.common.io.ByteArrayDataInput;
 

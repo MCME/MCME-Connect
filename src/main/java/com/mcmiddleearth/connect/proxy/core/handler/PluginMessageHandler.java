@@ -7,7 +7,6 @@ import com.mcmiddleearth.base.core.server.McmeServerInfo;
 import com.mcmiddleearth.connect.Channel;
 import com.mcmiddleearth.connect.bungee.tabList.TabViewManager;
 import com.mcmiddleearth.connect.bungee.tabList.playerItem.PlayerItemManager;
-import com.mcmiddleearth.connect.proxy.bungee.ConnectBungeePlugin;
 import com.mcmiddleearth.connect.proxy.core.McmeConnect;
 
 import java.util.UUID;
@@ -65,7 +64,7 @@ public class PluginMessageHandler {
                 {
                     String uuid = in.readUTF();
                     String worldName = in.readUTF();
-                    ConnectBungeePlugin.getMyWarpConnector().addWorldUUID(uuid, worldName);
+                    McmeConnect.getMyWarpConnector().addWorldUUID(uuid, worldName);
                     break;
                 }
                 case Channel.RESTART:
@@ -76,7 +75,7 @@ public class PluginMessageHandler {
                     break;
                 case Channel.SERVER_INFO:
                     String server = messageSender.getName();
-                    ConnectBungeePlugin.getInstance().getServerInformation(server).updateFromPluginMessage(in);
+                    McmeConnect.getServerInformation(server).updateFromPluginMessage(in);
                     break;
                 case Channel.AFK:
                     String uuid = in.readUTF();

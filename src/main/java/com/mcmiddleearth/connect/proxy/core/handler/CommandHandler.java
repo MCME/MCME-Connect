@@ -24,7 +24,8 @@ public class CommandHandler {
         out.writeUTF(Channel.COMMAND);
         out.writeUTF(commandSender);
         out.writeUTF(command);
-       McmeConnect.getProxy().getServerInfo(server).sendData(Channel.MAIN, out.toByteArray(),true);
+       McmeConnect.getProxy().sendPluginMessage(McmeConnect.getProxy().getServerInfo(server),
+                                                Channel.MAIN, out.toByteArray(),true);
     }
 
     public static boolean handleChatEvent(McmeProxyPlayer player, String chatMessage) {

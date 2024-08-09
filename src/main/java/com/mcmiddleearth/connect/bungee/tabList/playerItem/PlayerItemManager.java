@@ -5,6 +5,8 @@
  */
 package com.mcmiddleearth.connect.bungee.tabList.playerItem;
 
+import com.mcmiddleearth.base.bungee.server.BungeeMcmeServerInfo;
+import com.mcmiddleearth.base.core.server.McmeServerInfo;
 import com.mcmiddleearth.connect.Channel;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
@@ -187,6 +189,10 @@ public class PlayerItemManager {
 
     private static void sendPlayerListUpdate(TabViewPlayerItem item, boolean remove) {
         ProxyServer.getInstance().getServers().forEach((name, info) -> info.sendData(Channel.MAIN, item.toByteArray(remove)));
+    }
+
+    public static void sendAllPlayerList(McmeServerInfo info) {
+        sendAllPlayerList(((BungeeMcmeServerInfo)info).toBungeeServerInfo());
     }
 
     public static void sendAllPlayerList(ServerInfo info) {

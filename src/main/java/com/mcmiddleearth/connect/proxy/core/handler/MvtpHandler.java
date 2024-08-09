@@ -41,7 +41,8 @@ public class MvtpHandler {
                     ByteArrayDataOutput out = ByteStreams.newDataOutput();
                     out.writeUTF(Channel.SPAWN);
                     out.writeUTF(sender);
-                    McmeConnect.getProxy().getServerInfo(server).sendData(Channel.MAIN, out.toByteArray(),true);
+                    McmeConnect.getProxy().sendPluginMessage(McmeConnect.getProxy().getServerInfo(server),
+                                                             Channel.MAIN, out.toByteArray(),true);
                 }).schedule(McmeConnect.getConfig().getConnectDelay(), TimeUnit.MILLISECONDS);
             }
         };

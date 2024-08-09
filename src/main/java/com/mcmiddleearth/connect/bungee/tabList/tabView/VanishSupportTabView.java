@@ -1,8 +1,10 @@
 package com.mcmiddleearth.connect.bungee.tabList.tabView;
 
+import com.mcmiddleearth.base.bungee.player.BungeeMcmePlayer;
 import com.mcmiddleearth.connect.bungee.tabList.PacketLogger;
 import com.mcmiddleearth.connect.bungee.tabList.playerItem.TabViewPlayerItem;
 import com.mcmiddleearth.connect.bungee.tabList.tabView.configuration.ViewableTabViewConfig;
+import com.mcmiddleearth.connect.proxy.core.McmeConnect;
 import com.mcmiddleearth.connect.proxy.core.handler.VanishHandler;
 import com.mcmiddleearth.connect.log.Log;
 import net.md_5.bungee.api.ProxyServer;
@@ -64,7 +66,7 @@ public abstract class VanishSupportTabView extends AbstractViewableTabView {
         viewers.forEach(uuid -> {
             ProxiedPlayer player = ProxyServer.getInstance().getPlayer(uuid);
             if (player != null) {
-                if (!VanishHandler.hasVanishSeePermission(player)) {
+                if (!VanishHandler.hasVanishSeePermission(new BungeeMcmePlayer(McmeConnect.getProxyPlugin(),player))) {
                     PacketLogger.sendItem(player,packet);
                 } else {
                     PacketLogger.sendItem(player,packetDisplay);
@@ -88,7 +90,7 @@ public abstract class VanishSupportTabView extends AbstractViewableTabView {
         viewers.forEach(uuid -> {
             ProxiedPlayer player = ProxyServer.getInstance().getPlayer(uuid);
             if (player != null) {
-                if (!VanishHandler.hasVanishSeePermission(player)) {
+                if (!VanishHandler.hasVanishSeePermission(new BungeeMcmePlayer(McmeConnect.getProxyPlugin(),player))) {
                     PacketLogger.sendItem(player,packet);
                 } else {
                     PacketLogger.sendItem(player,packetDisplay);
@@ -125,13 +127,13 @@ public abstract class VanishSupportTabView extends AbstractViewableTabView {
 
         viewers.forEach(uuid -> {
             ProxiedPlayer player = ProxyServer.getInstance().getPlayer(uuid);
-            if(player!=null && VanishHandler.hasVanishSeePermission(player)) {
+            if(player!=null && VanishHandler.hasVanishSeePermission(new BungeeMcmePlayer(McmeConnect.getProxyPlugin(),player))) {
                 PacketLogger.sendItem(player,packet);
             }
         });
         viewers.forEach(uuid -> {
             ProxiedPlayer player = ProxyServer.getInstance().getPlayer(uuid);
-            if(player!=null && !VanishHandler.hasVanishSeePermission(player)) {
+            if(player!=null && !VanishHandler.hasVanishSeePermission(new BungeeMcmePlayer(McmeConnect.getProxyPlugin(),player))) {
                 PacketLogger.sendItem(player,publicPacket);
             }
         });
@@ -164,13 +166,13 @@ public abstract class VanishSupportTabView extends AbstractViewableTabView {
 
         viewers.forEach(uuid -> {
             ProxiedPlayer player = ProxyServer.getInstance().getPlayer(uuid);
-            if(player!=null && VanishHandler.hasVanishSeePermission(player)) {
+            if(player!=null && VanishHandler.hasVanishSeePermission(new BungeeMcmePlayer(McmeConnect.getProxyPlugin(),player))) {
                 PacketLogger.sendItem(player,packet);
             }
         });
         viewers.forEach(uuid -> {
             ProxiedPlayer player = ProxyServer.getInstance().getPlayer(uuid);
-            if(player!=null && !VanishHandler.hasVanishSeePermission(player)) {
+            if(player!=null && !VanishHandler.hasVanishSeePermission(new BungeeMcmePlayer(McmeConnect.getProxyPlugin(),player))) {
                 PacketLogger.sendItem(player,publicPacket);
             }
         });

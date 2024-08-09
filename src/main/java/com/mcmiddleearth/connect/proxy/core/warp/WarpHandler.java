@@ -18,7 +18,7 @@ package com.mcmiddleearth.connect.proxy.core.warp;
 
 import com.mcmiddleearth.base.core.player.McmeProxyPlayer;
 import com.mcmiddleearth.connect.Permission;
-import com.mcmiddleearth.connect.proxy.bungee.ConnectBungeePlugin;
+import com.mcmiddleearth.connect.proxy.core.McmeConnect;
 import com.mcmiddleearth.connect.proxy.core.handler.ChatMessageHandler;
 import com.mcmiddleearth.connect.proxy.core.handler.TpposHandler;
 import net.kyori.adventure.text.Component;
@@ -57,7 +57,7 @@ public class WarpHandler {
         for(int i = 2; i<message.length;i++) {
             warpName = warpName + " " + message[i];
         }
-        WarpData warp = ConnectBungeePlugin.getMyWarpConnector().getWarp(player, warpName);
+        WarpData warp = McmeConnect.getMyWarpConnector().getWarp(player, warpName);
         if(warp !=null && !warp.getWorld().equals(player.getServerInfo().getName())) {
             if(warp.getWorld().equals("_unknown")) {
                 ChatMessageHandler.handle(player.getServerInfo().getName(), player.getName(),
@@ -89,7 +89,7 @@ public class WarpHandler {
     }
 
     public static void updateCache() {
-        cache = ConnectBungeePlugin.getMyWarpConnector().getWarps();
+        cache = McmeConnect.getMyWarpConnector().getWarps();
     }
 
     public static List<String> getSuggestions(String search, McmeProxyPlayer player) {

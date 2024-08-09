@@ -1,5 +1,7 @@
 package com.mcmiddleearth.connect.bungee.tabList;
 
+import com.mcmiddleearth.base.bungee.player.BungeeMcmePlayer;
+import com.mcmiddleearth.base.core.player.McmeProxyPlayer;
 import com.mcmiddleearth.connect.proxy.bungee.ConnectBungeePlugin;
 import com.mcmiddleearth.connect.bungee.YamlConfiguration;
 import com.mcmiddleearth.connect.bungee.tabList.playerItem.PlayerItemManager;
@@ -10,6 +12,7 @@ import com.mcmiddleearth.connect.bungee.tabList.tabView.ServerTabView;
 import com.mcmiddleearth.connect.bungee.tabList.tabView.configuration.IPlayerItemConfig;
 import com.mcmiddleearth.connect.bungee.tabList.tabView.configuration.PlayerItemConfig;
 import com.mcmiddleearth.connect.bungee.tabList.tabView.configuration.ViewableTabViewConfig;
+import com.mcmiddleearth.connect.proxy.core.McmeConnect;
 import net.md_5.bungee.ServerConnection;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -49,9 +52,9 @@ public class TabViewManager implements Listener {
         if(!configFolder.exists()) {
             configFolder.mkdirs();
         }
-        ConnectBungeePlugin.getInstance().saveDefaultConfig(viewConfigFile,viewConfigFileName);
-        ConnectBungeePlugin.getInstance().saveDefaultConfig(playerItemConfigFile,playerItemConfigFileName);
-        ConnectBungeePlugin.getInstance().saveDefaultConfig(headerFooterConfigFile,headerFooterConfigFileName);
+        ConnectBungeePlugin.getInstance().saveResourceToFile(viewConfigFileName, viewConfigFile);
+        ConnectBungeePlugin.getInstance().saveResourceToFile(playerItemConfigFileName, playerItemConfigFile);
+        ConnectBungeePlugin.getInstance().saveResourceToFile(headerFooterConfigFileName, headerFooterConfigFile);
         reloadConfig();
     }
 
@@ -135,6 +138,10 @@ public class TabViewManager implements Listener {
         handleRemovePlayerPacket(event.getPlayer(),packet);
     }
 
+    public static void handlePlayerVanish(McmeProxyPlayer player) {
+        handlePlayerVanish(((BungeeMcmePlayer)player).getProxiedPlayer());
+    }
+
     public static void handlePlayerVanish(ProxiedPlayer player) {
         TabViewPlayerItem item = PlayerItemManager.getPlayerItem(player.getUniqueId());
         if(item!=null) {
@@ -142,11 +149,19 @@ public class TabViewManager implements Listener {
         }
     }
 
+    public static void handlePlayerUnvanish(McmeProxyPlayer player) {
+        handlePlayerUnvanish(((BungeeMcmePlayer)player).getProxiedPlayer());
+    }
+
     public static void handlePlayerUnvanish(ProxiedPlayer player) {
         TabViewPlayerItem item = PlayerItemManager.getPlayerItem(player.getUniqueId());
         if(item!=null) {
             tabViews.forEach((identifier, tabView) -> tabView.handleUnvanishPlayer(item));
         }
+    }
+
+    public static void handleUpdateAfk(McmeProxyPlayer vanillaRecipient, boolean afk) {
+        handleUpdateAfk(((BungeeMcmePlayer)vanillaRecipient).getProxiedPlayer(),afk);
     }
 
     public static void handleUpdateAfk(ProxiedPlayer vanillaRecipient, boolean afk) {

@@ -23,100 +23,54 @@ package com.mcmiddleearth.connect.proxy.bungee;
 
 import com.mcmiddleearth.base.bungee.AbstractBungeePlugin;
 import com.mcmiddleearth.connect.Channel;
-import com.mcmiddleearth.connect.proxy.core.RestartScheduler;
-import com.mcmiddleearth.connect.bungee.ServerInformation;
-import com.mcmiddleearth.connect.bungee.YamlConfiguration;
-import com.mcmiddleearth.connect.proxy.bungee.listener.ConnectionListener;
-import com.mcmiddleearth.connect.proxy.bungee.listener.PluginMessageListener;
 import com.mcmiddleearth.connect.bungee.tabList.TabViewCommand;
 import com.mcmiddleearth.connect.bungee.tabList.TabViewManager;
 import com.mcmiddleearth.connect.bungee.tabList.playerItem.PlayerItemUpdater;
-import com.mcmiddleearth.connect.proxy.bungee.watchdog.ServerWatchdog;
 import com.mcmiddleearth.connect.listener.VanishListener;
-import com.mcmiddleearth.connect.log.BungeeLog;
-import com.mcmiddleearth.connect.log.Log;
 import com.mcmiddleearth.connect.proxy.bungee.listener.CommandListener;
+import com.mcmiddleearth.connect.proxy.bungee.listener.ConnectionListener;
+import com.mcmiddleearth.connect.proxy.bungee.listener.PluginMessageListener;
 import com.mcmiddleearth.connect.proxy.core.McmeConnect;
-import com.mcmiddleearth.connect.proxy.core.handler.RestartHandler;
-import com.mcmiddleearth.connect.proxy.core.handler.TpaHandler;
-import com.mcmiddleearth.connect.proxy.core.handler.TpahereHandler;
+import com.mcmiddleearth.connect.proxy.core.McmeConnectConfig;
 import com.mcmiddleearth.connect.proxy.core.handler.VanishHandler;
-import com.mcmiddleearth.connect.proxy.core.warp.MyWarpDBConnector;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.platform.bungeecord.BungeeAudiences;
 import net.kyori.adventure.text.Component;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
-import net.md_5.bungee.api.scheduler.ScheduledTask;
 
-import java.io.*;
-import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.io.File;
 
 public class ConnectBungeePlugin extends AbstractBungeePlugin {
     
     private static ConnectBungeePlugin instance;
-    
-    private static Set<UUID> legacyPlayers = new HashSet<>();
 
-    private static ServerWatchdog watcher;
-    
-    private static final YamlConfiguration config = new YamlConfiguration();
-            
-    private static File configFile;
-    
     private static PlayerItemUpdater playerItemUpdater;
-
-    private static MyWarpDBConnector myWarpConnector;
-    
-    private static boolean myWarpEnabled;
-    
-    private RestartScheduler restartScheduler;
-    private ScheduledTask tpaCleanupScheduler;
-    private ScheduledTask tpahereCleanupScheduler;
 
     private TabViewCommand tabViewCommand;
 
-    private final Map<String, ServerInformation> serverInformation = new HashMap<>();
-
     private static BungeeAudiences audiences;
 
-    private Log logger;
+    //private Log logger;
     
     @Override
     public void onEnable() {
         super.onEnable();
         instance = this;
-        configFile = new File(getDataFolder(),"config.yml");
-        saveDefaultConfig(configFile, "config.yml");
-        loadConfig();
-        logger = new BungeeLog();
+        File configFile = new File(getDataFolder(), McmeConnectConfig.FILE_NAME);
+        saveResourceToFile(McmeConnectConfig.FILE_NAME, configFile);
+        //loadConfig();
+        //logger = new BungeeLog();
         audiences = getAdventure();//BungeeAudiences.create(ConnectBungeePlugin.getInstance());
-        McmeConnect.setProxyPlugin(this);
-        RestartHandler.init();
-        tpaCleanupScheduler = TpaHandler.startCleanupScheduler();
-        tpahereCleanupScheduler = TpahereHandler.startCleanupScheduler();
-        restartScheduler = new RestartScheduler();
-        if(config.getBoolean("serverWatchdog", true)) {
-            watcher = new ServerWatchdog();
-        }
-        loadLegacyPlayers();
-        VanishHandler.setPvSupport(config.getBoolean("premiumVanish", false));
-        myWarpEnabled = (Boolean) getConfig().getSection("myWarp").get("enabled");
-        if(myWarpEnabled) {
-            myWarpConnector = new MyWarpDBConnector(getConfig().getSection("myWarp"));
-        }
+        McmeConnect.enable(this);
         if(VanishHandler.isPvSupport()) {
-            VanishHandler.loadVanished();
             getProxy().getPluginManager().registerListener(this, new VanishListener());
         }
         ProxyServer.getInstance().registerChannel(Channel.MAIN);
         //getProxy().getPluginManager().registerListener(this, new TestListener());
         getProxy().getPluginManager().registerListener(this, new PluginMessageListener());
         getProxy().getPluginManager().registerListener(this, new CommandListener());
-        getProxy().getPluginManager().registerListener(this, 
-                         new ConnectionListener());
+        getProxy().getPluginManager().registerListener(this, new ConnectionListener());
         //getProxy().getPluginManager().registerListener(this, new TabViewManager());
         //playerItemUpdater = new PlayerItemUpdater();
         TabViewManager.init();
@@ -128,50 +82,19 @@ public class ConnectBungeePlugin extends AbstractBungeePlugin {
     @Override
     public void onDisable() {
         super.onDisable();
-        watcher.stopWatchdog();
-        myWarpConnector.disconnect();
-        restartScheduler.cancel();
-        tpaCleanupScheduler.cancel();
-        tpahereCleanupScheduler.cancel();
+        McmeConnect.disable();
         //playerItemUpdater.disable();
         //audiences.close();
-        logger.disable();
+        //logger.disable();
     }
 
     @Override
     public Component getMessagePrefix() {
-        return Component.text("[MCME-Connect]");
+        return McmeConnect.getMessagePrefix();
     }
 
-    private void loadLegacyPlayers() {
-        if(!getDataFolder().exists()) {
-            getDataFolder().mkdir();
-        }
-        File file = new File(getDataFolder(),"legacyPlayer.uid");
-        if(!file.exists()) {
-            try {
-                file.createNewFile();
-            } catch (IOException ex) {
-                Logger.getLogger(ConnectBungeePlugin.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-        try(Scanner scanner = new Scanner(file))
-        {
-            while(scanner.hasNext()) {
-                legacyPlayers.add(UUID.fromString(scanner.nextLine()));
-            }
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(ConnectBungeePlugin.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-    
-    private void loadConfig() {
+    /*private void loadConfig() {
         config.load(configFile);
-        legacyRedirectEnabled = config.getBoolean("legacyRedirect.enabled",true);
-        legacyRedirectFrom = config.getString("legacyRedirect.from","newPlayer");
-        legacyRedirectTo = config.getString("legacyRedirect.to","build");
-        noMVTP.addAll(config.getStringList("disableMVTP"));
-        connectDelay = config.getInt("connectDelay",200);
     }
     
     public void saveDefaultConfig(File configFile, String resource) {
@@ -194,44 +117,15 @@ public class ConnectBungeePlugin extends AbstractBungeePlugin {
                 Logger.getLogger(ConnectBungeePlugin.class.getName()).log(Level.SEVERE, null, ex);
             } 
         }
-    }
+    }*/
 
     public static ConnectBungeePlugin getInstance() {
         return instance;
     }
 
-    public static Set<UUID> getLegacyPlayers() {
-        return legacyPlayers;
-    }
-
-    public static ServerWatchdog getWatcher() {
-        return watcher;
-    }
-
-    public static YamlConfiguration getConfig() {
+    /*public static YamlConfiguration getConfig() {
         return config;
-    }
-
-    public static Set<String> getNoMVTP() {
-        return noMVTP;
-    }
-
-    public static MyWarpDBConnector getMyWarpConnector() {
-        return myWarpConnector;
-    }
-
-    public static boolean isMyWarpEnabled() {
-        return myWarpEnabled;
-    }
-
-    public ServerInformation getServerInformation(String name) {
-        ServerInformation info =  serverInformation.get(name);
-        if(info==null) {
-            info = new ServerInformation(name);
-            serverInformation.put(name,info);
-        }
-        return info;
-    }
+    }*/
 
     public TabViewCommand getTabViewCommand() {
         return tabViewCommand;

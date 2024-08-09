@@ -12,7 +12,7 @@ public class DiscordMessageHandler {
         out.writeUTF(Channel.DISCORD);
         out.writeUTF(channel);
         out.writeUTF(message);
-        sender.getServerInfo().sendData(Channel.MAIN, out.toByteArray(), true);
+        sender.sendDataToBackend(Channel.MAIN, out.toByteArray(), true);
     }
 }
 
