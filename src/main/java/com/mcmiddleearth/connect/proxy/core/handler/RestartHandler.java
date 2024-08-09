@@ -20,11 +20,10 @@ import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import com.mcmiddleearth.base.core.player.McmeProxyPlayer;
 import com.mcmiddleearth.base.core.server.McmeServerInfo;
+import com.mcmiddleearth.base.core.taskScheduling.Callback;
 import com.mcmiddleearth.connect.Channel;
-import com.mcmiddleearth.connect.bungee.Handler.ConnectHandler;
 import com.mcmiddleearth.connect.proxy.core.McmeConnect;
-import net.md_5.bungee.api.Callback;
-import net.md_5.bungee.api.config.ServerInfo;
+import net.kyori.adventure.text.Component;
 
 import java.io.File;
 import java.io.IOException;
@@ -86,7 +85,7 @@ public class RestartHandler {
             String otherServers = others.toString();
             Callback<Boolean> callback = (connected, error) -> {
                 if(connected) {
-                    ProxyServer.getInstance().getScheduler().schedule(ConnectBungeePlugin.getInstance(), () -> {
+                    McmeConnect.getProxyPlugin().getTask( () -> {
                         McmeServerInfo dest = McmeConnect.getProxy().getServerInfo(finalNext);
                         ByteArrayDataOutput out = ByteStreams.newDataOutput();
                         out.writeUTF(Channel.RESTART);
@@ -94,27 +93,27 @@ public class RestartHandler {
                         out.writeUTF(player.getName());
                         out.writeUTF(otherServers);
                         dest.sendData(Channel.MAIN, out.toByteArray(),true);   
-                    }, McmeConnect.getConfig().getConnectDelay(), TimeUnit.MILLISECONDS);
+                    }).schedule(McmeConnect.getConfig().getConnectDelay(), TimeUnit.MILLISECONDS);
                 }
             };
-            if(!ConnectHandler.handle(player.getName(), next, false, callback)) {
+            if(!ConnectionHandler.handleConnectPlayerToServer(player.getName(), next, false, callback)) {
                 callback.done(true, null);
             }
         }
     }
     
     public static void restartProxy(boolean shutdown) {
-        ProxyServer.getInstance().getScheduler().schedule(ConnectBungeePlugin.getInstance(), () -> {
+        McmeConnect.getProxyPlugin().getTask( () -> {
             if(!shutdown && !restartFile.exists()) {
                 try {
                     restartFile.createNewFile();
                 } catch (IOException ex) {
                     Logger.getLogger(RestartHandler.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                ProxyServer.getInstance().stop("MCME network is restarting.");
+                McmeConnect.getProxy().stop(Component.text("MCME network is restarting."));
             } else {
-                ProxyServer.getInstance().stop("MCME network is shutting down.");
+                McmeConnect.getProxy().stop(Component.text("MCME network is shutting down."));
             }
-        }, 5, TimeUnit.SECONDS);
+        }).schedule(5, TimeUnit.SECONDS);
     }
 }

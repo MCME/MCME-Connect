@@ -14,16 +14,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.mcmiddleearth.connect.bungee.Handler;
+package com.mcmiddleearth.connect.proxy.core.handler;
 
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
+import com.mcmiddleearth.base.core.player.McmeProxyPlayer;
+import com.mcmiddleearth.base.core.server.McmeServerInfo;
+import com.mcmiddleearth.base.core.taskScheduling.Callback;
 import com.mcmiddleearth.connect.Channel;
-import com.mcmiddleearth.connect.proxy.bungee.ConnectBungeePlugin;
-import net.md_5.bungee.api.Callback;
-import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.config.ServerInfo;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
+import com.mcmiddleearth.connect.proxy.core.McmeConnect;
 
 import java.util.concurrent.TimeUnit;
 
@@ -36,16 +35,16 @@ public class MvtpHandler {
     public static boolean handle(String sender, String server) {
         Callback<Boolean> callback = (connected, error) -> {
             if(connected) {
-                ProxyServer.getInstance().getScheduler().schedule(ConnectBungeePlugin.getInstance(), () -> {
-                    ServerInfo dest = ProxyServer.getInstance().getServerInfo(server);
-                    ProxiedPlayer player = ProxyServer.getInstance().getPlayer(sender);
+                McmeConnect.getProxyPlugin().getTask( () -> {
+                    McmeServerInfo dest = McmeConnect.getProxy().getServerInfo(server);
+                    McmeProxyPlayer player = McmeConnect.getProxyPlugin().getPlayer(sender);
                     ByteArrayDataOutput out = ByteStreams.newDataOutput();
                     out.writeUTF(Channel.SPAWN);
                     out.writeUTF(sender);
-                    ProxyServer.getInstance().getServerInfo(server).sendData(Channel.MAIN, out.toByteArray(),true);
-                }, ConnectBungeePlugin.getConnectDelay(), TimeUnit.MILLISECONDS);
+                    McmeConnect.getProxy().getServerInfo(server).sendData(Channel.MAIN, out.toByteArray(),true);
+                }).schedule(McmeConnect.getConfig().getConnectDelay(), TimeUnit.MILLISECONDS);
             }
         };
-        return (ConnectHandler.handle(sender, server, true, callback)); //if {
+        return (ConnectionHandler.handleConnectPlayerToServer(sender, server, true, callback)); //if {
     }
 }

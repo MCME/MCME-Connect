@@ -19,7 +19,7 @@ package com.mcmiddleearth.connect.proxy.core.warp;
 import com.mcmiddleearth.base.core.player.McmeProxyPlayer;
 import com.mcmiddleearth.connect.Permission;
 import com.mcmiddleearth.connect.proxy.bungee.ConnectBungeePlugin;
-import com.mcmiddleearth.connect.bungee.Handler.ChatMessageHandler;
+import com.mcmiddleearth.connect.proxy.core.handler.ChatMessageHandler;
 import com.mcmiddleearth.connect.proxy.core.handler.TpposHandler;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;

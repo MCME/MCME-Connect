@@ -58,6 +58,6 @@ public class McmeConnectConfig {
     }
 
     public Map<String, Object> getDatabaseConfig() {
-        config.getSection("database");
+        return config.getSection("database");
     }
 }

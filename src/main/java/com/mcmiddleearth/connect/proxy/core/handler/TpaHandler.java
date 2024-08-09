@@ -17,10 +17,10 @@
 package com.mcmiddleearth.connect.proxy.core.handler;
 
 import com.mcmiddleearth.base.core.player.McmeProxyPlayer;
+import com.mcmiddleearth.base.core.taskScheduling.Task;
+import com.mcmiddleearth.connect.proxy.core.McmeConnect;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.scheduler.ScheduledTask;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -141,9 +141,9 @@ public class TpaHandler {
         return requests.stream().anyMatch(request->request.getSender().getName().equalsIgnoreCase(sender.getName()));
     }
     
-    public static ScheduledTask startCleanupScheduler() {
+    public static Task startCleanupScheduler() {
         List<TpaRequest> removal = new ArrayList<>();
-        return ProxyServer.getInstance().getScheduler().schedule(ConnectBungeePlugin.getInstance(), () -> {
+        Task task = McmeConnect.getProxyPlugin().getTask( () -> {
                 long time = System.currentTimeMillis();
                 requests.stream().filter(request -> request.getTimestamp()+REQUEST_PERIOD<time)
                      .forEach(request -> {
@@ -151,7 +151,9 @@ public class TpaHandler {
                          request.getSender().sendError(Component.text("Your teleportation request timed out!"));
                        });
                 requests.removeAll(removal);
-        }, 20, 20, TimeUnit.SECONDS);
+        });
+        task.scheduleRepeating(20, 20, TimeUnit.SECONDS);
+        return task;
     }
     
     public static class TpaRequest {

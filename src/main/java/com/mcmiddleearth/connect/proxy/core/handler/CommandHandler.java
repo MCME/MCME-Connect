@@ -1,11 +1,12 @@
 package com.mcmiddleearth.connect.proxy.core.handler;
 
+import com.google.common.io.ByteArrayDataOutput;
+import com.google.common.io.ByteStreams;
 import com.mcmiddleearth.base.core.command.McmeCommandSender;
 import com.mcmiddleearth.base.core.player.McmeProxyPlayer;
 import com.mcmiddleearth.base.core.server.McmeServerInfo;
+import com.mcmiddleearth.connect.Channel;
 import com.mcmiddleearth.connect.Permission;
-import com.mcmiddleearth.connect.bungee.Handler.ConnectHandler;
-import com.mcmiddleearth.connect.bungee.Handler.MvtpHandler;
 import com.mcmiddleearth.connect.proxy.core.McmeConnect;
 import com.mcmiddleearth.connect.proxy.core.warp.WarpHandler;
 import net.kyori.adventure.text.Component;
@@ -17,6 +18,14 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class CommandHandler {
+
+    public static void handle(String server, String commandSender, String command) {
+        ByteArrayDataOutput out = ByteStreams.newDataOutput();
+        out.writeUTF(Channel.COMMAND);
+        out.writeUTF(commandSender);
+        out.writeUTF(command);
+       McmeConnect.getProxy().getServerInfo(server).sendData(Channel.MAIN, out.toByteArray(),true);
+    }
 
     public static boolean handleChatEvent(McmeProxyPlayer player, String chatMessage) {
         String[] message = replaceAlias(chatMessage).split(" ");
@@ -173,7 +182,7 @@ public class CommandHandler {
                 if (!isMvtpAllowed(player)) {
                     player.sendError(Component.text("/survival isn't allowed here."));
                 } else if (player.hasPermission(Permission.SURVIVAL)) {
-                    if (!ConnectHandler.handle(player.getName(), survivalserver, true, ((Boolean success, Throwable error) -> {}))) {
+                    if (!ConnectionHandler.handleConnectPlayerToServer(player.getName(), survivalserver, true, ((Boolean success, Throwable error) -> {}))) {
                         sendError(player);
                     }
                 } else {
@@ -197,7 +206,7 @@ public class CommandHandler {
                                 sendError(player);
                             }
                         } else {
-                            if(!ConnectHandler.handle(player.getName(), target, true, (Boolean success, Throwable error) -> {})) {
+                            if(!ConnectionHandler.handleConnectPlayerToServer(player.getName(), target, true, (Boolean success, Throwable error) -> {})) {
                                 sendError(player);
                             }
                         }

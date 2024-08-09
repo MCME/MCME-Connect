@@ -23,21 +23,20 @@ package com.mcmiddleearth.connect.proxy.bungee;
 
 import com.mcmiddleearth.base.bungee.AbstractBungeePlugin;
 import com.mcmiddleearth.connect.Channel;
-import com.mcmiddleearth.connect.bungee.RestartScheduler;
+import com.mcmiddleearth.connect.proxy.core.RestartScheduler;
 import com.mcmiddleearth.connect.bungee.ServerInformation;
 import com.mcmiddleearth.connect.bungee.YamlConfiguration;
-import com.mcmiddleearth.connect.bungee.listener.ConnectionListener;
-import com.mcmiddleearth.connect.bungee.listener.PluginMessageListener;
+import com.mcmiddleearth.connect.proxy.bungee.listener.ConnectionListener;
+import com.mcmiddleearth.connect.proxy.bungee.listener.PluginMessageListener;
 import com.mcmiddleearth.connect.bungee.tabList.TabViewCommand;
 import com.mcmiddleearth.connect.bungee.tabList.TabViewManager;
 import com.mcmiddleearth.connect.bungee.tabList.playerItem.PlayerItemUpdater;
-import com.mcmiddleearth.connect.bungee.watchdog.ServerWatchdog;
+import com.mcmiddleearth.connect.proxy.bungee.watchdog.ServerWatchdog;
 import com.mcmiddleearth.connect.listener.VanishListener;
 import com.mcmiddleearth.connect.log.BungeeLog;
 import com.mcmiddleearth.connect.log.Log;
 import com.mcmiddleearth.connect.proxy.bungee.listener.CommandListener;
 import com.mcmiddleearth.connect.proxy.core.McmeConnect;
-import com.mcmiddleearth.connect.proxy.core.McmeConnectConfig;
 import com.mcmiddleearth.connect.proxy.core.handler.RestartHandler;
 import com.mcmiddleearth.connect.proxy.core.handler.TpaHandler;
 import com.mcmiddleearth.connect.proxy.core.handler.TpahereHandler;
@@ -55,7 +54,7 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class ConnectBungeePlugin extends AbstractBungeePlugin implements McmeConnectConfig {
+public class ConnectBungeePlugin extends AbstractBungeePlugin {
     
     private static ConnectBungeePlugin instance;
     

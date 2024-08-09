@@ -19,12 +19,9 @@ package com.mcmiddleearth.connect.proxy.core.handler;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import com.mcmiddleearth.base.core.player.McmeProxyPlayer;
+import com.mcmiddleearth.base.core.taskScheduling.Callback;
 import com.mcmiddleearth.connect.Channel;
-import com.mcmiddleearth.connect.bungee.Handler.ChatMessageHandler;
-import com.mcmiddleearth.connect.bungee.Handler.ConnectHandler;
 import com.mcmiddleearth.connect.proxy.core.McmeConnect;
-import net.md_5.bungee.api.Callback;
-import net.md_5.bungee.api.ProxyServer;
 
 import java.util.concurrent.TimeUnit;
 
@@ -40,21 +37,21 @@ public class TpposHandler {
         if(player!=null) {
             Callback<Boolean> callback = (connected, error) -> {
                 if(connected) {
-                    ProxyServer.getInstance().getScheduler().schedule(ConnectBungeePlugin.getInstance(), () -> {
+                    McmeConnect.getProxyPlugin().getTask( () -> {
                         ByteArrayDataOutput out = ByteStreams.newDataOutput();
                         out.writeUTF(Channel.TPPOS);
                         out.writeUTF(sender);
                         out.writeUTF(world);
                         out.writeUTF(location);
-                        ProxyServer.getInstance().getServerInfo(server).sendData(Channel.MAIN, out.toByteArray());
+                        McmeConnect.getProxy().getServerInfo(server).sendData(Channel.MAIN, out.toByteArray());
                         if(!message.equals("")) {
                             ChatMessageHandler.handle(server, sender, message, 400);
                         }
-                    }, McmeConnect.getConfig().getConnectDelay(), TimeUnit.MILLISECONDS);
+                    }).schedule(McmeConnect.getConfig().getConnectDelay(), TimeUnit.MILLISECONDS);
                 }
             };
             if(!player.getServerInfo().getName().equals(server)) {
-                ConnectHandler.handle(sender, server, true, callback);
+                ConnectionHandler.handleConnectPlayerToServer(sender, server, true, callback);
             } else {
                 callback.done(Boolean.TRUE, null);
             }

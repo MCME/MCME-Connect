@@ -19,8 +19,8 @@ package com.mcmiddleearth.connect.proxy.core.handler;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import com.mcmiddleearth.base.core.player.McmeProxyPlayer;
-import com.mcmiddleearth.base.core.taskScheduling.Callback;
 import com.mcmiddleearth.connect.Channel;
+import com.mcmiddleearth.connect.proxy.bungee.ConnectBungeePlugin;
 import com.mcmiddleearth.connect.proxy.core.McmeConnect;
 
 import java.util.concurrent.TimeUnit;
@@ -29,22 +29,23 @@ import java.util.concurrent.TimeUnit;
  *
  * @author Eriol_Eandur
  */
-public class TpHandler {
+public class LegacyPlayerHandler {
     
-    public static boolean handle(String sender, String server, String target) {
-        Callback<Boolean> callback = (connected, error) -> {
-            if(connected) {
-                McmeConnect.getProxyPlugin().getTask( () -> {
-//Logger.getGlobal().info("TP callback: "+sender+" "+server+" "+target);
-                    McmeProxyPlayer player = McmeConnect.getProxyPlugin().getPlayer(sender);
-                    ByteArrayDataOutput out = ByteStreams.newDataOutput();
-                    out.writeUTF(Channel.TP);
-                    out.writeUTF(sender);
-                    out.writeUTF(target);
-                    McmeConnect.getProxy().getServerInfo(server).sendData(Channel.MAIN, out.toByteArray(),true);
-                }).schedule(McmeConnect.getConfig().getConnectDelay(), TimeUnit.MILLISECONDS);
-            }
-        };
-        return (ConnectionHandler.handleConnectPlayerToServer(sender, server, true, callback));
+    public static void handle(McmeProxyPlayer player, String joinedServer) {
+        if(!McmeConnect.getConfig().isLegacyRedirectEnabled()) {
+            return;
+        }
+        String redirectServer = McmeConnect.getConfig().getLegacyRedirectFrom();
+        if(ConnectBungeePlugin.getLegacyPlayers().contains(player.getUniqueId())
+                && joinedServer.equals(redirectServer)) {
+            String target = McmeConnect.getConfig().getLegacyRedirectTo();
+            McmeConnect.getProxyPlugin().getTask(() -> {
+                ByteArrayDataOutput out = ByteStreams.newDataOutput();
+                out.writeUTF(Channel.LEGACY);
+                out.writeUTF(player.getName());
+                out.writeUTF(target);
+                McmeConnect.getProxy().getServerInfo(redirectServer).sendData(Channel.MAIN, out.toByteArray(), true);
+            }).schedule(McmeConnect.getConfig().getConnectDelay(), TimeUnit.MILLISECONDS);
+        }
     }
 }

@@ -18,7 +18,7 @@ package com.mcmiddleearth.connect.proxy.core.handler;
 
 import com.mcmiddleearth.base.core.player.McmeProxyPlayer;
 import com.mcmiddleearth.connect.Permission;
-import com.mcmiddleearth.connect.bungee.listener.ConnectionListener;
+import com.mcmiddleearth.connect.proxy.bungee.listener.ConnectionListener;
 import com.mcmiddleearth.connect.bungee.tabList.TabViewManager;
 import com.mcmiddleearth.connect.proxy.core.McmeConnect;
 import net.kyori.adventure.text.Component;

@@ -17,13 +17,10 @@
 package com.mcmiddleearth.connect.proxy.core.handler;
 
 import com.mcmiddleearth.base.core.player.McmeProxyPlayer;
-import com.mcmiddleearth.connect.bungee.Handler.CommandHandler;
-import com.mcmiddleearth.connect.bungee.Handler.ConnectHandler;
+import com.mcmiddleearth.base.core.taskScheduling.Callback;
 import com.mcmiddleearth.connect.proxy.core.McmeConnect;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.md_5.bungee.api.Callback;
-import net.md_5.bungee.api.ProxyServer;
 
 import java.util.concurrent.TimeUnit;
 
@@ -36,14 +33,14 @@ public class ThemeHandler {
     public static boolean handle(McmeProxyPlayer sender, String server, String command) {
         Callback<Boolean> callback = (connected, error) -> {
             if(connected) {
-                ProxyServer.getInstance().getScheduler().schedule(ConnectBungeePlugin.getInstance(), () -> {
+                McmeConnect.getProxyPlugin().getTask(() -> {
                    sender.sendMessage(Component
                             .text("All Themed-build commands need to be issued from Themed-build world. You were teleported there.")
                                     .color(NamedTextColor.RED));
                     CommandHandler.handle(server, sender.getName(),command);
-                }, McmeConnect.getConfig().getConnectDelay(), TimeUnit.MILLISECONDS);
+                }).schedule(McmeConnect.getConfig().getConnectDelay(), TimeUnit.MILLISECONDS);
             }
         };
-        return (ConnectHandler.handle(sender.getName(), server, true, callback)); //if {
+        return (ConnectionHandler.handleConnectPlayerToServer(sender.getName(), server, true, callback));
     }
 }

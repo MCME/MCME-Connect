@@ -17,10 +17,10 @@
 package com.mcmiddleearth.connect.proxy.core.handler;
 
 import com.mcmiddleearth.base.core.player.McmeProxyPlayer;
+import com.mcmiddleearth.base.core.server.McmeServerInfo;
 import com.mcmiddleearth.connect.proxy.core.McmeConnect;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.md_5.bungee.api.ProxyServer;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -95,7 +95,7 @@ public class RestorestatsHandler {
                                 "Restoring your statistics. Please wait a minute before rejoining.")
                                 .color(NamedTextColor.WHITE));
         blacklist.add(player.getUniqueId());
-        ProxyServer.getInstance().getScheduler().schedule(ConnectBungeePlugin.getInstance(), () -> {
+        McmeConnect.getProxyPlugin().getTask( () -> {
             try {
                 Path serverPlayerDataFile = Paths.get(newplayerServerFolder+"/playerdata/"+uuid+".dat");
                 Files.copy(serverPlayerDataFile, backupPlayerDataFile);
@@ -107,7 +107,7 @@ public class RestorestatsHandler {
                     Path serverStatsFile = Paths.get(newplayerServerFolder+"/stats/"+uuid+".json");
                     Files.copy(serverStatsFile, backupStatsFile);
 
-                    for(String server: ProxyServer.getInstance().getServers().keySet()) {
+                    for(String server: McmeConnect.getProxy().getAllServerInfo().stream().map(McmeServerInfo::getName).toList()) {
                         String filename = serverPlayerStats+"/"+uuid+".json";
                         filename = filename.replace("<world>", server);
                         filename = filename.replace("<server>", (server.equals("world")?"mainworld":server));
@@ -120,7 +120,7 @@ public class RestorestatsHandler {
                 Logger.getLogger(RestorestatsHandler.class.getName()).log(Level.SEVERE, null, ex);
             }
             blacklist.remove(player.getUniqueId());
-        }, 5, TimeUnit.SECONDS);
+        }).schedule(5, TimeUnit.SECONDS);
     }
     
     public static void resetStatistics(McmeProxyPlayer player) {
