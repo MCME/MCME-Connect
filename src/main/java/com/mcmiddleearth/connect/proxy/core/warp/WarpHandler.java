@@ -21,8 +21,8 @@ import com.mcmiddleearth.connect.Permission;
 import com.mcmiddleearth.connect.proxy.core.McmeConnect;
 import com.mcmiddleearth.connect.proxy.core.handler.ChatMessageHandler;
 import com.mcmiddleearth.connect.proxy.core.handler.TpposHandler;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
+import com.mcmiddleearth.base.net.kyori.adventure.text.Component;
+import com.mcmiddleearth.base.net.kyori.adventure.text.format.NamedTextColor;
 
 import java.util.*;
 

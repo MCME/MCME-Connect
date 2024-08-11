@@ -33,9 +33,9 @@ import com.mcmiddleearth.connect.proxy.bungee.listener.PluginMessageListener;
 import com.mcmiddleearth.connect.proxy.core.McmeConnect;
 import com.mcmiddleearth.connect.proxy.core.McmeConnectConfig;
 import com.mcmiddleearth.connect.proxy.core.handler.VanishHandler;
-import net.kyori.adventure.audience.Audience;
-import net.kyori.adventure.platform.bungeecord.BungeeAudiences;
-import net.kyori.adventure.text.Component;
+import com.mcmiddleearth.base.net.kyori.adventure.audience.Audience;
+import com.mcmiddleearth.base.net.kyori.adventure.platform.bungeecord.BungeeAudiences;
+import com.mcmiddleearth.base.net.kyori.adventure.text.Component;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 

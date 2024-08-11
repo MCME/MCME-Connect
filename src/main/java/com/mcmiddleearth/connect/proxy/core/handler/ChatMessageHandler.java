@@ -19,7 +19,7 @@ package com.mcmiddleearth.connect.proxy.core.handler;
 import com.mcmiddleearth.base.core.player.McmeProxyPlayer;
 import com.mcmiddleearth.connect.Channel;
 import com.mcmiddleearth.connect.proxy.core.McmeConnect;
-import net.kyori.adventure.text.Component;
+import com.mcmiddleearth.base.net.kyori.adventure.text.Component;
 
 import java.util.Collection;
 import java.util.HashSet;
