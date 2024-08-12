@@ -1,7 +1,9 @@
 package com.mcmiddleearth.connect.proxy.core;
 
 import com.mcmiddleearth.base.core.logger.McmeLogger;
+import com.mcmiddleearth.base.core.message.Message;
 import com.mcmiddleearth.base.core.plugin.McmeBackendPlugin;
+import com.mcmiddleearth.base.core.plugin.McmePlugin;
 import com.mcmiddleearth.base.core.plugin.McmeProxyPlugin;
 import com.mcmiddleearth.base.core.server.McmeBackend;
 import com.mcmiddleearth.base.core.server.McmeProxy;
@@ -9,7 +11,6 @@ import com.mcmiddleearth.base.core.taskScheduling.Task;
 import com.mcmiddleearth.connect.proxy.core.handler.*;
 import com.mcmiddleearth.connect.proxy.core.warp.MyWarpDBConnector;
 import com.mcmiddleearth.connect.proxy.core.watchdog.ServerWatchdog;
-import com.mcmiddleearth.base.net.kyori.adventure.text.Component;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -47,6 +48,10 @@ public class McmeConnect {
 
     public static McmeBackendPlugin getBackendPlugin() {
         return backendPlugin;
+    }
+
+    public static McmePlugin getPlugin() {
+        return getProxyPlugin()!=null ? getProxyPlugin() : getBackendPlugin();
     }
 
     public static void enable(McmeBackendPlugin backendPlugin) {
@@ -112,7 +117,16 @@ public class McmeConnect {
         return info;
     }
 
-    public static Component getMessagePrefix() {
-        return Component.text("[MCME-Connect]");
+    public static Message getMessagePrefix() {
+        return getPlugin().createMessage().add("[MCME-Connect] ");
     }
+
+    public static Message infoMessage() {
+        return getPlugin().createInfoMessage();
+    }
+
+    public static  Message errorMessage() {
+        return getPlugin().createErrorMessage();
+    }
+
 }

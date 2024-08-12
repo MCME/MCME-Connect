@@ -9,8 +9,6 @@ import com.mcmiddleearth.connect.Channel;
 import com.mcmiddleearth.connect.Permission;
 import com.mcmiddleearth.connect.proxy.core.McmeConnect;
 import com.mcmiddleearth.connect.proxy.core.warp.WarpHandler;
-import com.mcmiddleearth.base.net.kyori.adventure.text.Component;
-import com.mcmiddleearth.base.net.kyori.adventure.text.format.NamedTextColor;
 
 import java.util.Arrays;
 import java.util.Collection;

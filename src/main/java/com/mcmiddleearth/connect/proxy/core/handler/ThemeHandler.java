@@ -19,8 +19,6 @@ package com.mcmiddleearth.connect.proxy.core.handler;
 import com.mcmiddleearth.base.core.player.McmeProxyPlayer;
 import com.mcmiddleearth.base.core.taskScheduling.Callback;
 import com.mcmiddleearth.connect.proxy.core.McmeConnect;
-import com.mcmiddleearth.base.net.kyori.adventure.text.Component;
-import com.mcmiddleearth.base.net.kyori.adventure.text.format.NamedTextColor;
 
 import java.util.concurrent.TimeUnit;
 

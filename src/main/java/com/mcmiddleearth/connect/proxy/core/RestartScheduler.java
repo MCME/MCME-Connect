@@ -18,9 +18,6 @@ package com.mcmiddleearth.connect.proxy.core;
 
 import com.mcmiddleearth.base.core.taskScheduling.Task;
 import com.mcmiddleearth.connect.proxy.core.handler.RestartHandler;
-import com.mcmiddleearth.base.net.kyori.adventure.text.Component;
-import com.mcmiddleearth.base.net.kyori.adventure.text.format.NamedTextColor;
-import com.mcmiddleearth.base.net.kyori.adventure.text.format.TextDecoration;
 
 import java.io.File;
 import java.time.DayOfWeek;
