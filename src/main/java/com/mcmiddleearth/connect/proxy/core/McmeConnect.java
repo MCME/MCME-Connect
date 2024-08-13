@@ -118,10 +118,6 @@ public class McmeConnect {
         return info;
     }
 
-    public static Message getMessagePrefix() {
-        return getPlugin().createMessage().add("[MCME-Connect] ");
-    }
-
     public static Message infoMessage() {
         return getPlugin().createInfoMessage();
     }

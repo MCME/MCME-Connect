@@ -57,12 +57,12 @@ public class ConnectBungeePlugin extends AbstractBungeePlugin {
     public void onEnable() {
         super.onEnable();
         instance = this;
+        McmeConnect.enable(this);
         File configFile = new File(getDataFolder(), McmeConnectConfig.FILE_NAME);
         saveResourceToFile(McmeConnectConfig.FILE_NAME, configFile);
         //loadConfig();
         //logger = new BungeeLog();
         audiences = getAdventure();//BungeeAudiences.create(ConnectBungeePlugin.getInstance());
-        McmeConnect.enable(this);
         if(VanishHandler.isPvSupport()) {
             getProxy().getPluginManager().registerListener(this, new VanishListener());
         }
@@ -76,9 +76,8 @@ public class ConnectBungeePlugin extends AbstractBungeePlugin {
         TabViewManager.init();
         tabViewCommand = new TabViewCommand();
         ProxyServer.getInstance().getPluginManager().registerCommand(this, tabViewCommand);
-
     }
-    
+
     @Override
     public void onDisable() {
         super.onDisable();
@@ -90,7 +89,7 @@ public class ConnectBungeePlugin extends AbstractBungeePlugin {
 
     @Override
     public Message getMessagePrefix() {
-        return McmeConnect.getMessagePrefix();
+        return  createMessage().add("[MCME-Connect] ");
     }
 
     /*private void loadConfig() {
