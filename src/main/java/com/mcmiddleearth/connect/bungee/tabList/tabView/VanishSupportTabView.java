@@ -66,7 +66,7 @@ public abstract class VanishSupportTabView extends AbstractViewableTabView {
         viewers.forEach(uuid -> {
             ProxiedPlayer player = ProxyServer.getInstance().getPlayer(uuid);
             if (player != null) {
-                if (!VanishHandler.hasVanishSeePermission(new BungeeMcmePlayer(McmeConnect.getProxyPlugin(),player))) {
+                if (!VanishHandler.hasVanishSeePermission(new BungeeMcmePlayer(player))) {
                     PacketLogger.sendItem(player,packet);
                 } else {
                     PacketLogger.sendItem(player,packetDisplay);
@@ -90,7 +90,7 @@ public abstract class VanishSupportTabView extends AbstractViewableTabView {
         viewers.forEach(uuid -> {
             ProxiedPlayer player = ProxyServer.getInstance().getPlayer(uuid);
             if (player != null) {
-                if (!VanishHandler.hasVanishSeePermission(new BungeeMcmePlayer(McmeConnect.getProxyPlugin(),player))) {
+                if (!VanishHandler.hasVanishSeePermission(new BungeeMcmePlayer(player))) {
                     PacketLogger.sendItem(player,packet);
                 } else {
                     PacketLogger.sendItem(player,packetDisplay);
@@ -127,13 +127,13 @@ public abstract class VanishSupportTabView extends AbstractViewableTabView {
 
         viewers.forEach(uuid -> {
             ProxiedPlayer player = ProxyServer.getInstance().getPlayer(uuid);
-            if(player!=null && VanishHandler.hasVanishSeePermission(new BungeeMcmePlayer(McmeConnect.getProxyPlugin(),player))) {
+            if(player!=null && VanishHandler.hasVanishSeePermission(new BungeeMcmePlayer(player))) {
                 PacketLogger.sendItem(player,packet);
             }
         });
         viewers.forEach(uuid -> {
             ProxiedPlayer player = ProxyServer.getInstance().getPlayer(uuid);
-            if(player!=null && !VanishHandler.hasVanishSeePermission(new BungeeMcmePlayer(McmeConnect.getProxyPlugin(),player))) {
+            if(player!=null && !VanishHandler.hasVanishSeePermission(new BungeeMcmePlayer(player))) {
                 PacketLogger.sendItem(player,publicPacket);
             }
         });
@@ -166,13 +166,13 @@ public abstract class VanishSupportTabView extends AbstractViewableTabView {
 
         viewers.forEach(uuid -> {
             ProxiedPlayer player = ProxyServer.getInstance().getPlayer(uuid);
-            if(player!=null && VanishHandler.hasVanishSeePermission(new BungeeMcmePlayer(McmeConnect.getProxyPlugin(),player))) {
+            if(player!=null && VanishHandler.hasVanishSeePermission(new BungeeMcmePlayer(player))) {
                 PacketLogger.sendItem(player,packet);
             }
         });
         viewers.forEach(uuid -> {
             ProxiedPlayer player = ProxyServer.getInstance().getPlayer(uuid);
-            if(player!=null && !VanishHandler.hasVanishSeePermission(new BungeeMcmePlayer(McmeConnect.getProxyPlugin(),player))) {
+            if(player!=null && !VanishHandler.hasVanishSeePermission(new BungeeMcmePlayer(player))) {
                 PacketLogger.sendItem(player,publicPacket);
             }
         });

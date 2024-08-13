@@ -16,6 +16,7 @@
  */
 package com.mcmiddleearth.connect.proxy.bungee.listener;
 
+import com.mcmiddleearth.base.bungee.server.BungeeMcmeProxy;
 import com.mcmiddleearth.base.bungee.server.BungeeMcmeServerInfo;
 import com.mcmiddleearth.connect.proxy.bungee.ConnectBungeePlugin;
 import com.mcmiddleearth.connect.proxy.core.McmeConnect;
@@ -39,7 +40,8 @@ public class PluginMessageListener implements Listener {
     public void onMessage(PluginMessageEvent event) {
         if(PluginMessageHandler.handlePluginMessage(event.getTag(),
                     event.getSender() instanceof Server ? new BungeeMcmeServerInfo(((Server)event.getSender()).getInfo()) : null,
-                    event.getReceiver() instanceof ProxiedPlayer ? ((ConnectBungeePlugin)McmeConnect.getProxyPlugin()).getPlayer((ProxiedPlayer) event.getReceiver()) : null,
+                    event.getReceiver() instanceof ProxiedPlayer ?
+                            ((BungeeMcmeProxy)McmeConnect.getProxy()).getPlayer((ProxiedPlayer) event.getReceiver()) : null,
                     event.getData())) {
             event.setCancelled(true);
         }

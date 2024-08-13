@@ -63,6 +63,7 @@ public class ConnectUtil {
         out.writeUTF(Channel.MESSAGE);
         out.writeUTF(server);
         out.writeUTF(recipient);
+        //todo: Create and serialize MCME-Base Message
         out.writeUTF(message);
         out.writeInt(delay);
         sender.sendPluginMessage(ConnectPlugin.getInstance(), Channel.MAIN, out.toByteArray());

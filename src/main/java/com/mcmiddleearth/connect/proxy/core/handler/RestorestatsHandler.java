@@ -16,6 +16,8 @@
  */
 package com.mcmiddleearth.connect.proxy.core.handler;
 
+import com.mcmiddleearth.base.core.message.McmeColors;
+import com.mcmiddleearth.base.core.message.MessageColor;
 import com.mcmiddleearth.base.core.player.McmeProxyPlayer;
 import com.mcmiddleearth.base.core.server.McmeServerInfo;
 import com.mcmiddleearth.connect.proxy.core.McmeConnect;
@@ -56,40 +58,39 @@ public class RestorestatsHandler {
         boolean joinOnly = message.length>1 && message[1].equalsIgnoreCase("joinDateOnly");
         boolean restoreAll = message.length>1 && message[1].equalsIgnoreCase("allStats");
         if(!joinOnly && !restoreAll) {
-            player.sendMessage(Component.text(
-                                    "This command will reset your playerstats to the values you had at Nov 2nd 2019 when the MCME Bungee network was implemented. "
-                                   +"The command will disconnect you from the server for a minute to restore the data. If you really want to do this use: \n"
-                                   +"-'"+NamedTextColor.WHITE+"/restorestats joinDateOnly"+NamedTextColor.GOLD+"' to keep your stats and restore your first join date only.\n"
-                                   +"OR\n"
-                                   +"-'"+ NamedTextColor.WHITE +"/restorestats allStats"+NamedTextColor.GOLD+"' to reset all your stats including your first join date. ")
-                                    .color(NamedTextColor.GOLD));
+            player.sendMessage(McmeConnect.infoMessage(
+                    "This command will reset your playerstats to the values you had at Nov 2nd 2019 when the MCME Bungee network was implemented. "
+                   +"The command will disconnect you from the server for a minute to restore the data. If you really want to do this use: \n"
+                   +"-'")
+                .add("/restorestats joinDateOnly", McmeColors.INFO_STRESSED)
+                .add(" to keep your stats and restore your first join date only.\n"
+                        +"OR\n"
+                        +"-'")
+                .add("/restorestats allStats", McmeColors.INFO_STRESSED)
+                .add("' to reset all your stats including your first join date. "));
             return;
         }
         UUID uuid = player.getUniqueId();
         Path backupPlayerDataFile = Paths.get(backupFolder+"/playerdata/"+uuid.toString()+".dat");
         if(Files.exists(backupPlayerDataFile)) {
-            player.sendMessage(Component.text(
-                                    "Your player stats were already restored. If you think this is an error, please contact an admin.")
-                                    .color(NamedTextColor.RED));
+            player.sendMessage(McmeConnect.errorMessage(
+                        "Your player stats were already restored. If you think this is an error, please contact an admin."));
             return;
         }
         Path restorePlayerDataFile = Paths.get(restoreFolder+"/playerdata/"+uuid+".dat");
         if(!Files.exists(restorePlayerDataFile)) {
-            player.sendMessage(Component.text(
-                                    "There is no backup of your playerdata to restore If you think this is an error, please contact an admin.")
-                                    .color(NamedTextColor.RED));
+            player.sendMessage(McmeConnect.errorMessage(
+                        "There is no backup of your playerdata to restore If you think this is an error, please contact an admin."));
             return;
         }
         Path restoreStatsFile = Paths.get(restoreFolder+"/stats/"+uuid+".json");
         if(!joinOnly && !Files.exists(restoreStatsFile)) {
-            player.sendMessage(Component.text(
-                                    "There is no backup of your stats to restore If you think this is an error, please contact an admin.")
-                                    .color(NamedTextColor.RED));
+            player.sendMessage(McmeConnect.errorMessage(
+                    "There is no backup of your stats to restore If you think this is an error, please contact an admin."));
             return;
         }
-        player.disconnect(Component.text(
-                                "Restoring your statistics. Please wait a minute before rejoining.")
-                                .color(NamedTextColor.WHITE));
+        player.disconnect(McmeConnect.message("Restoring your statistics. Please wait a minute before rejoining.",
+                                                MessageColor.WHITE));
         blacklist.add(player.getUniqueId());
         McmeConnect.getProxyPlugin().getTask( () -> {
             try {

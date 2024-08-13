@@ -37,7 +37,7 @@ public class MvtpHandler {
             if(connected) {
                 McmeConnect.getProxyPlugin().getTask( () -> {
                     McmeServerInfo dest = McmeConnect.getProxy().getServerInfo(server);
-                    McmeProxyPlayer player = McmeConnect.getProxyPlugin().getPlayer(sender);
+                    McmeProxyPlayer player = McmeConnect.getProxy().getPlayer(sender);
                     ByteArrayDataOutput out = ByteStreams.newDataOutput();
                     out.writeUTF(Channel.SPAWN);
                     out.writeUTF(sender);

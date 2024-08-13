@@ -37,7 +37,7 @@ public class CommandListener implements Listener {
     @EventHandler
     public void onChat(ChatEvent event) {
         if(event.isCommand() && event.getSender() instanceof ProxiedPlayer) {
-            if(CommandHandler.handleChatEvent(new BungeeMcmePlayer(ConnectBungeePlugin.getInstance(), (ProxiedPlayer) event.getSender()),
+            if(CommandHandler.handleChatEvent(new BungeeMcmePlayer((ProxiedPlayer) event.getSender()),
                                                          event.getMessage())) {
                 event.setCancelled(true);
             }
@@ -48,7 +48,7 @@ public class CommandListener implements Listener {
     public void onTabComplete(TabCompleteEvent event) {
         event.getSuggestions().addAll(CommandHandler.processGetSuggestions(event.getCursor(),
                 event.getSender() instanceof ProxiedPlayer ?
-                        new BungeeMcmePlayer(ConnectBungeePlugin.getInstance(), (ProxiedPlayer) event.getSender()):
+                        new BungeeMcmePlayer((ProxiedPlayer) event.getSender()):
                         null));
     }
     

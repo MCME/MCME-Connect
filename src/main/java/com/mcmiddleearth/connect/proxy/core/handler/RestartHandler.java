@@ -107,9 +107,9 @@ public class RestartHandler {
                 } catch (IOException ex) {
                     McmeConnect.getProxyPlugin().getMcmeLogger().error("IOException", ex);
                 }
-                McmeConnect.getProxy().stop(Component.text("MCME network is restarting."));
+                McmeConnect.getProxy().stop(McmeConnect.infoMessage("MCME network is restarting."));
             } else {
-                McmeConnect.getProxy().stop(Component.text("MCME network is shutting down."));
+                McmeConnect.getProxy().stop(McmeConnect.infoMessage("MCME network is shutting down."));
             }
         }).schedule(5, TimeUnit.SECONDS);
     }

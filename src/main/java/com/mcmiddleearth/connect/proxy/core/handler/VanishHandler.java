@@ -16,6 +16,7 @@
  */
 package com.mcmiddleearth.connect.proxy.core.handler;
 
+import com.mcmiddleearth.base.core.message.MessageColor;
 import com.mcmiddleearth.base.core.player.McmeProxyPlayer;
 import com.mcmiddleearth.connect.Permission;
 import com.mcmiddleearth.connect.bungee.tabList.TabViewManager;
@@ -45,10 +46,10 @@ public class VanishHandler {
             saveVanished();
         }
         if(isVanished(player)) {
-            McmeConnect.getProxyPlugin().getPlayers().stream()
+            McmeConnect.getProxy().getPlayers().stream()
                 .filter(VanishHandler::hasVanishSeePermission).forEach(otherPlayer -> {
-                otherPlayer.sendMessage(Component.text(otherPlayer.getName()+" joined the MCME-Network while being vanished.")
-                                            .color(NamedTextColor.GREEN));
+                otherPlayer.sendMessage(McmeConnect
+                        .message(" joined the MCME-Network while being vanished.", MessageColor.GREEN));
             });
         } else {
             ConnectionHandler.sendJoinMessage(player, false);
@@ -57,10 +58,10 @@ public class VanishHandler {
     
     public static void quit(McmeProxyPlayer player) {
         if(isVanished(player)) {
-            McmeConnect.getProxyPlugin().getPlayers().stream()
+            McmeConnect.getProxy().getPlayers().stream()
                     .filter(VanishHandler::hasVanishSeePermission).forEach(p -> {
-                    p.sendMessage(Component.text(player.getName()+" left the MCME-Network while being vanished.")
-                                                .color(NamedTextColor.GREEN));
+                    p.sendMessage(McmeConnect
+                            .message(player.getName()+" left the MCME-Network while being vanished.", MessageColor.GREEN));
             });
         } else {
             ConnectionHandler.sendLeaveMessage(player, false);
@@ -70,10 +71,9 @@ public class VanishHandler {
     public static void vanish(McmeProxyPlayer player) {
         vanishedPlayers.add(player.getUniqueId());
         saveVanished();
-        McmeConnect.getProxyPlugin().getPlayers().stream()
+        McmeConnect.getProxy().getPlayers().stream()
                 .filter(VanishHandler::hasVanishSeePermission).forEach(p -> {
-                p.sendMessage(Component.text(player.getName()+" vanished.")
-                                            .color(NamedTextColor.GREEN));
+                p.sendMessage(McmeConnect.message(player.getName()+" vanished.", MessageColor.GREEN));
         });
         ConnectionHandler.sendLeaveMessage(player,true);
         TabViewManager.handlePlayerVanish(player);
@@ -82,10 +82,9 @@ public class VanishHandler {
     public static void unvanish(McmeProxyPlayer player) {
         vanishedPlayers.remove(player.getUniqueId());
         saveVanished();
-        McmeConnect.getProxyPlugin().getPlayers().stream()
+        McmeConnect.getProxy().getPlayers().stream()
                 .filter(VanishHandler::hasVanishSeePermission).forEach(p -> {
-                p.sendMessage(Component.text(player.getName()+" unvanished.")
-                                            .color(NamedTextColor.GREEN));
+                p.sendMessage(McmeConnect.message(player.getName()+" unvanished.", MessageColor.GREEN));
         });
         ConnectionHandler.sendJoinMessage(player,true);
         TabViewManager.handlePlayerUnvanish(player);

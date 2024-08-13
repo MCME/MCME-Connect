@@ -16,6 +16,8 @@
  */
 package com.mcmiddleearth.connect.proxy.core.watchdog;
 
+import com.mcmiddleearth.base.core.message.McmeColors;
+import com.mcmiddleearth.base.core.message.Message;
 import com.mcmiddleearth.base.core.taskScheduling.Task;
 import com.mcmiddleearth.connect.Permission;
 import com.mcmiddleearth.connect.proxy.core.McmeConnect;
@@ -54,24 +56,22 @@ public class ServerWatchdog {
             McmeConnect.getProxyPlugin().getTask( () -> {
                 if(!downList.isEmpty()) {
                     downList.sort((one,two) -> (one==null?-1:(two==null?1:one.compareToIgnoreCase(two))));
-                    Component downserver = Component.text(downList.get(0)).color(NamedTextColor.DARK_RED);
-                    for(int i=1; i<downList.size()-1; i++) {
-                        downserver = downserver.append(Component.text(" , ").color(NamedTextColor.RED))
-                                               .append(Component.text(downList.get(i)).color(NamedTextColor.DARK_RED));
-                    }
-                    if(downList.size()>1) {
-                        downserver = downserver.append(Component.text(" and ").color(NamedTextColor.RED))
-                                .append(Component.text(downList.get(downList.size()-1)).color(NamedTextColor.DARK_RED));
-                    }
-                    Component finalDown = downserver;
                     String single = (downList.size()>1?"":"s");
                     String multi = (downList.size()>1?"s":"");
-                    McmeConnect.getProxyPlugin().getPlayers().stream()
+                    Message message = McmeConnect.errorMessage("WARNING! Server"+multi+" ")
+                            .add(downList.get(0), McmeColors.ERROR_STRESSED);
+                    for(int i=1; i<downList.size(); i++) {
+                        if(i < downList.size()-1) {
+                            message.add(" , ");
+                        } else {
+                            message.add(" and ");
+                        }
+                        message.add(downList.get(i), McmeColors.ERROR_STRESSED);
+                    }
+                    message.add(" seem" + single + " to be down.");
+                    McmeConnect.getProxy().getPlayers().stream()
                                .filter(player -> player.hasPermission(Permission.WATCHDOG))
-                               .forEach(player -> player.sendMessage(
-                                       Component.text("WARNING! Server"+multi+" ").color(NamedTextColor.RED)
-                                               .append(finalDown).append(Component.text(" seem"
-                                                                    +single+ " to be down.").color(NamedTextColor.RED))));
+                               .forEach(player -> player.sendMessage(message));
                 }
             }).schedule(10, TimeUnit.SECONDS);
         });

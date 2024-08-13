@@ -18,6 +18,7 @@ package com.mcmiddleearth.connect.proxy.core.handler;
 
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
+import com.mcmiddleearth.base.core.message.MessageColor;
 import com.mcmiddleearth.base.core.player.McmeProxyPlayer;
 import com.mcmiddleearth.base.core.server.McmeServerInfo;
 import com.mcmiddleearth.base.core.taskScheduling.Callback;
@@ -39,11 +40,12 @@ public class ConnectionHandler {
     private static final ArrayList<UUID> welcomedPlayers = new ArrayList<>();
 
     public static boolean handleConnectPlayerToServer(String sender, String server, boolean welcomeMsg, Callback<Boolean> callback) {
-        McmeProxyPlayer source = McmeConnect.getProxyPlugin().getPlayer(sender);
+        McmeProxyPlayer source = McmeConnect.getProxy().getPlayer(sender);
         McmeServerInfo target = McmeConnect.getProxy().getServerInfo(server);
         if(target!=null && !source.getServerInfo().getName().equals(server)) {
             if(welcomeMsg) {
-                ChatMessageHandler.handle(server, sender, NamedTextColor.YELLOW+"Welcome to '"+server+"'!",
+                ChatMessageHandler.handle(server, sender, McmeConnect.message("Welcome to '"+server+"'!",
+                                                                                MessageColor.YELLOW),
                         McmeConnect.getConfig().getConnectDelay());
             }
             source.connect(target,callback);
@@ -53,14 +55,14 @@ public class ConnectionHandler {
     }
 
     public static void sendJoinMessage(McmeProxyPlayer player, boolean fake) {
-        McmeConnect.getProxyPlugin().getPlayers().stream()
+        McmeConnect.getProxy().getPlayers().stream()
                 .filter(p -> !VanishHandler.isPvSupport()
                         || !fake
                         || !p.hasPermission(Permission.VANISH_SEE))
-                .forEach(p -> p.sendMessage(Component.text(player.getName()+" joined the game.")
-                        .color(NamedTextColor.YELLOW)));
+                .forEach(p -> p.sendMessage(McmeConnect.message(player.getName()+" joined the game.",
+                                                                MessageColor.YELLOW)));
         McmeConnect.getProxyPlugin().getTask( () -> {
-            Iterator<McmeProxyPlayer> it = McmeConnect.getProxyPlugin().getPlayers().iterator();
+            Iterator<McmeProxyPlayer> it = McmeConnect.getProxy().getPlayers().iterator();
             if(it.hasNext()) {
                 McmeProxyPlayer other = it.next();
                 if(other.getServerInfo()==null) {
@@ -76,14 +78,12 @@ public class ConnectionHandler {
     }
 
     public static void sendLeaveMessage(McmeProxyPlayer player, boolean fake) {
-        McmeConnect.getProxyPlugin().getPlayers().stream()
+        McmeConnect.getProxy().getPlayers().stream()
                 .filter(p -> !VanishHandler.isPvSupport()
                         || !fake
                         || !p.hasPermission(Permission.VANISH_SEE))
-                .forEach(p -> {
-                    p.sendMessage(Component.text(player.getName()+" left the game.")
-                            .color(NamedTextColor.YELLOW));
-                });
+                .forEach(p -> p.sendMessage(McmeConnect.message(player.getName()+" left the game.",
+                                                                 MessageColor.YELLOW)));
         McmeProxyPlayer other = getOtherPlayer(player);
         if(other != null && other.getServerInfo() != null) {
             ByteArrayDataOutput out = ByteStreams.newDataOutput();
@@ -95,7 +95,7 @@ public class ConnectionHandler {
     }
 
     private static McmeProxyPlayer getOtherPlayer(McmeProxyPlayer player) {
-        Iterator<McmeProxyPlayer> iterator = McmeConnect.getProxyPlugin().getPlayers().iterator();
+        Iterator<McmeProxyPlayer> iterator = McmeConnect.getProxy().getPlayers().iterator();
         if(!iterator.hasNext()) return null;
         McmeProxyPlayer other = iterator.next();
         if(other.equals(player)) {
@@ -140,13 +140,13 @@ public class ConnectionHandler {
 
     public static void handlePlayerJoin(McmeProxyPlayer player) {
         if(RestorestatsHandler.getBlacklist().contains(player.getUniqueId())) {
-            player.disconnect(Component.text(
-                    "Your statistics are currently restored. Please wait a minute before rejoining.")
-                    .color(NamedTextColor.WHITE));
+            player.disconnect(McmeConnect.message(
+                    "Your statistics are currently restored. Please wait a minute before rejoining.",
+                    MessageColor.WHITE));
         }
         String playerName = player.getName();
         McmeConnect.getProxyPlugin().getTask( () -> {
-            McmeProxyPlayer finalPlayer = McmeConnect.getProxyPlugin().getPlayer(playerName);
+            McmeProxyPlayer finalPlayer = McmeConnect.getProxy().getPlayer(playerName);
             if(finalPlayer != null) {
                 if (!VanishHandler.isPvSupport()) {
                     sendJoinMessage(finalPlayer, false);

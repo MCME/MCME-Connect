@@ -2,6 +2,7 @@ package com.mcmiddleearth.connect.proxy.core;
 
 import com.mcmiddleearth.base.core.logger.McmeLogger;
 import com.mcmiddleearth.base.core.message.Message;
+import com.mcmiddleearth.base.core.message.MessageColor;
 import com.mcmiddleearth.base.core.plugin.McmeBackendPlugin;
 import com.mcmiddleearth.base.core.plugin.McmePlugin;
 import com.mcmiddleearth.base.core.plugin.McmeProxyPlugin;
@@ -128,5 +129,15 @@ public class McmeConnect {
     public static  Message errorMessage() {
         return getPlugin().createErrorMessage();
     }
+    public static Message infoMessage(String message) {
+        return getPlugin().createInfoMessage().add(message);
+    }
 
+    public static  Message errorMessage(String message) {
+        return getPlugin().createErrorMessage().add(message);
+    }
+
+    public static Message message(String message, MessageColor color) {
+        return getPlugin().createMessage().add(message, color);
+    }
 }

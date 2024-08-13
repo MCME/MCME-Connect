@@ -32,9 +32,8 @@ public class ThemeHandler {
         Callback<Boolean> callback = (connected, error) -> {
             if(connected) {
                 McmeConnect.getProxyPlugin().getTask(() -> {
-                   sender.sendMessage(Component
-                            .text("All Themed-build commands need to be issued from Themed-build world. You were teleported there.")
-                                    .color(NamedTextColor.RED));
+                   sender.sendMessage(McmeConnect
+                           .errorMessage("All Themed-build commands need to be issued from Themed-build world. You were teleported there."));
                     CommandHandler.handle(server, sender.getName(),command);
                 }).schedule(McmeConnect.getConfig().getConnectDelay(), TimeUnit.MILLISECONDS);
             }

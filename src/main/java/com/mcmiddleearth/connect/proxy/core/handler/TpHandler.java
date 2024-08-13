@@ -36,7 +36,7 @@ public class TpHandler {
             if(connected) {
                 McmeConnect.getProxyPlugin().getTask( () -> {
 //Logger.getGlobal().info("TP callback: "+sender+" "+server+" "+target);
-                    McmeProxyPlayer player = McmeConnect.getProxyPlugin().getPlayer(sender);
+                    McmeProxyPlayer player = McmeConnect.getProxy().getPlayer(sender);
                     ByteArrayDataOutput out = ByteStreams.newDataOutput();
                     out.writeUTF(Channel.TP);
                     out.writeUTF(sender);

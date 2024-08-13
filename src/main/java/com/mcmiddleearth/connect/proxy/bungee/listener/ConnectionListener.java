@@ -16,8 +16,8 @@
  */
 package com.mcmiddleearth.connect.proxy.bungee.listener;
 
+import com.mcmiddleearth.base.bungee.server.BungeeMcmeProxy;
 import com.mcmiddleearth.base.bungee.server.BungeeMcmeServerInfo;
-import com.mcmiddleearth.connect.proxy.bungee.ConnectBungeePlugin;
 import com.mcmiddleearth.connect.proxy.core.McmeConnect;
 import com.mcmiddleearth.connect.proxy.core.handler.ConnectionHandler;
 import com.mcmiddleearth.connect.proxy.core.handler.LegacyPlayerHandler;
@@ -45,27 +45,27 @@ public class ConnectionListener implements Listener {
 
     @EventHandler
     public void onJoin(PostLoginEvent event) {
-        ConnectionHandler.handlePlayerJoin(((ConnectBungeePlugin)McmeConnect.getProxyPlugin()).getPlayer(event.getPlayer()));
+        ConnectionHandler.handlePlayerJoin(((BungeeMcmeProxy)McmeConnect.getProxy()).getPlayer(event.getPlayer()));
     }
     
     @EventHandler
     public void onLeave(PlayerDisconnectEvent event) {
-        ConnectionHandler.handlePlayerLeave(((ConnectBungeePlugin)McmeConnect.getProxyPlugin()).getPlayer(event.getPlayer()));
+        ConnectionHandler.handlePlayerLeave(((BungeeMcmeProxy)McmeConnect.getProxy()).getPlayer(event.getPlayer()));
     }
     
     @EventHandler
     public void onServerConnect(ServerConnectEvent event) {
         if(event.getReason().equals(ServerConnectEvent.Reason.JOIN_PROXY)) {
-            LegacyPlayerHandler.handle(((ConnectBungeePlugin)McmeConnect.getProxyPlugin()).getPlayer(event.getPlayer()),
+            LegacyPlayerHandler.handle(((BungeeMcmeProxy)McmeConnect.getProxy()).getPlayer(event.getPlayer()),
                                        event.getTarget().getName());
         }
-        ConnectionHandler.handleServerConnect(((ConnectBungeePlugin)McmeConnect.getProxyPlugin()).getPlayer(event.getPlayer()),
+        ConnectionHandler.handleServerConnect(((BungeeMcmeProxy)McmeConnect.getProxy()).getPlayer(event.getPlayer()),
                                                 event.getReason().name());
     }
     
     @EventHandler
     public void onServerConnected(ServerConnectedEvent event) {
-        ConnectionHandler.handleServerConnected(((ConnectBungeePlugin)McmeConnect.getProxyPlugin()).getPlayer(event.getPlayer()),
+        ConnectionHandler.handleServerConnected(((BungeeMcmeProxy)McmeConnect.getProxy()).getPlayer(event.getPlayer()),
                                                 new BungeeMcmeServerInfo(event.getServer().getInfo()));
     }
 

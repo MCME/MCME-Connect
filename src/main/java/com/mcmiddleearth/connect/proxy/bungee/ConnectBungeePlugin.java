@@ -22,11 +22,12 @@ package com.mcmiddleearth.connect.proxy.bungee;
  */
 
 import com.mcmiddleearth.base.bungee.AbstractBungeePlugin;
+import com.mcmiddleearth.base.core.message.Message;
 import com.mcmiddleearth.connect.Channel;
 import com.mcmiddleearth.connect.bungee.tabList.TabViewCommand;
 import com.mcmiddleearth.connect.bungee.tabList.TabViewManager;
 import com.mcmiddleearth.connect.bungee.tabList.playerItem.PlayerItemUpdater;
-import com.mcmiddleearth.connect.listener.VanishListener;
+import com.mcmiddleearth.connect.proxy.bungee.listener.VanishListener;
 import com.mcmiddleearth.connect.proxy.bungee.listener.CommandListener;
 import com.mcmiddleearth.connect.proxy.bungee.listener.ConnectionListener;
 import com.mcmiddleearth.connect.proxy.bungee.listener.PluginMessageListener;
@@ -35,7 +36,6 @@ import com.mcmiddleearth.connect.proxy.core.McmeConnectConfig;
 import com.mcmiddleearth.connect.proxy.core.handler.VanishHandler;
 import com.mcmiddleearth.base.net.kyori.adventure.audience.Audience;
 import com.mcmiddleearth.base.net.kyori.adventure.platform.bungeecord.BungeeAudiences;
-import com.mcmiddleearth.base.net.kyori.adventure.text.Component;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
@@ -89,7 +89,7 @@ public class ConnectBungeePlugin extends AbstractBungeePlugin {
     }
 
     @Override
-    public Component getMessagePrefix() {
+    public Message getMessagePrefix() {
         return McmeConnect.getMessagePrefix();
     }
 

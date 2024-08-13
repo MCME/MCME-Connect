@@ -16,6 +16,7 @@
  */
 package com.mcmiddleearth.connect.proxy.core.handler;
 
+import com.mcmiddleearth.base.core.message.Message;
 import com.mcmiddleearth.base.core.player.McmeProxyPlayer;
 import com.mcmiddleearth.connect.Channel;
 import com.mcmiddleearth.connect.proxy.core.McmeConnect;
@@ -30,17 +31,17 @@ import java.util.concurrent.TimeUnit;
  */
 public class ChatMessageHandler {
 
-    public static boolean handle(String server, String recipient, String message, int delay) {
+    public static boolean handle(String server, String recipient, Message message, int delay) {
         McmeConnect.getProxyPlugin().getTask( () -> {
             Collection<McmeProxyPlayer> players = new HashSet<>();
             if(recipient.equals(Channel.ALL)) {
                 if(server.equals(Channel.ALL)) {
-                    players = McmeConnect.getProxyPlugin().getPlayers();
+                    players = McmeConnect.getProxy().getPlayers();
                 } else {
-                    players = McmeConnect.getProxyPlugin().getPlayers(McmeConnect.getProxy().getServerInfo(server));
+                    players = McmeConnect.getProxy().getPlayers(McmeConnect.getProxy().getServerInfo(server));
                 }
             } else {
-                McmeProxyPlayer player = McmeConnect.getProxyPlugin().getPlayer(recipient);
+                McmeProxyPlayer player = McmeConnect.getProxy().getPlayer(recipient);
                 if(player != null && (server.equals(Channel.ALL)
                         || player.getServerInfo().getName().equals(server))) {
                     players.add(player);
@@ -51,9 +52,7 @@ public class ChatMessageHandler {
                     .filter(player->player instanceof ProxiedPlayer && finalPlayers.contains((ProxiedPlayer) player));
             audience.sendMessage(LegacyComponentSerializer.builder().build().deserialize(message));*/
 
-            players.forEach(player -> {
-                player.sendMessage(Component.text(message));
-            });
+            players.forEach(player -> player.sendMessage(message));
         }).schedule(delay, TimeUnit.MILLISECONDS);
         return true;
     }

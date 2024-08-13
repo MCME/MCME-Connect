@@ -16,6 +16,7 @@
  */
 package com.mcmiddleearth.connect.proxy.core.handler;
 
+import com.mcmiddleearth.base.core.message.MessageColor;
 import com.mcmiddleearth.base.core.player.McmeProxyPlayer;
 import com.mcmiddleearth.base.core.taskScheduling.Task;
 import com.mcmiddleearth.connect.proxy.core.McmeConnect;
@@ -39,25 +40,25 @@ public class TpahereHandler {
     public static void sendRequest(McmeProxyPlayer sender, McmeProxyPlayer target) {
         if(requests.stream().anyMatch(request -> request.getSender().getName().equalsIgnoreCase(sender.getName())
                                               && request.getTarget().getName().equalsIgnoreCase(target.getName()))) {
-            sender.sendMessage(Component.text("You already sent "+target.getName()+" a teleport request.").color(NamedTextColor.RED));
+            sender.sendMessage(McmeConnect.message("You already sent "+target.getName()+" a teleport request.",MessageColor.RED));
             return;
         }
         //removeRequestsForSender(sender);
         requests.add(new TpahereRequest(sender, target));
-        sender.sendMessage(Component.text("Teleport request sent to ").color(NamedTextColor.GOLD)
-                        .append(Component.text(target.getName()).color(NamedTextColor.RED))
-                        .append(Component.text(".\nTo cancel this request, type ").color(NamedTextColor.GOLD))
-                        .append(Component.text("/tpacancel").color(NamedTextColor.RED))
-                        .append(Component.text(".").color(NamedTextColor.GOLD)));
-        target.sendMessage(Component.text(sender.getName()).color(NamedTextColor.RED)
-                        .append(Component.text(" has requested that you teleport to them.\n").color(NamedTextColor.GOLD))
-                        .append(Component.text("To teleport, type ").color(NamedTextColor.GOLD))
-                        .append(Component.text("/tpaccept").color(NamedTextColor.RED))
-                        .append(Component.text("\nTo deny this request, type ").color(NamedTextColor.GOLD))
-                        .append(Component.text("/tpdeny").color(NamedTextColor.RED))
-                        .append(Component.text("\nThis request will timeout after ").color(NamedTextColor.GOLD))
-                        .append(Component.text("120 seconds").color(NamedTextColor.RED))
-                        .append(Component.text(".").color(NamedTextColor.GOLD)));
+        sender.sendMessage(McmeConnect.message("Teleport request sent to ",MessageColor.GOLD)
+                        .add(McmeConnect.message(target.getName(),MessageColor.RED))
+                        .add(McmeConnect.message(".\nTo cancel this request, type ",MessageColor.GOLD))
+                        .add(McmeConnect.message("/tpacancel",MessageColor.RED))
+                        .add(McmeConnect.message(".",MessageColor.GOLD)));
+        target.sendMessage(McmeConnect.message(sender.getName(),MessageColor.RED)
+                        .add(McmeConnect.message(" has requested that you teleport to them.\n",MessageColor.GOLD))
+                        .add(McmeConnect.message("To teleport, type ",MessageColor.GOLD))
+                        .add(McmeConnect.message("/tpaccept",MessageColor.RED))
+                        .add(McmeConnect.message("\nTo deny this request, type ",MessageColor.GOLD))
+                        .add(McmeConnect.message("/tpdeny",MessageColor.RED))
+                        .add(McmeConnect.message("\nThis request will timeout after ",MessageColor.GOLD))
+                        .add(McmeConnect.message("120 seconds",MessageColor.RED))
+                        .add(McmeConnect.message(".",MessageColor.GOLD)));
     }
     
     public static boolean accept(McmeProxyPlayer player) {
@@ -69,13 +70,12 @@ public class TpahereHandler {
             if(!TpHandler.handle(request.getTarget().getName(),
                                  request.getSender().getServerInfo().getName(),
                                  request.getSender().getName())) {
-                request.getSender().sendMessage(Component.text("There was an error with your teleportation request!")
-                                .color(NamedTextColor.RED));
+                request.getSender().sendMessage(McmeConnect.message("There was an error with your teleportation request!",
+                                                                    MessageColor.RED));
             } else {
-                request.getTarget().sendMessage(Component.text("Teleport request accepted.")
-                                .color(NamedTextColor.GOLD));
-                request.getSender().sendMessage(Component.text(request.getTarget().getName()).color(NamedTextColor.RED)
-                                .append(Component.text(" accepted your teleport request.").color(NamedTextColor.GOLD)));
+                request.getTarget().sendMessage(McmeConnect.message("Teleport request accepted.", MessageColor.GOLD));
+                request.getSender().sendMessage(McmeConnect.message(request.getTarget().getName(), MessageColor.RED)
+                                .add(McmeConnect.message(" accepted your teleport request.", MessageColor.GOLD)));
             }
         });
         removeRequestsForTarget(player);
@@ -88,10 +88,9 @@ public class TpahereHandler {
         }
         requests.stream().filter(request->request.getTarget().getName().equalsIgnoreCase(player.getName()))
                          .forEach(request-> request.getSender()
-                                 .sendMessage(Component.text(request.getTarget().getName()).color(NamedTextColor.RED)
-                                 .append(Component.text(" denied your teleport request.").color(NamedTextColor.GOLD))));
-        player.sendMessage(Component.text("Teleport request denied.")
-                .color(NamedTextColor.GOLD));
+                                 .sendMessage(McmeConnect.message(request.getTarget().getName(), MessageColor.RED)
+                                 .add(McmeConnect.message(" denied your teleport request.", MessageColor.GOLD))));
+        player.sendMessage(McmeConnect.message("Teleport request denied.", MessageColor.GOLD));
         removeRequestsForTarget(player);
         return true;
     }
@@ -101,8 +100,8 @@ public class TpahereHandler {
             return false;
         }
         removeRequestsForSender(player);
-        player.sendMessage(Component.text("All outstanding teleport requests cancelled.")
-                .color(NamedTextColor.GOLD));
+        player.sendMessage(McmeConnect.message("All outstanding teleport requests cancelled.",
+                                                MessageColor.GOLD));
         removeRequestsForTarget(player);
         return true;
     }
@@ -141,8 +140,8 @@ public class TpahereHandler {
                 requests.stream().filter(request -> request.getTimestamp()+REQUEST_PERIOD<time)
                      .forEach(request -> {
                          removal.add(request);
-                         request.getSender().sendMessage(Component.text("Your teleportation request timed out!")
-                                         .color(NamedTextColor.RED));
+                         request.getSender().sendMessage(McmeConnect.message("Your teleportation request timed out!",
+                                                                            MessageColor.RED));
                        });
                 requests.removeAll(removal);
         });

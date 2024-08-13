@@ -2,6 +2,7 @@ package com.mcmiddleearth.connect.proxy.core.handler;
 
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteStreams;
+import com.mcmiddleearth.base.core.message.Message;
 import com.mcmiddleearth.base.core.player.McmeProxyPlayer;
 import com.mcmiddleearth.base.core.server.McmeServerInfo;
 import com.mcmiddleearth.connect.Channel;
@@ -35,14 +36,14 @@ public class PluginMessageHandler {
                     String sender = in.readUTF();
                     String world = in.readUTF();
                     String locLine = in.readUTF();
-                    TpposHandler.handle(sender, server, world, locLine, "");
+                    TpposHandler.handle(sender, server, world, locLine, McmeConnect.getPlugin().emptyMessage());
                     break;
                 }
                 case Channel.MESSAGE:
                 {
                     String server = in.readUTF();
                     String recipient = in.readUTF();
-                    String message = in.readUTF();
+                    Message message = McmeConnect.getPlugin().deserializeMessage(in.readUTF());
                     int delay = in.readInt();
                     ChatMessageHandler.handle(server,recipient, message, delay);
                     break;
@@ -71,7 +72,7 @@ public class PluginMessageHandler {
                     boolean shutdown = in.readBoolean();
                     String player = in.readUTF();
                     String[] servers = in.readUTF().split(" ");
-                    RestartHandler.handle(McmeConnect.getProxyPlugin().getPlayer(player), servers, shutdown);
+                    RestartHandler.handle(McmeConnect.getProxy().getPlayer(player), servers, shutdown);
                     break;
                 case Channel.SERVER_INFO:
                     String server = messageSender.getName();
@@ -80,7 +81,7 @@ public class PluginMessageHandler {
                 case Channel.AFK:
                     String uuid = in.readUTF();
                     boolean afk = in.readBoolean();
-                    McmeProxyPlayer afkPlayer = McmeConnect.getProxyPlugin().getPlayer(UUID.fromString(uuid));
+                    McmeProxyPlayer afkPlayer = McmeConnect.getProxy().getPlayer(UUID.fromString(uuid));
                     if(afkPlayer!=null) {
                         TabViewManager.handleUpdateAfk(afkPlayer, afk);
                     }

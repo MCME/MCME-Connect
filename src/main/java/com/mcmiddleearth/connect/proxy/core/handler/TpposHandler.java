@@ -18,6 +18,7 @@ package com.mcmiddleearth.connect.proxy.core.handler;
 
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
+import com.mcmiddleearth.base.core.message.Message;
 import com.mcmiddleearth.base.core.player.McmeProxyPlayer;
 import com.mcmiddleearth.base.core.taskScheduling.Callback;
 import com.mcmiddleearth.connect.Channel;
@@ -32,8 +33,8 @@ import java.util.concurrent.TimeUnit;
 public class TpposHandler {
     
     public static boolean handle(String sender, String server, String world, 
-                                 String location, String message) {
-        McmeProxyPlayer player = McmeConnect.getProxyPlugin().getPlayer(sender);
+                                 String location, Message message) {
+        McmeProxyPlayer player = McmeConnect.getProxy().getPlayer(sender);
         if(player!=null) {
             Callback<Boolean> callback = (connected, error) -> {
                 if(connected) {
@@ -45,7 +46,7 @@ public class TpposHandler {
                         out.writeUTF(location);
                         McmeConnect.getProxy().sendPluginMessage(McmeConnect.getProxy().getServerInfo(server),
                                                                  Channel.MAIN, out.toByteArray(), true);
-                        if(!message.equals("")) {
+                        if(!message.isEmpty()) {
                             ChatMessageHandler.handle(server, sender, message, 400);
                         }
                     }).schedule(McmeConnect.getConfig().getConnectDelay(), TimeUnit.MILLISECONDS);

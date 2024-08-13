@@ -51,24 +51,24 @@ public class WarpHandler {
      * @return true if the warp command was or will be handled.
      */
     public static boolean handle(McmeProxyPlayer player, String[] message) {
-        String warpName = message[1];
+        StringBuilder warpName = new StringBuilder(message[1]);
         for(int i = 2; i<message.length;i++) {
-            warpName = warpName + " " + message[i];
+            warpName.append(" ").append(message[i]);
         }
-        WarpData warp = McmeConnect.getMyWarpConnector().getWarp(player, warpName);
+        WarpData warp = McmeConnect.getMyWarpConnector().getWarp(player, warpName.toString());
         if(warp !=null && !warp.getWorld().equals(player.getServerInfo().getName())) {
             if(warp.getWorld().equals("_unknown")) {
                 ChatMessageHandler.handle(player.getServerInfo().getName(), player.getName(),
-                                          NamedTextColor.RED+"The world of that warp could not be found!", 10);
+                                          McmeConnect.errorMessage("The world of that warp could not be found!"), 10);
             } else if((player.hasPermission(Permission.WORLD+"."
                        +warp.getWorld().toLowerCase()))){
                 TpposHandler.handle(player.getName(), warp.getServer(),
                                     warp.getWorld(), warp.getLocation(), 
-                                    NamedTextColor.AQUA+warp.getWelcomeMessage()
+                                    McmeConnect.infoMessage(warp.getWelcomeMessage()
                                            .replace("%player%", player.getName())
-                                           .replace("%warp%",warp.getName()));
+                                           .replace("%warp%",warp.getName())));
             } else {
-                player.sendMessage(Component.text("You don't have permission to enter world '"
+                player.sendMessage(McmeConnect.errorMessage("You don't have permission to enter world '"
                                                          +warp.getWorld()+"'."));
             }
             return true;

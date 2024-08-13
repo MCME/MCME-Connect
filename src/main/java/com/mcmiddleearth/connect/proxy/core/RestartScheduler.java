@@ -16,10 +16,12 @@
  */
 package com.mcmiddleearth.connect.proxy.core;
 
+import com.mcmiddleearth.base.core.message.McmeColors;
+import com.mcmiddleearth.base.core.message.MessageColor;
+import com.mcmiddleearth.base.core.message.MessageDecoration;
 import com.mcmiddleearth.base.core.taskScheduling.Task;
 import com.mcmiddleearth.connect.proxy.core.handler.RestartHandler;
 
-import java.io.File;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -43,8 +45,6 @@ public class RestartScheduler {
     
     private final Task task;
     
-    private static final File restartScheduleFile = new File(McmeConnect.getProxyPlugin().getDataFolder(),"restartSchedule.yml");
-
     public RestartScheduler() {
         loadConfig();
         task = McmeConnect.getProxyPlugin().getTask( () -> {
@@ -57,14 +57,17 @@ public class RestartScheduler {
                         if(now.isBefore(restart.minusMinutes(9)) 
                                 && now.isAfter(restart.minusMinutes(10))) {
                             restartScheduled = true;
-                            McmeConnect.getProxy().broadcast(Component.text("MCME network will restart in 10 minutes.")
-                                    .decorate(TextDecoration.BOLD).color(NamedTextColor.RED));
-                            runLater(() -> McmeConnect.getProxy().broadcast(Component.text("MCME network will restart in 5 minutes.")
-                                                                .color(NamedTextColor.RED)),300);
-                            runLater(() -> McmeConnect.getProxy().broadcast(Component.text("MCME network will restart in 1 minutes.")
-                                                                .color(NamedTextColor.RED)),540);
-                            runLater(() -> McmeConnect.getProxy().broadcast(Component.text("MCME network is restarting ...")
-                                                                .color(NamedTextColor.RED)),600);
+                            McmeConnect.getProxy().broadcast(McmeConnect.infoMessage()
+                                    .add("MCME network will restart in 10 minutes.", MessageColor.RED, MessageDecoration.BOLD));
+                            runLater(() -> McmeConnect.getProxy().broadcast(McmeConnect.infoMessage()
+                                    .add("MCME network will restart in 5 minutes.", MessageColor.RED, MessageDecoration.BOLD)),
+                                    300);
+                            runLater(() -> McmeConnect.getProxy().broadcast(McmeConnect.infoMessage()
+                                    .add("MCME network will restart in 1 minutes.", MessageColor.RED, MessageDecoration.BOLD)),
+                                    540);
+                            runLater(() -> McmeConnect.getProxy().broadcast(McmeConnect.infoMessage()
+                                    .add("MCME network is restarting ...", MessageColor.RED, MessageDecoration.BOLD)),
+                                    600);
                             runLater(() -> RestartHandler.restartProxy(false),602);
                         }
                     }

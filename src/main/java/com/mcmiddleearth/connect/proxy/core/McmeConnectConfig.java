@@ -12,13 +12,13 @@ public class McmeConnectConfig {
 
     private final YamlConfiguration config;
 
-    private int connectDelay = 200;
-    private boolean legacyRedirectEnabled = true;
-    private boolean isPVsupported = false;
-    private boolean isServerWatchdogEnabled = true;
-    private boolean isMyWarpEnabled = false;
-    private String legacyRedirectFrom = "newplayerworld";
-    private String legacyRedirectTo = "world";
+    private final int connectDelay;
+    private final boolean legacyRedirectEnabled;
+    private final boolean isPVsupported;
+    private final boolean isServerWatchdogEnabled;
+    private final boolean isMyWarpEnabled;
+    private final String legacyRedirectFrom;
+    private final String legacyRedirectTo;
     private final Set<String> noMVTP = new HashSet<>();
 
     public static final String FILE_NAME = "config.yml";

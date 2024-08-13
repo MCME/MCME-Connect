@@ -43,7 +43,7 @@ public class CommandHandler {
                                 sendError(player);
                             }
                         } else {
-                            player.sendError(Component.text("You don't have permission to enter "
+                            player.sendMessage(McmeConnect.errorMessage("You don't have permission to enter "
                                     +destination.getName()+"'s world."));
                         }
                         return true;
@@ -63,7 +63,7 @@ public class CommandHandler {
                                     sendError(player);
                                 }
                             } else {
-                                player.sendError(Component.text(source.getName()+" is not allowed to enter "
+                                player.sendMessage(McmeConnect.errorMessage(source.getName()+" is not allowed to enter "
                                         +destination.getName()+"'s world."));
                             }
                             return true;
@@ -81,7 +81,7 @@ public class CommandHandler {
                             && isMvtpAllowed(player)) {
                         TpaHandler.sendRequest(player,destination);
                     } else {
-                        player.sendError(Component.text("You don't have permission to enter "
+                        player.sendMessage(McmeConnect.errorMessage("You don't have permission to enter "
                                 +destination.getName()+"'s world."));
                     }
                     return true;
@@ -97,7 +97,7 @@ public class CommandHandler {
                             && isMvtpAllowed(destination)) {
                         TpahereHandler.sendRequest(player,destination);
                     } else {
-                        player.sendError(Component.text(destination.getName()+" doesn't have permission to enter "
+                        player.sendMessage(McmeConnect.errorMessage(destination.getName()+" doesn't have permission to enter "
                                 +"your world."));
                     }
                     return true;
@@ -113,8 +113,8 @@ public class CommandHandler {
                             && isMvtpAllowed(sender)) {
                         TpaHandler.accept(player);
                     } else {
-                        sender.sendMessage(Component.text(player.getName() + " accepted your request but have no permission to enter his world!")
-                                        .color(NamedTextColor.RED));
+                        sender.sendMessage(McmeConnect.errorMessage(player.getName()
+                                        + " accepted your request but have no permission to enter his world!"));
                         TpaHandler.removeRequests(player);
                     }
                     return true;
@@ -126,8 +126,8 @@ public class CommandHandler {
                             && isMvtpAllowed(player)) {
                         TpahereHandler.accept(player);
                     } else {
-                        sender.sendMessage(Component.text(player.getName() + " accepted your request but he has no permission to enter your world!")
-                                        .color(NamedTextColor.RED));
+                        sender.sendMessage(McmeConnect.errorMessage(player.getName()
+                                        + " accepted your request but he has no permission to enter your world!"));
                         TpahereHandler.removeRequests(player);
                     }
                     return true;
@@ -150,7 +150,7 @@ public class CommandHandler {
                             sendError(player);
                         }
                     } else {
-                        player.sendError(Component.text(target.getName()
+                        player.sendMessage(McmeConnect.errorMessage(target.getName()
                                 +" has no permission to enter your world."));
                     }
                     return true;
@@ -161,15 +161,14 @@ public class CommandHandler {
             if(!player.getServerInfo().getName()
                     .equals(themedWorld)) {
                 if(!isMvtpAllowed(player)) {
-                    player.sendError(Component.text(
-                            "/theme isn't allowed here."));
+                    player.sendMessage(McmeConnect.errorMessage("/theme isn't allowed here."));
                 } else {
                     if(player.hasPermission(Permission.WORLD+"."+themedWorld)) {
                         if(!ThemeHandler.handle(player,themedWorld, chatMessage)) {
                             sendError(player);
                         }
                     } else {
-                        player.sendError(Component.text("You don't have permission to enter world '"
+                        player.sendMessage(McmeConnect.errorMessage("You don't have permission to enter world '"
                                 +themedWorld+"'."));
                     }
                 }
@@ -179,13 +178,13 @@ public class CommandHandler {
             String survivalserver = "survivalserver";
             if (!player.getServerInfo().getName().equals(survivalserver) && McmeConnect.getProxy().getServerInfo(survivalserver) != null) {
                 if (!isMvtpAllowed(player)) {
-                    player.sendError(Component.text("/survival isn't allowed here."));
+                    player.sendMessage(McmeConnect.errorMessage("/survival isn't allowed here."));
                 } else if (player.hasPermission(Permission.SURVIVAL)) {
                     if (!ConnectionHandler.handleConnectPlayerToServer(player.getName(), survivalserver, true, ((Boolean success, Throwable error) -> {}))) {
                         sendError(player);
                     }
                 } else {
-                    player.sendError(Component.text("You don't have permission to enter survival server."));
+                    player.sendMessage(McmeConnect.errorMessage("You don't have permission to enter survival server."));
                 }
                 return true;
             }
@@ -196,8 +195,7 @@ public class CommandHandler {
             String target = message[1];
             if(!player.getServerInfo().getName().equals(target)) {
                 if(!isMvtpAllowed(player)) {
-                    player.sendError(Component.text(
-                            "/mvtp and /switch isn't allowed here."));
+                    player.sendMessage(McmeConnect.errorMessage("/mvtp and /switch isn't allowed here."));
                 } else {
                     if(player.hasPermission(Permission.WORLD+"."+target)) {
                         if(message[0].equalsIgnoreCase("/mvtp")) {
@@ -210,7 +208,7 @@ public class CommandHandler {
                             }
                         }
                     } else {
-                        player.sendError(Component.text("You don't have permission to enter world '"
+                        player.sendMessage(McmeConnect.errorMessage("You don't have permission to enter world '"
                                 +target+"'."));
                     }
                 }
@@ -218,16 +216,14 @@ public class CommandHandler {
             }
         } else if(WarpHandler.isWarpCommand(message)) {
             if(!isMvtpAllowed(player)) {
-                player.sendError(Component.text(
-                        "/warp isn't allowed here."));
+                player.sendMessage(McmeConnect.errorMessage("/warp isn't allowed here."));
                 return true;
             } else {
                 return WarpHandler.handle(player, message);
             }
         } else if(message[0].equalsIgnoreCase("/reboot")) {
             if(!player.hasPermission(Permission.RESTART)) {
-                player.sendError(Component.text(
-                        "You are not allowed to use that command."));
+                player.sendMessage(McmeConnect.errorMessage("You are not allowed to use that command."));
                 return true;
             }
             if(message.length>1 && !message[1].equalsIgnoreCase("reloadconfig")
@@ -237,8 +233,7 @@ public class CommandHandler {
             }
         } else if(message[0].equalsIgnoreCase("/stop") && message.length>1) {
             if(!player.hasPermission(Permission.RESTART)) {
-                player.sendError(Component.text(
-                        "You are not allowed to use that command."));
+                player.sendMessage(McmeConnect.errorMessage("You are not allowed to use that command."));
                 return true;
             }
             RestartHandler.handle(player, Arrays.copyOfRange(message, 1, message.length),true);
@@ -322,7 +317,7 @@ public class CommandHandler {
 
     private static List<String> suggestAllOtherPlayers(McmeCommandSender sender, String start) {
         List<String> suggestions = new LinkedList<>();
-        Collection<McmeProxyPlayer> players = McmeConnect.getProxyPlugin().getPlayers();
+        Collection<McmeProxyPlayer> players = McmeConnect.getProxy().getPlayers();
         players.stream().filter(player -> ((sender==null || !player.getName().equalsIgnoreCase(sender.getName()))
                         && player.getName().toLowerCase().startsWith(start.toLowerCase())
                         && !VanishHandler.isVanished(player)))
@@ -331,11 +326,11 @@ public class CommandHandler {
     }
 
     private static void sendError(McmeProxyPlayer player) {
-        player.sendError(Component.text("There was an error!"));
+        player.sendMessage(McmeConnect.errorMessage("There was an error!"));
     }
 
     private static McmeProxyPlayer getPlayer(String name) {
-        return McmeConnect.getProxyPlugin().getPlayer(name);
+        return McmeConnect.getProxy().getPlayer(name);
     }
 
     private static String replaceAlias(String message) {
