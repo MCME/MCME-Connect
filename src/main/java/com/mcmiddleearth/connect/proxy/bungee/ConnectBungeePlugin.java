@@ -27,15 +27,15 @@ import com.mcmiddleearth.connect.Channel;
 import com.mcmiddleearth.connect.bungee.tabList.TabViewCommand;
 import com.mcmiddleearth.connect.bungee.tabList.TabViewManager;
 import com.mcmiddleearth.connect.bungee.tabList.playerItem.PlayerItemUpdater;
-import com.mcmiddleearth.connect.proxy.bungee.listener.VanishListener;
 import com.mcmiddleearth.connect.proxy.bungee.listener.CommandListener;
 import com.mcmiddleearth.connect.proxy.bungee.listener.ConnectionListener;
 import com.mcmiddleearth.connect.proxy.bungee.listener.PluginMessageListener;
+import com.mcmiddleearth.connect.proxy.bungee.listener.VanishListener;
 import com.mcmiddleearth.connect.proxy.core.McmeConnect;
 import com.mcmiddleearth.connect.proxy.core.McmeConnectConfig;
 import com.mcmiddleearth.connect.proxy.core.handler.VanishHandler;
-import com.mcmiddleearth.base.net.kyori.adventure.audience.Audience;
-import com.mcmiddleearth.base.net.kyori.adventure.platform.bungeecord.BungeeAudiences;
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.platform.bungeecord.BungeeAudiences;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
@@ -56,22 +56,28 @@ public class ConnectBungeePlugin extends AbstractBungeePlugin {
     @Override
     public void onEnable() {
         super.onEnable();
-        instance = this;
-        McmeConnect.enable(this);
+
         File configFile = new File(getDataFolder(), McmeConnectConfig.FILE_NAME);
         saveResourceToFile(McmeConnectConfig.FILE_NAME, configFile);
+
+        McmeConnect.enable(this);
+
         //loadConfig();
         //logger = new BungeeLog();
+        instance = this;
         audiences = getAdventure();//BungeeAudiences.create(ConnectBungeePlugin.getInstance());
+
+        ProxyServer.getInstance().registerChannel(Channel.MAIN);
+
         if(VanishHandler.isPvSupport()) {
             getProxy().getPluginManager().registerListener(this, new VanishListener());
         }
-        ProxyServer.getInstance().registerChannel(Channel.MAIN);
         //getProxy().getPluginManager().registerListener(this, new TestListener());
         getProxy().getPluginManager().registerListener(this, new PluginMessageListener());
         getProxy().getPluginManager().registerListener(this, new CommandListener());
         getProxy().getPluginManager().registerListener(this, new ConnectionListener());
         //getProxy().getPluginManager().registerListener(this, new TabViewManager());
+
         //playerItemUpdater = new PlayerItemUpdater();
         TabViewManager.init();
         tabViewCommand = new TabViewCommand();

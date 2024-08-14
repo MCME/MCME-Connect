@@ -16,6 +16,7 @@
  */
 package com.mcmiddleearth.connect.proxy.bungee.listener;
 
+import com.mcmiddleearth.base.bungee.player.BungeeMcmePlayer;
 import com.mcmiddleearth.base.bungee.server.BungeeMcmeProxy;
 import com.mcmiddleearth.base.bungee.server.BungeeMcmeServerInfo;
 import com.mcmiddleearth.connect.proxy.core.McmeConnect;
@@ -45,27 +46,27 @@ public class ConnectionListener implements Listener {
 
     @EventHandler
     public void onJoin(PostLoginEvent event) {
-        ConnectionHandler.handlePlayerJoin(((BungeeMcmeProxy)McmeConnect.getProxy()).getPlayer(event.getPlayer()));
+        ConnectionHandler.handlePlayerJoin(new BungeeMcmePlayer(event.getPlayer()));
     }
     
     @EventHandler
     public void onLeave(PlayerDisconnectEvent event) {
-        ConnectionHandler.handlePlayerLeave(((BungeeMcmeProxy)McmeConnect.getProxy()).getPlayer(event.getPlayer()));
+        ConnectionHandler.handlePlayerLeave(new BungeeMcmePlayer(event.getPlayer()));
     }
     
     @EventHandler
     public void onServerConnect(ServerConnectEvent event) {
         if(event.getReason().equals(ServerConnectEvent.Reason.JOIN_PROXY)) {
-            LegacyPlayerHandler.handle(((BungeeMcmeProxy)McmeConnect.getProxy()).getPlayer(event.getPlayer()),
+            LegacyPlayerHandler.handle(new BungeeMcmePlayer(event.getPlayer()),
                                        event.getTarget().getName());
         }
-        ConnectionHandler.handleServerConnect(((BungeeMcmeProxy)McmeConnect.getProxy()).getPlayer(event.getPlayer()),
+        ConnectionHandler.handleServerConnect(new BungeeMcmePlayer(event.getPlayer()),
                                                 event.getReason().name());
     }
     
     @EventHandler
     public void onServerConnected(ServerConnectedEvent event) {
-        ConnectionHandler.handleServerConnected(((BungeeMcmeProxy)McmeConnect.getProxy()).getPlayer(event.getPlayer()),
+        ConnectionHandler.handleServerConnected(new BungeeMcmePlayer(event.getPlayer()),
                                                 new BungeeMcmeServerInfo(event.getServer().getInfo()));
     }
 
