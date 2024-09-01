@@ -60,6 +60,12 @@ public class MyWarpDBConnector {
         if(config==null) {
             config = new HashMap();
         }
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+        } catch (ClassNotFoundException e) {
+            McmeConnect.getLogger().error("MySQL driver not found!", e);
+            e.printStackTrace();
+        }
         dbUser = (String) config.get("user");
         dbPassword = (String) config.get("password");//,"mywarp");
         dbName = (String) config.get("dbName");//,"mywarp");

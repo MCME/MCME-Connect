@@ -34,12 +34,17 @@ public class CommandListener {
     
     @Subscribe
     public void onCommand(CommandExecuteEvent event) {
+//McmeConnect.getLogger().info("command: "+event.getCommand());
         if(event.getCommandSource() instanceof Player player) {
+//McmeConnect.getLogger().info("Player");
             if(CommandHandler.handleChatEvent(new VelocityMcmePlayer(player),
-                                                         event.getCommand())) {
+                                                         "/"+event.getCommand())) {
                 event.setResult(CommandExecuteEvent.CommandResult.denied());
             }
         }
+        /*if(event.getCommand().equals("reboot") && !(event.getCommandSource() instanceof ConsoleCommandSource)) {
+            event.setResult(CommandExecuteEvent.CommandResult.forwardToServer());
+        }*/
     }
 
     @Subscribe

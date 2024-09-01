@@ -26,6 +26,7 @@ public class McmeConnectConfig {
     public McmeConnectConfig(File dataFolder) {
         this.config = new YamlConfiguration(new File(dataFolder, FILE_NAME));
 
+//McmeConnect.getLogger().warn("ConnectDelay: "+config.getInt("connectDelay",200));
         legacyRedirectEnabled = config.getBoolean("legacyRedirect.enabled",true);
         legacyRedirectFrom = config.getString("legacyRedirect.from","newplayerworld");
         legacyRedirectTo = config.getString("legacyRedirect.to","world");
@@ -34,7 +35,7 @@ public class McmeConnectConfig {
                           (Boolean) config.getSection("myWarp").get("enabled") : false;
         isServerWatchdogEnabled = config.getBoolean("serverWatchdog", true);
         noMVTP.addAll(config.getStringList("disableMVTP"));
-        connectDelay = config.getInt("connectDelay",200);
+        connectDelay = config.getInt("connectDelay",2000);
     }
 
     public boolean isGamemodeSyncEnabled(String server) {

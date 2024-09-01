@@ -37,6 +37,7 @@ public class PluginMessageListener {
     
     @Subscribe
     public void onMessage(PluginMessageEvent event) {
+//McmeConnect.getLogger().info(event.toString());
         if(PluginMessageHandler.handlePluginMessage(event.getIdentifier().getId(),
                     event.getSource() instanceof ServerConnection connection ?
                             new VelocityMcmeServerInfo(((ConnectVelocityPlugin)McmeConnect.getPlugin()).getProxyServer(),
@@ -45,6 +46,7 @@ public class PluginMessageListener {
                             new VelocityMcmePlayer(player) : null,
                     event.getData())) {
             event.setResult(PluginMessageEvent.ForwardResult.handled());
+//McmeConnect.getLogger().info("handled");
         }
     }
 }

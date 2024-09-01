@@ -32,10 +32,11 @@ import java.util.concurrent.TimeUnit;
 public class TpHandler {
     
     public static boolean handle(String sender, String server, String target) {
+//McmeConnect.getLogger().info("TpHandler");
         Callback<Boolean> callback = (connected, error) -> {
             if(connected) {
                 McmeConnect.getProxyPlugin().getTask( () -> {
-//Logger.getGlobal().info("TP callback: "+sender+" "+server+" "+target);
+//McmeConnect.getLogger().info("TP callback: "+sender+" "+server+" "+target);
                     McmeProxyPlayer player = McmeConnect.getProxy().getPlayer(sender);
                     ByteArrayDataOutput out = ByteStreams.newDataOutput();
                     out.writeUTF(Channel.TP);

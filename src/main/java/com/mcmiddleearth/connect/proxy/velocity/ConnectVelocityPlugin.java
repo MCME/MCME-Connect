@@ -6,9 +6,12 @@ import com.mcmiddleearth.base.velocity.AbstractVelocityPlugin;
 import com.mcmiddleearth.connect.Channel;
 import com.mcmiddleearth.connect.proxy.core.McmeConnect;
 import com.mcmiddleearth.connect.proxy.core.McmeConnectConfig;
+import com.mcmiddleearth.connect.proxy.velocity.command.RebootCommand;
 import com.mcmiddleearth.connect.proxy.velocity.listener.CommandListener;
 import com.mcmiddleearth.connect.proxy.velocity.listener.ConnectionListener;
 import com.mcmiddleearth.connect.proxy.velocity.listener.PluginMessageListener;
+import com.velocitypowered.api.command.CommandManager;
+import com.velocitypowered.api.command.CommandMeta;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.player.TabCompleteEvent;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
@@ -30,6 +33,7 @@ public class ConnectVelocityPlugin extends AbstractVelocityPlugin{
     @Inject
     public ConnectVelocityPlugin(Logger logger, ProxyServer proxyServer, @DataDirectory Path dataDirectory) {
         super(logger, proxyServer, dataDirectory);
+        McmeConnect.setLogger(getMcmeLogger());
     }
 
     @Subscribe
@@ -45,6 +49,13 @@ public class ConnectVelocityPlugin extends AbstractVelocityPlugin{
         getProxyServer().getEventManager().register(this, new CommandListener());
         getProxyServer().getEventManager().register(this, new ConnectionListener());
 
+        RebootCommand rebootCommand = new RebootCommand();
+        CommandManager commandManager = getProxyServer().getCommandManager();
+        CommandMeta reportMeta = commandManager.metaBuilder("reboot")
+                .plugin(this)
+                .build();
+        commandManager.register(reportMeta, rebootCommand);
+
         getMcmeProxy().getConsole().sendMessage(createMessage().add("Enabled on Velocity proxy!"));
     }
 
@@ -55,7 +66,7 @@ public class ConnectVelocityPlugin extends AbstractVelocityPlugin{
 
     @Subscribe
     public void onTabComplete(TabCompleteEvent event) {
-
+//McmeConnect.getLogger().info("TabComplete in ConnectVelocityPlugin");
     }
 
     @Override

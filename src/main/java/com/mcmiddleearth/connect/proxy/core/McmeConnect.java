@@ -40,6 +40,10 @@ public class McmeConnect {
         return proxyPlugin;
     }
 
+    public static void setLogger(McmeLogger logger) {
+        McmeConnect.logger = logger;
+    }
+
     public static void enable(McmeProxyPlugin proxyPlugin) {
         McmeConnect.proxyPlugin = proxyPlugin;
         config = new McmeConnectConfig(proxyPlugin.getDataFolder());

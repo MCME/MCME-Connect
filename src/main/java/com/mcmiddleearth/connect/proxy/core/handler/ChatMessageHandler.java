@@ -43,7 +43,7 @@ public class ChatMessageHandler {
             } else {
                 McmeProxyPlayer player = McmeConnect.getProxy().getPlayer(recipient);
                 if(player != null && (server.equals(Channel.ALL)
-                        || player.getServerInfo().getName().equals(server))) {
+                        || (player.getServerInfo() != null && player.getServerInfo().getName().equals(server)))) {
                     players.add(player);
                 }
             }

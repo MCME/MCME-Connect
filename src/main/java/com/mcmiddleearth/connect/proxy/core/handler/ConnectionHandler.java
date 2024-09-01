@@ -40,6 +40,7 @@ public class ConnectionHandler {
     private static final ArrayList<UUID> welcomedPlayers = new ArrayList<>();
 
     public static boolean handleConnectPlayerToServer(String sender, String server, boolean welcomeMsg, Callback<Boolean> callback) {
+//McmeConnect.getLogger().info("ConnectionHandler");
         McmeProxyPlayer source = McmeConnect.getProxy().getPlayer(sender);
         McmeServerInfo target = McmeConnect.getProxy().getServerInfo(server);
         if(target!=null && !source.getServerInfo().getName().equals(server)) {
@@ -48,6 +49,7 @@ public class ConnectionHandler {
                                                                                 MessageColor.YELLOW),
                         McmeConnect.getConfig().getConnectDelay());
             }
+//McmeConnect.getLogger().info("Connect!");
             source.connect(target,callback);
             return true;
         }
