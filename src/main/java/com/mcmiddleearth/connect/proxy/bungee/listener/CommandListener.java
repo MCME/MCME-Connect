@@ -17,7 +17,6 @@
 package com.mcmiddleearth.connect.proxy.bungee.listener;
 
 import com.mcmiddleearth.base.bungee.player.BungeeMcmePlayer;
-import com.mcmiddleearth.connect.proxy.bungee.ConnectBungeePlugin;
 import com.mcmiddleearth.connect.proxy.core.handler.CommandHandler;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.ChatEvent;
