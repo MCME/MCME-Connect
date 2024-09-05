@@ -17,6 +17,7 @@
 package com.mcmiddleearth.connect.proxy.velocity.listener;
 
 import com.mcmiddleearth.base.velocity.player.VelocityMcmePlayer;
+import com.mcmiddleearth.connect.proxy.core.McmeConnect;
 import com.mcmiddleearth.connect.proxy.core.handler.CommandHandler;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.command.CommandExecuteEvent;
@@ -34,17 +35,14 @@ public class CommandListener {
     
     @Subscribe
     public void onCommand(CommandExecuteEvent event) {
-//McmeConnect.getLogger().info("command: "+event.getCommand());
         if(event.getCommandSource() instanceof Player player) {
-//McmeConnect.getLogger().info("Player");
             if(CommandHandler.handleChatEvent(new VelocityMcmePlayer(player),
                                                          "/"+event.getCommand())) {
                 event.setResult(CommandExecuteEvent.CommandResult.denied());
+            } else {
+                event.setResult(CommandExecuteEvent.CommandResult.forwardToServer());
             }
         }
-        /*if(event.getCommand().equals("reboot") && !(event.getCommandSource() instanceof ConsoleCommandSource)) {
-            event.setResult(CommandExecuteEvent.CommandResult.forwardToServer());
-        }*/
     }
 
     @Subscribe

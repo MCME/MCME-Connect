@@ -13,17 +13,21 @@ import java.util.concurrent.CompletableFuture;
 
 public class ConnectCommand implements SimpleCommand {
 
+    private final String permission;
+
+    public ConnectCommand(String permission) {
+        this.permission = permission;
+    }
+
     @Override
     public void execute(Invocation invocation) {
-McmeConnect.getLogger().info("ConnectCommand.execute");
         //Nothing to do here: Execution is handled in CommandListener.onCommand
     }
 
     @Override
     public CompletableFuture<List<String>> suggestAsync(Invocation invocation) {
-McmeConnect.getLogger().info("ConnectCommand.suggetsAsync");
         if(invocation.source() instanceof Player player) {
-            String cursor = "/" + Joiner.on(" ").join(invocation.alias(), invocation.arguments());
+            String cursor = "/" + invocation.alias() + " "+ Joiner.on(" ").join(invocation.arguments());
             return CompletableFuture.supplyAsync(() -> CommandHandler
                     .processGetSuggestions(cursor, ((VelocityMcmeProxy) McmeConnect.getProxy()).getPlayer(player)));
         }
@@ -32,6 +36,9 @@ McmeConnect.getLogger().info("ConnectCommand.suggetsAsync");
 
     @Override
     public boolean hasPermission(Invocation invocation) {
-        return true;
+        if(permission == null) {
+            return true;
+        }
+        return invocation.source().hasPermission(permission);
     }
 }
