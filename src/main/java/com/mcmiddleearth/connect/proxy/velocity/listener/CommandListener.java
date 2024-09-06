@@ -19,6 +19,9 @@ package com.mcmiddleearth.connect.proxy.velocity.listener;
 import com.mcmiddleearth.base.velocity.player.VelocityMcmePlayer;
 import com.mcmiddleearth.connect.proxy.core.McmeConnect;
 import com.mcmiddleearth.connect.proxy.core.handler.CommandHandler;
+import com.mcmiddleearth.connect.proxy.velocity.ConnectVelocityPlugin;
+import com.velocitypowered.api.command.CommandManager;
+import com.velocitypowered.api.command.CommandMeta;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.command.CommandExecuteEvent;
 import com.velocitypowered.api.event.player.TabCompleteEvent;
@@ -35,7 +38,12 @@ public class CommandListener {
     
     @Subscribe
     public void onCommand(CommandExecuteEvent event) {
-        if(event.getCommandSource() instanceof Player player) {
+        ConnectVelocityPlugin plugin = (ConnectVelocityPlugin)McmeConnect.getProxyPlugin();
+        CommandManager commandManager = plugin.getProxyServer().getCommandManager();
+        CommandMeta commandMeta = commandManager.getCommandMeta(event.getCommand().split(" ")[0]);
+        if(commandMeta!=null && commandMeta.getPlugin() != null
+                && commandMeta.getPlugin() instanceof  ConnectVelocityPlugin
+                && event.getCommandSource() instanceof Player player) {
             if(CommandHandler.handleChatEvent(new VelocityMcmePlayer(player),
                                                          "/"+event.getCommand())) {
                 event.setResult(CommandExecuteEvent.CommandResult.denied());

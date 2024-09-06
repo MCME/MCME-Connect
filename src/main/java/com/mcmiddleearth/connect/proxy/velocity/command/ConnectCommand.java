@@ -20,7 +20,7 @@ public class ConnectCommand implements SimpleCommand {
     }
 
     @Override
-    public void execute(Invocation invocation) {
+    public void execute(final Invocation invocation) {
         //Nothing to do here: Execution is handled in CommandListener.onCommand
     }
 
