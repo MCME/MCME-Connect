@@ -42,8 +42,8 @@ public class TpHandler {
                     out.writeUTF(Channel.TP);
                     out.writeUTF(sender);
                     out.writeUTF(target);
-                    McmeConnect.getProxy().sendPluginMessage(McmeConnect.getProxy().getServerInfo(server),
-                                                             Channel.MAIN, out.toByteArray(), true);
+                    McmeConnect.getProxy().getServerInfo(server)
+                               .sendPluginMessage(Channel.MAIN, out.toByteArray(), true);
                 }).schedule(McmeConnect.getConfig().getConnectDelay(), TimeUnit.MILLISECONDS);
             }
         };

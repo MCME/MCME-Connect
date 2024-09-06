@@ -44,8 +44,8 @@ public class TpposHandler {
                         out.writeUTF(sender);
                         out.writeUTF(world);
                         out.writeUTF(location);
-                        McmeConnect.getProxy().sendPluginMessage(McmeConnect.getProxy().getServerInfo(server),
-                                                                 Channel.MAIN, out.toByteArray(), true);
+                        McmeConnect.getProxy().getServerInfo(server)
+                                   .sendPluginMessage(Channel.MAIN, out.toByteArray(), true);
                         if(!message.isEmpty()) {
                             ChatMessageHandler.handle(server, sender, message, 400);
                         }

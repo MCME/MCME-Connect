@@ -49,8 +49,7 @@ public class TitleHandler {
             out.writeInt(intro);
             out.writeInt(show);
             out.writeInt(extro);
-            servers.forEach(info ->
-                    McmeConnect.getProxy().sendPluginMessage(info, Channel.MAIN, out.toByteArray(),false));
+            servers.forEach(info -> info.sendPluginMessage(Channel.MAIN, out.toByteArray(),false));
         }).schedule(delay, TimeUnit.MILLISECONDS);
         return true;
     }

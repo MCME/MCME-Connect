@@ -89,7 +89,7 @@ public class RestartHandler {
                         out.writeBoolean(shutdown);
                         out.writeUTF(player.getName());
                         out.writeUTF(otherServers);
-                        McmeConnect.getProxy().sendPluginMessage(dest,Channel.MAIN, out.toByteArray(),true);
+                        dest.sendPluginMessage(Channel.MAIN, out.toByteArray(),true);
                     }).schedule(McmeConnect.getConfig().getConnectDelay(), TimeUnit.MILLISECONDS);
                 }
             };

@@ -74,7 +74,7 @@ public class ConnectionHandler {
                 out.writeUTF(Channel.DISCORD);
                 out.writeUTF("Global");
                 out.writeUTF(":bangbang: **"+player.getName()+" joined the game.**");
-                McmeConnect.getProxy().sendPluginMessage(other.getServerInfo(), Channel.MAIN, out.toByteArray(),true);
+                other.getServerInfo().sendPluginMessage(Channel.MAIN, out.toByteArray(),true);
             }
         }).schedule(McmeConnect.getConfig().getConnectDelay(), TimeUnit.MILLISECONDS);
     }
@@ -92,7 +92,7 @@ public class ConnectionHandler {
             out.writeUTF(Channel.DISCORD);
             out.writeUTF("Global");
             out.writeUTF(":x: **"+player.getName()+" left the game.**");
-            McmeConnect.getProxy().sendPluginMessage(other.getServerInfo(), Channel.MAIN, out.toByteArray(),false);
+            other.getServerInfo().sendPluginMessage(Channel.MAIN, out.toByteArray(),false);
         }
     }
 
@@ -121,7 +121,7 @@ public class ConnectionHandler {
                 out.writeUTF(player.getName());
                 out.writeUTF(reason);
                 connectReasons.remove(player);
-                McmeConnect.getProxy().sendPluginMessage(destination, Channel.MAIN, out.toByteArray(), true);
+                destination.sendPluginMessage(Channel.MAIN, out.toByteArray(), true);
             }
         }).schedule(McmeConnect.getConfig().getConnectDelay(), TimeUnit.MILLISECONDS);
 

@@ -52,8 +52,8 @@ public class LegacyPlayerHandler {
                 out.writeUTF(Channel.LEGACY);
                 out.writeUTF(player.getName());
                 out.writeUTF(target);
-                McmeConnect.getProxy().sendPluginMessage(McmeConnect.getProxy().getServerInfo(redirectServer),
-                                                         Channel.MAIN, out.toByteArray(), true);
+                McmeConnect.getProxy().getServerInfo(redirectServer)
+                        .sendPluginMessage(Channel.MAIN, out.toByteArray(), true);
             }).schedule(McmeConnect.getConfig().getConnectDelay(), TimeUnit.MILLISECONDS);
         }
     }
