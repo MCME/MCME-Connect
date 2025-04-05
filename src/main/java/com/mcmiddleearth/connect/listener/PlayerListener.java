@@ -38,6 +38,7 @@ public class PlayerListener implements Listener {
 
     @EventHandler(priority=EventPriority.NORMAL)
     public void onJoin(PlayerJoinEvent event) {
+Logger.getGlobal().info("Player join: "+event.getPlayer().getName());
         event.setJoinMessage("");
         new BukkitRunnable(){
             @Override

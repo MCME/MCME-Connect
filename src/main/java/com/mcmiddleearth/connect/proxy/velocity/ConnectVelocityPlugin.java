@@ -38,8 +38,8 @@ public class ConnectVelocityPlugin extends AbstractVelocityPlugin{
         McmeConnect.setLogger(getMcmeLogger());
     }
 
-    @Subscribe
-    public void onProxyInitialization(ProxyInitializeEvent event) {
+    @Override
+    public void enable() {
         File configFile = new File(getDataFolder(), McmeConnectConfig.FILE_NAME);
         saveResourceToFile(McmeConnectConfig.FILE_NAME, configFile);
 
@@ -75,8 +75,8 @@ public class ConnectVelocityPlugin extends AbstractVelocityPlugin{
         getMcmeProxy().getConsole().sendMessage(createMessage().add("Enabled on Velocity proxy!"));
     }
 
-    @Subscribe
-    public void onProxyShutdown(ProxyShutdownEvent event) {
+    @Override
+    public void disable() {
         McmeConnect.disable();
     }
 

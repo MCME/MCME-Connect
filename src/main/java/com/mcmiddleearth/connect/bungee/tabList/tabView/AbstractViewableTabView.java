@@ -6,6 +6,7 @@ import com.mcmiddleearth.connect.bungee.tabList.playerItem.PlayerItemManager;
 import com.mcmiddleearth.connect.bungee.tabList.playerItem.TabViewPlayerItem;
 import com.mcmiddleearth.connect.bungee.tabList.tabView.configuration.ViewableTabViewConfig;
 import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.protocol.Property;
 import net.md_5.bungee.protocol.packet.PlayerListHeaderFooter;
@@ -196,12 +197,12 @@ public abstract class AbstractViewableTabView implements ITabView{
                         if (prop != null) {
                             item.setProperties(prop.clone());
                         }
-                        item.setDisplayName(config.getDisplayName(playerItem));
+                        item.setDisplayName(TextComponent.fromLegacyText(config.getDisplayName(playerItem))[0]);
                         item.setGamemode(playerItem.getGamemode());
                         item.setPing(playerItem.getPing());
                         break;
                     case UPDATE_DISPLAY_NAME:
-                        item.setDisplayName(config.getDisplayName(playerItem));
+                        item.setDisplayName(TextComponent.fromLegacyText(config.getDisplayName(playerItem))[0]);
                         break;
                     case UPDATE_LATENCY:
                         item.setPing(playerItem.getPing());

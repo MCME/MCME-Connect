@@ -139,7 +139,7 @@ public class TabViewManager implements Listener {
     }
 
     public static void handlePlayerVanish(McmeProxyPlayer player) {
-        handlePlayerVanish(((BungeeMcmePlayer)player).getProxiedPlayer());
+        handlePlayerVanish(((BungeeMcmePlayer)player).getBungeePlayer());
     }
 
     public static void handlePlayerVanish(ProxiedPlayer player) {
@@ -150,7 +150,7 @@ public class TabViewManager implements Listener {
     }
 
     public static void handlePlayerUnvanish(McmeProxyPlayer player) {
-        handlePlayerUnvanish(((BungeeMcmePlayer)player).getProxiedPlayer());
+        handlePlayerUnvanish(((BungeeMcmePlayer)player).getBungeePlayer());
     }
 
     public static void handlePlayerUnvanish(ProxiedPlayer player) {
@@ -161,7 +161,7 @@ public class TabViewManager implements Listener {
     }
 
     public static void handleUpdateAfk(McmeProxyPlayer vanillaRecipient, boolean afk) {
-        handleUpdateAfk(((BungeeMcmePlayer)vanillaRecipient).getProxiedPlayer(),afk);
+        handleUpdateAfk(((BungeeMcmePlayer)vanillaRecipient).getBungeePlayer(),afk);
     }
 
     public static void handleUpdateAfk(ProxiedPlayer vanillaRecipient, boolean afk) {

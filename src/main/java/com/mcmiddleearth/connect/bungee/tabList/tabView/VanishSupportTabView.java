@@ -8,6 +8,7 @@ import com.mcmiddleearth.connect.proxy.core.McmeConnect;
 import com.mcmiddleearth.connect.proxy.core.handler.VanishHandler;
 import com.mcmiddleearth.connect.log.Log;
 import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.protocol.Property;
 import net.md_5.bungee.protocol.packet.PlayerListItem;
@@ -46,7 +47,7 @@ public abstract class VanishSupportTabView extends AbstractViewableTabView {
         net.md_5.bungee.protocol.packet.PlayerListItem.Item item = new net.md_5.bungee.protocol.packet.PlayerListItem.Item();
         item.setUuid(tabViewItem.getUuid());
         item.setUsername(tabViewItem.getUsername());
-        item.setDisplayName(getConfig().getDisplayName(tabViewItem));
+        item.setDisplayName(TextComponent.fromLegacyText(getConfig().getDisplayName(tabViewItem))[0]);
         item.setGamemode(tabViewItem.getGamemode());
         Property[] prop = tabViewItem.getProperties();
         if(prop != null) {

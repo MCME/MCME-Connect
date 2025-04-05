@@ -52,10 +52,9 @@ public class ConnectBungeePlugin extends AbstractBungeePlugin {
     private static BungeeAudiences audiences;
 
     //private Log logger;
-    
+
     @Override
-    public void onEnable() {
-        super.onEnable();
+    public void enable() {
 
         File configFile = new File(getDataFolder(), McmeConnectConfig.FILE_NAME);
         saveResourceToFile(McmeConnectConfig.FILE_NAME, configFile);
@@ -85,7 +84,7 @@ public class ConnectBungeePlugin extends AbstractBungeePlugin {
     }
 
     @Override
-    public void onDisable() {
+    public void disable() {
         super.onDisable();
         McmeConnect.disable();
         //playerItemUpdater.disable();

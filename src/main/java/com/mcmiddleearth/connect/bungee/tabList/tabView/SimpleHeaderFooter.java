@@ -6,6 +6,7 @@ import com.mcmiddleearth.connect.proxy.core.ServerInformation;
 import com.mcmiddleearth.connect.bungee.tabList.PacketLogger;
 import com.mcmiddleearth.connect.bungee.tabList.TabViewManager;
 import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.connection.Server;
 import net.md_5.bungee.protocol.packet.PlayerListHeaderFooter;
@@ -27,8 +28,8 @@ public class SimpleHeaderFooter implements IHeaderFooter {
     @Override
     public void send(ProxiedPlayer player) {
         PlayerListHeaderFooter packet = new PlayerListHeaderFooter();
-        packet.setFooter("\""+replacePlaceholder(player, TabViewManager.getFooter(footer))+"\"");
-        packet.setHeader("\""+replacePlaceholder(player, TabViewManager.getHeader(header))+"\"");
+        packet.setFooter(TextComponent.fromLegacyText("\""+replacePlaceholder(player, TabViewManager.getFooter(footer))+"\"")[0]);
+        packet.setHeader(TextComponent.fromLegacyText("\""+replacePlaceholder(player, TabViewManager.getHeader(header))+"\"")[0]);
         PacketLogger.sendHeaderFooter(player,packet);
     }
 

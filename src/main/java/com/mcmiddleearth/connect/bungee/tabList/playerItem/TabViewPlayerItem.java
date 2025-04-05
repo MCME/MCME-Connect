@@ -38,7 +38,7 @@ public class TabViewPlayerItem {
 //Logger.getGlobal().info("username: "+item.getUsername());
         username = item.getUsername();
 //Logger.getGlobal().info("displayname: "+item.getDisplayName());
-        displayname = item.getDisplayName();
+        displayname = item.getDisplayName().toString();
 //Logger.getGlobal().info("gamemode: "+item.getGamemode());
         gamemode = (item.getGamemode()!=null?item.getGamemode():2);
 //Logger.getGlobal().info("ping: "+item.getPing());
