@@ -35,7 +35,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class ConnectionHandler {
 
-    private static final Map<McmeProxyPlayer, String> connectReasons = new HashMap<>();
+    private static final Map<UUID, String> connectReasons = new HashMap<>();
 
     private static final ArrayList<UUID> welcomedPlayers = new ArrayList<>();
 
@@ -109,12 +109,12 @@ public class ConnectionHandler {
 
 
     public static void handleServerConnect(McmeProxyPlayer player, String reason) {
-        connectReasons.put(player, reason);
+        connectReasons.put(player.getUniqueId(), reason);
     }
 
     public static void handleServerConnected(McmeProxyPlayer player, McmeServerInfo destination) {
         McmeConnect.getProxyPlugin().getTask( () -> {
-            String reason = connectReasons.get(player);
+            String reason = connectReasons.get(player.getUniqueId());
             if(reason!=null) {
                 ByteArrayDataOutput out = ByteStreams.newDataOutput();
                 out.writeUTF(Channel.JOIN);
