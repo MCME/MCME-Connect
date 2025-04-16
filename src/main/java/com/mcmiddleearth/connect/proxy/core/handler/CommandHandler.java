@@ -26,6 +26,7 @@ public class CommandHandler {
     }
 
     public static boolean handleChatEvent(McmeProxyPlayer player, String chatMessage) {
+//McmeConnect.getLogger().info("Command: "+chatMessage);
         String[] message = replaceAlias(chatMessage).split(" ");
         if(message[0].equalsIgnoreCase("/tp") && message.length>1) {
             if(player.hasPermission(Permission.TP)) {

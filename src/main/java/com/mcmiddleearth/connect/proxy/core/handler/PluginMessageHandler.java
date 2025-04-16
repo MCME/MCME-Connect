@@ -43,7 +43,9 @@ public class PluginMessageHandler {
                 {
                     String server = in.readUTF();
                     String recipient = in.readUTF();
-                    Message message = McmeConnect.getPlugin().deserializeMessage(in.readUTF());
+                    String rawMessage = in.readUTF();
+//McmeConnect.getLogger().info("Message: "+rawMessage);
+                    Message message = McmeConnect.getPlugin().deserializeMessage(rawMessage);
                     int delay = in.readInt();
                     ChatMessageHandler.handle(server,recipient, message, delay);
                     break;

@@ -16,15 +16,17 @@
  */
 package com.mcmiddleearth.connect.proxy.velocity.listener;
 
+import com.mcmiddleearth.base.adventure.AdventureMessage;
 import com.mcmiddleearth.base.velocity.player.VelocityMcmePlayer;
 import com.mcmiddleearth.base.velocity.server.VelocityMcmeServerInfo;
 import com.mcmiddleearth.connect.proxy.core.McmeConnect;
 import com.mcmiddleearth.connect.proxy.core.handler.ConnectionHandler;
-import com.mcmiddleearth.connect.proxy.core.handler.LegacyPlayerHandler;
 import com.mcmiddleearth.connect.proxy.velocity.ConnectVelocityPlugin;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.DisconnectEvent;
 import com.velocitypowered.api.event.connection.PostLoginEvent;
+import com.velocitypowered.api.event.player.KickedFromServerEvent;
+import com.velocitypowered.api.event.player.PlayerChooseInitialServerEvent;
 import com.velocitypowered.api.event.player.ServerPostConnectEvent;
 import com.velocitypowered.api.event.player.ServerPreConnectEvent;
 
@@ -45,34 +47,61 @@ public class ConnectionListener {
 
     @Subscribe
     public void onJoin(PostLoginEvent event) {
+McmeConnect.getLogger().info("onJoin: "+event.getPlayer().getUsername());
         ConnectionHandler.handlePlayerJoin(new VelocityMcmePlayer(event.getPlayer()));
     }
     
     @Subscribe
     public void onLeave(DisconnectEvent event) {
+//McmeConnect.getLogger().info("onDiconnect: "+event.getPlayer().getUsername());
         ConnectionHandler.handlePlayerLeave(new VelocityMcmePlayer(event.getPlayer()));
     }
     
     @Subscribe
     public void onServerConnect(ServerPreConnectEvent event) {
+//McmeConnect.getLogger().info("onServerConnect: "+event.getPlayer().getUsername());
         String joinReason;
         if(event.getPreviousServer() == null) {
-            LegacyPlayerHandler.handle(new VelocityMcmePlayer(event.getPlayer()),
-                                       event.getOriginalServer().getServerInfo().getName());
             joinReason = "JOIN_PROXY";
         } else if(!event.getOriginalServer().equals(event.getResult().getServer().orElse(null))) {
             joinReason = "SERVER_DOWN_REDIRECT";
         } else {
             joinReason = "UNKNOWN";
         }
+//McmeConnect.getLogger().info("reason: "+joinReason);
         ConnectionHandler.handleServerConnect(new VelocityMcmePlayer(event.getPlayer()), joinReason);
+    }
+
+    @Subscribe
+    public void onServerSelect(PlayerChooseInitialServerEvent event) {
+        String target = ConnectionHandler.chooseInitialServer(new VelocityMcmePlayer(event.getPlayer()));
+        if(target != null) {
+            ((ConnectVelocityPlugin) McmeConnect.getPlugin()).getProxyServer()
+                    .getServer(target).ifPresent(event::setInitialServer);
+        }
     }
     
     @Subscribe
     public void onServerConnected(ServerPostConnectEvent event) {
+//McmeConnect.getLogger().info("onServerConnected: "+event.getPlayer().getUsername());
         ConnectionHandler.handleServerConnected(new VelocityMcmePlayer(event.getPlayer()),
                         new VelocityMcmeServerInfo(((ConnectVelocityPlugin)McmeConnect.getPlugin()).getProxyServer(),
                                                     event.getPlayer().getCurrentServer().orElseThrow().getServerInfo()));
+    }
+
+    @Subscribe
+    public void onKick(KickedFromServerEvent event) {
+        if(!event.getServer().getServerInfo().getName().equals("newplayer")) {
+            event.setResult(KickedFromServerEvent.RedirectPlayer
+                    .create(((ConnectVelocityPlugin) McmeConnect.getPlugin()).getProxyServer().getServer("world")
+                            .orElseThrow()));
+        } else {
+            event.setResult(KickedFromServerEvent.DisconnectPlayer
+                    .create(((AdventureMessage)McmeConnect
+                            .errorMessage("Server unavailable, try again in a minute or ask for help at Discord."))
+                            .getComponent()));
+        }
+
     }
 
 }

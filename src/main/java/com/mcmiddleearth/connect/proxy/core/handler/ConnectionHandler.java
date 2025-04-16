@@ -22,6 +22,7 @@ import com.mcmiddleearth.base.core.message.MessageColor;
 import com.mcmiddleearth.base.core.player.McmeProxyPlayer;
 import com.mcmiddleearth.base.core.server.McmeServerInfo;
 import com.mcmiddleearth.base.core.taskScheduling.Callback;
+import com.mcmiddleearth.base.velocity.player.VelocityMcmePlayer;
 import com.mcmiddleearth.connect.Channel;
 import com.mcmiddleearth.connect.Permission;
 import com.mcmiddleearth.connect.proxy.core.McmeConnect;
@@ -38,6 +39,8 @@ public class ConnectionHandler {
     private static final Map<UUID, String> connectReasons = new HashMap<>();
 
     private static final ArrayList<UUID> welcomedPlayers = new ArrayList<>();
+
+    private static final Map<UUID, String> playerServers = new HashMap<>();
 
     public static boolean handleConnectPlayerToServer(String sender, String server, boolean welcomeMsg, Callback<Boolean> callback) {
 //McmeConnect.getLogger().info("ConnectionHandler");
@@ -114,13 +117,18 @@ public class ConnectionHandler {
 
     public static void handleServerConnected(McmeProxyPlayer player, McmeServerInfo destination) {
         McmeConnect.getProxyPlugin().getTask( () -> {
+            playerServers.put(player.getUniqueId(), destination.getName());
             String reason = connectReasons.get(player.getUniqueId());
             if(reason!=null) {
+//McmeConnect.getLogger().info("ConnectReason: "+reason);
+                if(reason.equals("JOIN_PROXY")) {
+                    LegacyPlayerHandler.handle(player, destination.getName());
+                }
+                connectReasons.remove(player.getUniqueId());
                 ByteArrayDataOutput out = ByteStreams.newDataOutput();
                 out.writeUTF(Channel.JOIN);
                 out.writeUTF(player.getName());
                 out.writeUTF(reason);
-                connectReasons.remove(player);
                 destination.sendPluginMessage(Channel.MAIN, out.toByteArray(), true);
             }
         }).schedule(McmeConnect.getConfig().getConnectDelay(), TimeUnit.MILLISECONDS);
@@ -159,5 +167,13 @@ public class ConnectionHandler {
             }
         }).schedule(2, TimeUnit.SECONDS);
 
+    }
+
+    public static String chooseInitialServer(VelocityMcmePlayer player) {
+        String server = playerServers.get(player.getUniqueId());
+        if(server == null && LegacyPlayerHandler.getLegacyPlayers().contains(player.getUniqueId())) {
+            server = "world";
+        }
+        return server;
     }
 }

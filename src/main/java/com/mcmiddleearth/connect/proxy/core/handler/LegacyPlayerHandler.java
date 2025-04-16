@@ -20,6 +20,7 @@ import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import com.mcmiddleearth.base.core.player.McmeProxyPlayer;
 import com.mcmiddleearth.connect.Channel;
+import com.mcmiddleearth.connect.events.PlayerConnectEvent;
 import com.mcmiddleearth.connect.proxy.core.McmeConnect;
 
 import java.io.File;
@@ -40,19 +41,23 @@ public class LegacyPlayerHandler {
     private static final Set<UUID> legacyPlayers = new HashSet<>();
 
     public static void handle(McmeProxyPlayer player, String joinedServer) {
+//McmeConnect.getLogger().info("LegacyPlayerHandler: "+joinedServer);
         if(!McmeConnect.getConfig().isLegacyRedirectEnabled()) {
             return;
         }
-        String redirectServer = McmeConnect.getConfig().getLegacyRedirectFrom();
+        String redirectFromServer = McmeConnect.getConfig().getLegacyRedirectFrom();
+//McmeConnect.getLogger().info("redirect from: "+redirectFromServer);
         if(legacyPlayers.contains(player.getUniqueId())
-                && joinedServer.equals(redirectServer)) {
+                && joinedServer.equals(redirectFromServer)) {
             String target = McmeConnect.getConfig().getLegacyRedirectTo();
+
             McmeConnect.getProxyPlugin().getTask(() -> {
                 ByteArrayDataOutput out = ByteStreams.newDataOutput();
                 out.writeUTF(Channel.LEGACY);
                 out.writeUTF(player.getName());
                 out.writeUTF(target);
-                McmeConnect.getProxy().getServerInfo(redirectServer)
+//McmeConnect.getLogger().info("redirect to: "+target);
+                McmeConnect.getProxy().getServerInfo(redirectFromServer)
                         .sendPluginMessage(Channel.MAIN, out.toByteArray(), true);
             }).schedule(McmeConnect.getConfig().getConnectDelay(), TimeUnit.MILLISECONDS);
         }
@@ -78,6 +83,10 @@ public class LegacyPlayerHandler {
         } catch (FileNotFoundException ex) {
             McmeConnect.getLogger().error("FileNotFoundException", ex);
         }
+    }
+
+    public static Set<UUID> getLegacyPlayers() {
+        return legacyPlayers;
     }
 
 }
