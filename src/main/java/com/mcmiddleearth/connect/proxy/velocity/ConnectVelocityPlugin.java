@@ -12,6 +12,7 @@ import com.mcmiddleearth.connect.proxy.velocity.command.RebootCommand;
 import com.mcmiddleearth.connect.proxy.velocity.listener.CommandListener;
 import com.mcmiddleearth.connect.proxy.velocity.listener.ConnectionListener;
 import com.mcmiddleearth.connect.proxy.velocity.listener.PluginMessageListener;
+import com.mcmiddleearth.connect.proxy.velocity.listener.VanishListener;
 import com.velocitypowered.api.command.CommandManager;
 import com.velocitypowered.api.command.CommandMeta;
 import com.velocitypowered.api.event.Subscribe;
@@ -50,6 +51,7 @@ public class ConnectVelocityPlugin extends AbstractVelocityPlugin{
         getProxyServer().getEventManager().register(this, new PluginMessageListener());
         getProxyServer().getEventManager().register(this, new CommandListener());
         getProxyServer().getEventManager().register(this, new ConnectionListener());
+//        getProxyServer().getEventManager().register(this, new VanishListener());
 
         CommandManager commandManager = getProxyServer().getCommandManager();
         CommandMeta commandMeta = commandManager.metaBuilder("reboot").plugin(this).build();

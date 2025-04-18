@@ -18,7 +18,10 @@ package com.mcmiddleearth.connect.proxy.core.handler;
 
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
+import com.mcmiddleearth.base.adventure.AdventureMessage;
+import com.mcmiddleearth.base.core.message.Message;
 import com.mcmiddleearth.base.core.message.MessageColor;
+import com.mcmiddleearth.base.core.player.McmePlayer;
 import com.mcmiddleearth.base.core.player.McmeProxyPlayer;
 import com.mcmiddleearth.base.core.server.McmeServerInfo;
 import com.mcmiddleearth.base.core.taskScheduling.Callback;
@@ -26,6 +29,9 @@ import com.mcmiddleearth.base.velocity.player.VelocityMcmePlayer;
 import com.mcmiddleearth.connect.Channel;
 import com.mcmiddleearth.connect.Permission;
 import com.mcmiddleearth.connect.proxy.core.McmeConnect;
+import com.mcmiddleearth.connect.proxy.velocity.ConnectVelocityPlugin;
+import com.velocitypowered.api.event.player.KickedFromServerEvent;
+import org.checkerframework.checker.units.qual.K;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -39,8 +45,6 @@ public class ConnectionHandler {
     private static final Map<UUID, String> connectReasons = new HashMap<>();
 
     private static final ArrayList<UUID> welcomedPlayers = new ArrayList<>();
-
-    private static final Map<UUID, String> playerServers = new HashMap<>();
 
     public static boolean handleConnectPlayerToServer(String sender, String server, boolean welcomeMsg, Callback<Boolean> callback) {
 //McmeConnect.getLogger().info("ConnectionHandler");
@@ -117,7 +121,7 @@ public class ConnectionHandler {
 
     public static void handleServerConnected(McmeProxyPlayer player, McmeServerInfo destination) {
         McmeConnect.getProxyPlugin().getTask( () -> {
-            playerServers.put(player.getUniqueId(), destination.getName());
+            McmeConnect.setPlayerServer(player, destination.getName());
             String reason = connectReasons.get(player.getUniqueId());
             if(reason!=null) {
 //McmeConnect.getLogger().info("ConnectReason: "+reason);
@@ -136,11 +140,15 @@ public class ConnectionHandler {
     }
 
     public static void handlePlayerLeave(McmeProxyPlayer player) {
+McmeConnect.getLogger().info("handlePlayerLeave. VanishSupport: "+VanishHandler.isPvSupport());
+McmeConnect.getLogger().info("handlePlayerLeave. welcomed: "+welcomedPlayers.contains(player.getUniqueId()));
         if(welcomedPlayers.contains(player.getUniqueId())) {
+McmeConnect.getLogger().info("handlePlayerLeave. 1");
             TpaHandler.removeRequests(player);
             if (!VanishHandler.isPvSupport()) {
                 sendLeaveMessage(player, false);
             } else {
+McmeConnect.getLogger().info("handlePlayerLeave. 2");
                 VanishHandler.quit(player);
             }
             welcomedPlayers.remove(player.getUniqueId());
@@ -158,9 +166,11 @@ public class ConnectionHandler {
         McmeConnect.getProxyPlugin().getTask( () -> {
             McmeProxyPlayer finalPlayer = McmeConnect.getProxy().getPlayer(playerName);
             if(finalPlayer != null) {
+McmeConnect.getLogger().info("handlePlayerJoin. VanishSupport: "+VanishHandler.isPvSupport());
                 if (!VanishHandler.isPvSupport()) {
                     sendJoinMessage(finalPlayer, false);
                 } else {
+McmeConnect.getLogger().info("handlePlayerjoin. 1");
                     VanishHandler.join(finalPlayer);
                 }
                 welcomedPlayers.add(finalPlayer.getUniqueId());
@@ -169,11 +179,42 @@ public class ConnectionHandler {
 
     }
 
-    public static String chooseInitialServer(VelocityMcmePlayer player) {
-        String server = playerServers.get(player.getUniqueId());
+    public static String chooseInitialServer(McmeProxyPlayer player) {
+        String server = McmeConnect.getPlayerServer(player);
         if(server == null && LegacyPlayerHandler.getLegacyPlayers().contains(player.getUniqueId())) {
             server = "world";
+McmeConnect.getLogger().info("InitialServer: "+server);
         }
+McmeConnect.getLogger().info("InitialServer: "+server);
         return server;
+    }
+
+    public static KickResult handleKick(McmeProxyPlayer player, String kickServer) {
+        KickResult result = new KickResult();
+        result.redirect = !kickServer.equals("newplayer");
+        if(result.redirect) {
+            String server = (kickServer.equalsIgnoreCase("world")?"moria":"world");
+            result.redirectServer = server;
+            if(kickServer.equalsIgnoreCase("world")) {
+                kickServer = "mainworld";
+            }
+            if(server.equalsIgnoreCase("world")) {
+                server = "mainworld";
+            }
+            result.message = McmeConnect
+                    .errorMessage(kickServer + "server is unavailable. You were teleported to "+server+" instead.");
+        } else {
+            result.message = McmeConnect
+                            .message("Newplayer server is unavailable, try again in a minute or ask for help at Discord."
+                                    , MessageColor.RED);
+        }
+
+        return result;
+    }
+
+    public static class KickResult {
+        public Message message;
+        public boolean redirect;
+        public String redirectServer;
     }
 }

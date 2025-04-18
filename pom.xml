@@ -56,10 +56,6 @@
                             </artifactSet>
                             <relocations>
                                 <relocation>
-                                    <pattern>net.kyori.adventure</pattern>
-                                    <shadedPattern>com.mcmiddleearth.connect.adventure</shadedPattern>
-                                </relocation>
-                                <relocation>
                                     <pattern>com.mysql.mysql-connector-j</pattern>
                                     <shadedPattern>com.mcmiddleearth.connect.mysql.mysql-connector-j</shadedPattern>
                                 </relocation>
@@ -161,17 +157,10 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>de.myzelyam</groupId>
+            <groupId>com.github.LeonMangler</groupId>
             <artifactId>PremiumVanishAPI</artifactId>
-            <scope>system</scope>
-            <version>2.5.11</version>
-            <systemPath>D:/SystemRepository/PremiumVanishAPI.jar</systemPath>
-            <exclusions>
-                <exclusion>
-                    <groupId>net.md-5</groupId>
-                    <artifactId>brigadier</artifactId>
-                </exclusion>
-            </exclusions>
+            <version>2.9.18-2</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>net.luckperms</groupId>

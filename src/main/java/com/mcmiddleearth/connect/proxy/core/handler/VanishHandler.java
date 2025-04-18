@@ -41,6 +41,7 @@ public class VanishHandler {
     private static final File vanishFile = new File(McmeConnect.getProxyPlugin().getDataFolder(),"vanished.uid");
     
     public static void join(McmeProxyPlayer player) {
+McmeConnect.getLogger().info("vanish:join is vanished: "+isVanished(player));
         if(player.hasPermission(Permission.JOIN_VANISHED)) {
             vanishedPlayers.add(player.getUniqueId());
             saveVanished();
@@ -57,6 +58,7 @@ public class VanishHandler {
     }
     
     public static void quit(McmeProxyPlayer player) {
+McmeConnect.getLogger().info("vanish:quit isVanished: "+isVanished(player));
         if(isVanished(player)) {
             McmeConnect.getProxy().getPlayers().stream()
                     .filter(VanishHandler::hasVanishSeePermission).forEach(p -> {
@@ -69,6 +71,7 @@ public class VanishHandler {
     }
     
     public static void vanish(McmeProxyPlayer player) {
+McmeConnect.getLogger().info("vanish: "+player.getUniqueId());
         vanishedPlayers.add(player.getUniqueId());
         saveVanished();
         McmeConnect.getProxy().getPlayers().stream()
@@ -80,6 +83,7 @@ public class VanishHandler {
     }
     
     public static void unvanish(McmeProxyPlayer player) {
+McmeConnect.getLogger().info("unvanish: "+player.getUniqueId());
         vanishedPlayers.remove(player.getUniqueId());
         saveVanished();
         McmeConnect.getProxy().getPlayers().stream()
@@ -95,6 +99,7 @@ public class VanishHandler {
     }
 
     public static boolean isVanished(UUID player) {
+McmeConnect.getLogger().info("is vanished: "+player);
         return pvSupport && vanishedPlayers.contains(player);
     }
     

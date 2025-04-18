@@ -17,7 +17,9 @@
 package com.mcmiddleearth.connect.proxy.velocity.listener;
 
 import com.mcmiddleearth.base.adventure.AdventureMessage;
+import com.mcmiddleearth.base.core.message.MessageColor;
 import com.mcmiddleearth.base.velocity.player.VelocityMcmePlayer;
+import com.mcmiddleearth.base.velocity.server.VelocityMcmeProxy;
 import com.mcmiddleearth.base.velocity.server.VelocityMcmeServerInfo;
 import com.mcmiddleearth.connect.proxy.core.McmeConnect;
 import com.mcmiddleearth.connect.proxy.core.handler.ConnectionHandler;
@@ -53,7 +55,7 @@ McmeConnect.getLogger().info("onJoin: "+event.getPlayer().getUsername());
     
     @Subscribe
     public void onLeave(DisconnectEvent event) {
-//McmeConnect.getLogger().info("onDiconnect: "+event.getPlayer().getUsername());
+McmeConnect.getLogger().info("onDiconnect: "+event.getPlayer().getUsername());
         ConnectionHandler.handlePlayerLeave(new VelocityMcmePlayer(event.getPlayer()));
     }
     
@@ -83,7 +85,7 @@ McmeConnect.getLogger().info("onJoin: "+event.getPlayer().getUsername());
     
     @Subscribe
     public void onServerConnected(ServerPostConnectEvent event) {
-//McmeConnect.getLogger().info("onServerConnected: "+event.getPlayer().getUsername());
+McmeConnect.getLogger().info("onServerConnected: "+event.getPlayer().getUsername());
         ConnectionHandler.handleServerConnected(new VelocityMcmePlayer(event.getPlayer()),
                         new VelocityMcmeServerInfo(((ConnectVelocityPlugin)McmeConnect.getPlugin()).getProxyServer(),
                                                     event.getPlayer().getCurrentServer().orElseThrow().getServerInfo()));
@@ -91,15 +93,18 @@ McmeConnect.getLogger().info("onJoin: "+event.getPlayer().getUsername());
 
     @Subscribe
     public void onKick(KickedFromServerEvent event) {
-        if(!event.getServer().getServerInfo().getName().equals("newplayer")) {
+//McmeConnect.getLogger().warn("Kicked from: "+event.getServer().getServerInfo().getName());
+        ConnectionHandler.KickResult kickResult = ConnectionHandler.handleKick(VelocityMcmeProxy.getPlayer(event.getPlayer()),
+                                                            event.getServer().getServerInfo().getName());
+        if(kickResult.redirect) {
             event.setResult(KickedFromServerEvent.RedirectPlayer
-                    .create(((ConnectVelocityPlugin) McmeConnect.getPlugin()).getProxyServer().getServer("world")
+                    .create(((ConnectVelocityPlugin) McmeConnect.getPlugin()).getProxyServer()
+                            .getServer(kickResult.redirectServer)
                             .orElseThrow()));
+            event.getPlayer().sendMessage(((AdventureMessage)kickResult.message).getComponent());
         } else {
             event.setResult(KickedFromServerEvent.DisconnectPlayer
-                    .create(((AdventureMessage)McmeConnect
-                            .errorMessage("Server unavailable, try again in a minute or ask for help at Discord."))
-                            .getComponent()));
+                    .create(((AdventureMessage)kickResult.message).getComponent()));
         }
 
     }

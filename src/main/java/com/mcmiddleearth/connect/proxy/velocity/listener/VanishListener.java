@@ -17,11 +17,14 @@
 package com.mcmiddleearth.connect.proxy.velocity.listener;
 
 import com.mcmiddleearth.base.bungee.server.BungeeMcmeProxy;
+import com.mcmiddleearth.base.velocity.server.VelocityMcmeProxy;
 import com.mcmiddleearth.connect.proxy.core.McmeConnect;
 import com.mcmiddleearth.connect.proxy.core.handler.VanishHandler;
 import com.velocitypowered.api.event.Subscribe;
 import de.myzelyam.api.vanish.BungeePlayerHideEvent;
 import de.myzelyam.api.vanish.BungeePlayerShowEvent;
+import de.myzelyam.api.vanish.VelocityPlayerHideEvent;
+import de.myzelyam.api.vanish.VelocityPlayerShowEvent;
 
 /**
  *
@@ -30,13 +33,13 @@ import de.myzelyam.api.vanish.BungeePlayerShowEvent;
 public class VanishListener {
     
     @Subscribe
-    public void onVanish(BungeePlayerHideEvent event) {
-        VanishHandler.vanish(((BungeeMcmeProxy)McmeConnect.getProxy()).getPlayer(event.getPlayer()));
+    public void onVanish(VelocityPlayerHideEvent event) {
+        VanishHandler.vanish(VelocityMcmeProxy.getPlayer(event.getPlayer()));
     }
     
     @Subscribe
-    public void onVanish(BungeePlayerShowEvent event) {
-        VanishHandler.unvanish(((BungeeMcmeProxy)McmeConnect.getProxy()).getPlayer(event.getPlayer()));
+    public void onVanish(VelocityPlayerShowEvent event) {
+        VanishHandler.unvanish(VelocityMcmeProxy.getPlayer(event.getPlayer()));
     }
     
     
