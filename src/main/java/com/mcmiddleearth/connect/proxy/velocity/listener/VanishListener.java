@@ -16,13 +16,9 @@
  */
 package com.mcmiddleearth.connect.proxy.velocity.listener;
 
-import com.mcmiddleearth.base.bungee.server.BungeeMcmeProxy;
 import com.mcmiddleearth.base.velocity.server.VelocityMcmeProxy;
-import com.mcmiddleearth.connect.proxy.core.McmeConnect;
 import com.mcmiddleearth.connect.proxy.core.handler.VanishHandler;
 import com.velocitypowered.api.event.Subscribe;
-import de.myzelyam.api.vanish.BungeePlayerHideEvent;
-import de.myzelyam.api.vanish.BungeePlayerShowEvent;
 import de.myzelyam.api.vanish.VelocityPlayerHideEvent;
 import de.myzelyam.api.vanish.VelocityPlayerShowEvent;
 

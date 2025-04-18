@@ -19,7 +19,6 @@ package com.mcmiddleearth.connect.proxy.core.handler;
 import com.mcmiddleearth.base.core.message.MessageColor;
 import com.mcmiddleearth.base.core.player.McmeProxyPlayer;
 import com.mcmiddleearth.connect.Permission;
-import com.mcmiddleearth.connect.bungee.tabList.TabViewManager;
 import com.mcmiddleearth.connect.proxy.core.McmeConnect;
 
 import java.io.*;
@@ -41,7 +40,7 @@ public class VanishHandler {
     private static final File vanishFile = new File(McmeConnect.getProxyPlugin().getDataFolder(),"vanished.uid");
     
     public static void join(McmeProxyPlayer player) {
-McmeConnect.getLogger().info("vanish:join is vanished: "+isVanished(player));
+//McmeConnect.getLogger().info("vanish:join is vanished: "+isVanished(player));
         if(player.hasPermission(Permission.JOIN_VANISHED)) {
             vanishedPlayers.add(player.getUniqueId());
             saveVanished();
@@ -58,7 +57,7 @@ McmeConnect.getLogger().info("vanish:join is vanished: "+isVanished(player));
     }
     
     public static void quit(McmeProxyPlayer player) {
-McmeConnect.getLogger().info("vanish:quit isVanished: "+isVanished(player));
+//McmeConnect.getLogger().info("vanish:quit isVanished: "+isVanished(player));
         if(isVanished(player)) {
             McmeConnect.getProxy().getPlayers().stream()
                     .filter(VanishHandler::hasVanishSeePermission).forEach(p -> {
@@ -71,7 +70,7 @@ McmeConnect.getLogger().info("vanish:quit isVanished: "+isVanished(player));
     }
     
     public static void vanish(McmeProxyPlayer player) {
-McmeConnect.getLogger().info("vanish: "+player.getUniqueId());
+//McmeConnect.getLogger().info("vanish: "+player.getUniqueId());
         vanishedPlayers.add(player.getUniqueId());
         saveVanished();
         McmeConnect.getProxy().getPlayers().stream()
@@ -79,11 +78,11 @@ McmeConnect.getLogger().info("vanish: "+player.getUniqueId());
                 p.sendMessage(McmeConnect.message(player.getName()+" vanished.", MessageColor.GREEN));
         });
         ConnectionHandler.sendLeaveMessage(player,true);
-        TabViewManager.handlePlayerVanish(player);
+        //TabViewManager.handlePlayerVanish(player);
     }
     
     public static void unvanish(McmeProxyPlayer player) {
-McmeConnect.getLogger().info("unvanish: "+player.getUniqueId());
+//McmeConnect.getLogger().info("unvanish: "+player.getUniqueId());
         vanishedPlayers.remove(player.getUniqueId());
         saveVanished();
         McmeConnect.getProxy().getPlayers().stream()
@@ -91,7 +90,7 @@ McmeConnect.getLogger().info("unvanish: "+player.getUniqueId());
                 p.sendMessage(McmeConnect.message(player.getName()+" unvanished.", MessageColor.GREEN));
         });
         ConnectionHandler.sendJoinMessage(player,true);
-        TabViewManager.handlePlayerUnvanish(player);
+        //TabViewManager.handlePlayerUnvanish(player);
     }
     
     public static boolean isVanished(McmeProxyPlayer player) {
@@ -99,7 +98,7 @@ McmeConnect.getLogger().info("unvanish: "+player.getUniqueId());
     }
 
     public static boolean isVanished(UUID player) {
-McmeConnect.getLogger().info("is vanished: "+player);
+//McmeConnect.getLogger().info("is vanished: "+player);
         return pvSupport && vanishedPlayers.contains(player);
     }
     

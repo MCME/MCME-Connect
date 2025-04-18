@@ -18,6 +18,7 @@ package com.mcmiddleearth.connect.proxy.core.handler;
 
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
+import com.mcmiddleearth.base.core.message.MessageColor;
 import com.mcmiddleearth.base.core.player.McmeProxyPlayer;
 import com.mcmiddleearth.base.core.server.McmeServerInfo;
 import com.mcmiddleearth.base.core.taskScheduling.Callback;
@@ -107,9 +108,9 @@ public class RestartHandler {
                 } catch (IOException ex) {
                     McmeConnect.getProxyPlugin().getMcmeLogger().error("IOException", ex);
                 }
-                McmeConnect.getProxy().stop(McmeConnect.infoMessage("MCME network is restarting."));
+                McmeConnect.getProxy().stop(McmeConnect.message("MCME network is restarting.", MessageColor.GRAY));
             } else {
-                McmeConnect.getProxy().stop(McmeConnect.infoMessage("MCME network is shutting down."));
+                McmeConnect.getProxy().stop(McmeConnect.message("MCME network is shutting down.", MessageColor.GRAY));
             }
         }).schedule(5, TimeUnit.SECONDS);
     }

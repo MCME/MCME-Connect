@@ -18,20 +18,14 @@ package com.mcmiddleearth.connect.proxy.core.handler;
 
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
-import com.mcmiddleearth.base.adventure.AdventureMessage;
 import com.mcmiddleearth.base.core.message.Message;
 import com.mcmiddleearth.base.core.message.MessageColor;
-import com.mcmiddleearth.base.core.player.McmePlayer;
 import com.mcmiddleearth.base.core.player.McmeProxyPlayer;
 import com.mcmiddleearth.base.core.server.McmeServerInfo;
 import com.mcmiddleearth.base.core.taskScheduling.Callback;
-import com.mcmiddleearth.base.velocity.player.VelocityMcmePlayer;
 import com.mcmiddleearth.connect.Channel;
 import com.mcmiddleearth.connect.Permission;
 import com.mcmiddleearth.connect.proxy.core.McmeConnect;
-import com.mcmiddleearth.connect.proxy.velocity.ConnectVelocityPlugin;
-import com.velocitypowered.api.event.player.KickedFromServerEvent;
-import org.checkerframework.checker.units.qual.K;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -140,15 +134,11 @@ public class ConnectionHandler {
     }
 
     public static void handlePlayerLeave(McmeProxyPlayer player) {
-McmeConnect.getLogger().info("handlePlayerLeave. VanishSupport: "+VanishHandler.isPvSupport());
-McmeConnect.getLogger().info("handlePlayerLeave. welcomed: "+welcomedPlayers.contains(player.getUniqueId()));
         if(welcomedPlayers.contains(player.getUniqueId())) {
-McmeConnect.getLogger().info("handlePlayerLeave. 1");
             TpaHandler.removeRequests(player);
             if (!VanishHandler.isPvSupport()) {
                 sendLeaveMessage(player, false);
             } else {
-McmeConnect.getLogger().info("handlePlayerLeave. 2");
                 VanishHandler.quit(player);
             }
             welcomedPlayers.remove(player.getUniqueId());
@@ -166,11 +156,9 @@ McmeConnect.getLogger().info("handlePlayerLeave. 2");
         McmeConnect.getProxyPlugin().getTask( () -> {
             McmeProxyPlayer finalPlayer = McmeConnect.getProxy().getPlayer(playerName);
             if(finalPlayer != null) {
-McmeConnect.getLogger().info("handlePlayerJoin. VanishSupport: "+VanishHandler.isPvSupport());
                 if (!VanishHandler.isPvSupport()) {
                     sendJoinMessage(finalPlayer, false);
                 } else {
-McmeConnect.getLogger().info("handlePlayerjoin. 1");
                     VanishHandler.join(finalPlayer);
                 }
                 welcomedPlayers.add(finalPlayer.getUniqueId());
@@ -183,9 +171,7 @@ McmeConnect.getLogger().info("handlePlayerjoin. 1");
         String server = McmeConnect.getPlayerServer(player);
         if(server == null && LegacyPlayerHandler.getLegacyPlayers().contains(player.getUniqueId())) {
             server = "world";
-McmeConnect.getLogger().info("InitialServer: "+server);
         }
-McmeConnect.getLogger().info("InitialServer: "+server);
         return server;
     }
 

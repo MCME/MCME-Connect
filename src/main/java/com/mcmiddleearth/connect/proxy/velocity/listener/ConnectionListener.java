@@ -17,7 +17,6 @@
 package com.mcmiddleearth.connect.proxy.velocity.listener;
 
 import com.mcmiddleearth.base.adventure.AdventureMessage;
-import com.mcmiddleearth.base.core.message.MessageColor;
 import com.mcmiddleearth.base.velocity.player.VelocityMcmePlayer;
 import com.mcmiddleearth.base.velocity.server.VelocityMcmeProxy;
 import com.mcmiddleearth.base.velocity.server.VelocityMcmeServerInfo;
@@ -49,13 +48,13 @@ public class ConnectionListener {
 
     @Subscribe
     public void onJoin(PostLoginEvent event) {
-McmeConnect.getLogger().info("onJoin: "+event.getPlayer().getUsername());
+//McmeConnect.getLogger().info("onJoin: "+event.getPlayer().getUsername());
         ConnectionHandler.handlePlayerJoin(new VelocityMcmePlayer(event.getPlayer()));
     }
     
     @Subscribe
     public void onLeave(DisconnectEvent event) {
-McmeConnect.getLogger().info("onDiconnect: "+event.getPlayer().getUsername());
+//McmeConnect.getLogger().info("onDiconnect: "+event.getPlayer().getUsername());
         ConnectionHandler.handlePlayerLeave(new VelocityMcmePlayer(event.getPlayer()));
     }
     
@@ -85,7 +84,7 @@ McmeConnect.getLogger().info("onDiconnect: "+event.getPlayer().getUsername());
     
     @Subscribe
     public void onServerConnected(ServerPostConnectEvent event) {
-McmeConnect.getLogger().info("onServerConnected: "+event.getPlayer().getUsername());
+//McmeConnect.getLogger().info("onServerConnected: "+event.getPlayer().getUsername());
         ConnectionHandler.handleServerConnected(new VelocityMcmePlayer(event.getPlayer()),
                         new VelocityMcmeServerInfo(((ConnectVelocityPlugin)McmeConnect.getPlugin()).getProxyServer(),
                                                     event.getPlayer().getCurrentServer().orElseThrow().getServerInfo()));

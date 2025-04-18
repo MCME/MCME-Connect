@@ -23,12 +23,10 @@ import com.mcmiddleearth.connect.util.ConnectUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import java.util.logging.Logger;
 
 /**
  *
@@ -38,7 +36,7 @@ public class PlayerListener implements Listener {
 
     @EventHandler(priority=EventPriority.NORMAL)
     public void onJoin(PlayerJoinEvent event) {
-Logger.getGlobal().info("Player join: "+event.getPlayer().getName());
+//Logger.getGlobal().info("Player join: "+event.getPlayer().getName());
         event.setJoinMessage("");
         new BukkitRunnable(){
             @Override
