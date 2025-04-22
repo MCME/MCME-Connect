@@ -175,8 +175,13 @@ public class ConnectionHandler {
         return server;
     }
 
-    public static KickResult handleKick(McmeProxyPlayer player, String kickServer) {
+    public static KickResult handleKick(McmeProxyPlayer player, String kickServer, Message reason) {
         KickResult result = new KickResult();
+        if(reason.toString().contains("unsupported")) {
+            result.message = reason;
+            result.redirect = false;
+            return result;
+        }
         result.redirect = !kickServer.equals("newplayer");
         if(result.redirect) {
             String server = (kickServer.equalsIgnoreCase("world")?"moria":"world");
@@ -187,12 +192,9 @@ public class ConnectionHandler {
             if(server.equalsIgnoreCase("world")) {
                 server = "mainworld";
             }
-            result.message = McmeConnect
-                    .errorMessage(kickServer + "server is unavailable. You were teleported to "+server+" instead.");
+            result.message = reason.add(" Trying to redirect you to "+server+" server.");
         } else {
-            result.message = McmeConnect
-                            .message("Newplayer server is unavailable, try again in a minute or ask for help at Discord."
-                                    , MessageColor.RED);
+            result.message = reason;
         }
 
         return result;

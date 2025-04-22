@@ -31,11 +31,17 @@ import com.velocitypowered.api.event.player.PlayerChooseInitialServerEvent;
 import com.velocitypowered.api.event.player.ServerPostConnectEvent;
 import com.velocitypowered.api.event.player.ServerPreConnectEvent;
 
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
+
 /**
  *
  * @author Eriol_Eandur
  */
 public class ConnectionListener {
+
+    private final Set<UUID> redirectPlayers = new HashSet<>();
 
     public ConnectionListener() {
         //priorities.add("world");
@@ -85,6 +91,7 @@ public class ConnectionListener {
     @Subscribe
     public void onServerConnected(ServerPostConnectEvent event) {
 //McmeConnect.getLogger().info("onServerConnected: "+event.getPlayer().getUsername());
+        redirectPlayers.remove(event.getPlayer().getUniqueId());
         ConnectionHandler.handleServerConnected(new VelocityMcmePlayer(event.getPlayer()),
                         new VelocityMcmeServerInfo(((ConnectVelocityPlugin)McmeConnect.getPlugin()).getProxyServer(),
                                                     event.getPlayer().getCurrentServer().orElseThrow().getServerInfo()));
@@ -93,14 +100,20 @@ public class ConnectionListener {
     @Subscribe
     public void onKick(KickedFromServerEvent event) {
 //McmeConnect.getLogger().warn("Kicked from: "+event.getServer().getServerInfo().getName());
+//McmeConnect.getLogger().warn("Kicked message: "+event.getServerKickReason().get());
+        AdventureMessage reason = new AdventureMessage();
+        if(event.getServerKickReason().isPresent()) {
+             reason = new AdventureMessage(event.getServerKickReason().orElse(null));
+        }
         ConnectionHandler.KickResult kickResult = ConnectionHandler.handleKick(VelocityMcmeProxy.getPlayer(event.getPlayer()),
-                                                            event.getServer().getServerInfo().getName());
-        if(kickResult.redirect) {
+                                                            event.getServer().getServerInfo().getName(), reason);
+//McmeConnect.getLogger().warn("New message: "+kickResult.message);
+        if(kickResult.redirect && !redirectPlayers.contains(event.getPlayer().getUniqueId())) {
             event.setResult(KickedFromServerEvent.RedirectPlayer
                     .create(((ConnectVelocityPlugin) McmeConnect.getPlugin()).getProxyServer()
                             .getServer(kickResult.redirectServer)
-                            .orElseThrow()));
-            event.getPlayer().sendMessage(((AdventureMessage)kickResult.message).getComponent());
+                            .orElseThrow(), ((AdventureMessage)kickResult.message).getComponent()));
+            redirectPlayers.add(event.getPlayer().getUniqueId());
         } else {
             event.setResult(KickedFromServerEvent.DisconnectPlayer
                     .create(((AdventureMessage)kickResult.message).getComponent()));

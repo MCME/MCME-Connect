@@ -85,12 +85,12 @@ public class PluginMessageHandler {
                     boolean afk = in.readBoolean();
                     McmeProxyPlayer afkPlayer = McmeConnect.getProxy().getPlayer(UUID.fromString(uuid));
                     if(afkPlayer!=null) {
-                        TabViewManager.handleUpdateAfk(afkPlayer, afk);
+                        //TabViewManager.handleUpdateAfk(afkPlayer, afk);
                     }
                     break;
                 case Channel.PLAYER:
                     McmeServerInfo info = messageReceiver.getServerInfo();
-                    PlayerItemManager.sendAllPlayerList(info);
+                    //PlayerItemManager.sendAllPlayerList(info);
                 default:
                     break;
             }
