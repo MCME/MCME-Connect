@@ -177,7 +177,7 @@ public class ConnectionHandler {
 
     public static KickResult handleKick(McmeProxyPlayer player, String kickServer, Message reason) {
         KickResult result = new KickResult();
-        if(reason.toString().contains("unsupported")) {
+        if(reason.toString().contains("unsupported") || reason.toString().toLowerCase().contains("idling")) {
             result.message = reason;
             result.redirect = false;
             return result;
