@@ -11,6 +11,7 @@ import com.mcmiddleearth.connect.bungee.tabList.playerItem.PlayerItemManager;
 import com.mcmiddleearth.connect.proxy.core.McmeConnect;
 
 import java.util.UUID;
+import java.util.logging.Logger;
 
 public class PluginMessageHandler {
 
@@ -32,6 +33,7 @@ public class PluginMessageHandler {
                 }
                 case Channel.TPPOS:
                 {
+Logger.getGlobal().info("PluginMessageHandler: TPPOS");
                     String server = in.readUTF();
                     String sender = in.readUTF();
                     String world = in.readUTF();

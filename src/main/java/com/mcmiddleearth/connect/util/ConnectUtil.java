@@ -51,6 +51,7 @@ public class ConnectUtil {
         out.writeUTF(world);
         out.writeUTF(location.getX()+";"+location.getY()+";"+location.getZ()+";"+location.getYaw()+";"+location.getPitch());
         player.sendPluginMessage(ConnectPlugin.getInstance(), Channel.MAIN, out.toByteArray());
+Logger.getGlobal().info("Sent TPPOS message");
     }
     
     public static void sendMessage(Player sender, String server, String recipient, String message,

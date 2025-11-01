@@ -77,7 +77,8 @@ public class WarpHandler {
     }
     
     public static boolean isWarpCommand(String[] message) {
-        return message.length>1
+        //disabled: feature moved to new MCME-Warps
+        return false  && message.length>1
             && commands.contains(message[0].toLowerCase())
             && !subcommands.contains(message[1].toLowerCase());
     }

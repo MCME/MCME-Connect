@@ -25,6 +25,7 @@ import com.mcmiddleearth.connect.Channel;
 import com.mcmiddleearth.connect.proxy.core.McmeConnect;
 
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
 
 /**
  *
@@ -36,8 +37,10 @@ public class TpposHandler {
                                  String location, Message message) {
         McmeProxyPlayer player = McmeConnect.getProxy().getPlayer(sender);
         if(player!=null) {
+Logger.getGlobal().info("TpposHandler....");
             Callback<Boolean> callback = (connected, error) -> {
                 if(connected) {
+Logger.getGlobal().info("Sending TPPOS to backend...");
                     McmeConnect.getProxyPlugin().getTask( () -> {
                         ByteArrayDataOutput out = ByteStreams.newDataOutput();
                         out.writeUTF(Channel.TPPOS);
@@ -52,6 +55,7 @@ public class TpposHandler {
                     }).schedule(McmeConnect.getConfig().getConnectDelay(), TimeUnit.MILLISECONDS);
                 }
             };
+Logger.getGlobal().info("Player server "+player.getServerInfo().getName()+" - Server: "+server);
             if(!player.getServerInfo().getName().equals(server)) {
                 ConnectionHandler.handleConnectPlayerToServer(sender, server, true, callback);
             } else {

@@ -25,7 +25,7 @@ import java.io.File;
 import java.nio.file.Path;
 import java.util.List;
 
-@Plugin(id = "mcmeconnect", name = "MCME-Connect", version = "2.0.0",
+@Plugin(id = "mcmeconnect", name = "MCME-Connect", version = "2.0.1",
         url = "https://github.com/MCME/MCME-Connect", description = "Plugin to connect MCME servers in a Velocity network",
         authors = {"Eriol_Eandur"})
 public class ConnectVelocityPlugin extends AbstractVelocityPlugin{
@@ -63,7 +63,7 @@ public class ConnectVelocityPlugin extends AbstractVelocityPlugin{
         registerConnectCommand("theme", null);
         registerConnectCommand("survival", Permission.SURVIVAL);
         registerConnectCommand("mvtp", null,"switch");
-        registerConnectCommand("warp", null, "to");
+        //registerConnectCommand("warp", null, "to");
         registerConnectCommand("stop", Permission.STOP);
         registerConnectCommand("restorestats", null);
 

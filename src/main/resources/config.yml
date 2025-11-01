@@ -13,7 +13,9 @@ legacyRedirect:
     from: newplayer
     to: build
 disableMVTP:
-- battle
+  - battle
+fixedSwitch:
+  - hub  900 -30 800 90 0
 serverWatchdog: true
 connectDelay: 200
 premiumVanish: true

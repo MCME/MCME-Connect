@@ -203,7 +203,8 @@ public class CommandHandler {
                                 sendError(player);
                             }
                         } else {
-                            if(!ConnectionHandler.handleConnectPlayerToServer(player.getName(), target, true, (Boolean success, Throwable error) -> {})) {
+                            if (!ConnectionHandler.handleConnectPlayerToServer(player.getName(), target, true, (Boolean success, Throwable error) -> {
+                            })) {
                                 sendError(player);
                             }
                         }
@@ -291,11 +292,11 @@ public class CommandHandler {
                         suggestions.addAll(servers);
                     }
                     break;
-                case "/warp":
+                /*case "/warp":
                     if(args.length == 2 && !WarpHandler.matchesSubcommand(args[1])) {
                         suggestions.addAll(WarpHandler.getSuggestions(args[1],sender));
                     }
-                    break;
+                    break;*/
                 case "/vote":
                     if(args.length == 2) {
                         suggestions.addAll(suggestAllOtherPlayers(sender,args[1]));
