@@ -3,6 +3,7 @@ package com.mcmiddleearth.connect.proxy.core.handler;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import com.mcmiddleearth.base.core.command.McmeCommandSender;
+import com.mcmiddleearth.base.core.message.MessageColor;
 import com.mcmiddleearth.base.core.player.McmeProxyPlayer;
 import com.mcmiddleearth.base.core.server.McmeServerInfo;
 import com.mcmiddleearth.connect.Channel;
@@ -28,7 +29,7 @@ public class CommandHandler {
     public static boolean handleChatEvent(McmeProxyPlayer player, String chatMessage) {
 //McmeConnect.getLogger().info("Command: "+chatMessage);
         String[] message = replaceAlias(chatMessage).split(" ");
-        if(message[0].equalsIgnoreCase("/tp") && message.length>1) {
+       if(message[0].equalsIgnoreCase("/tp") && message.length>1) {
             if(player.hasPermission(Permission.TP)) {
                 if(message.length<3) {
                     McmeProxyPlayer destination = getPlayer(message[1]);
@@ -203,8 +204,19 @@ public class CommandHandler {
                                 sendError(player);
                             }
                         } else {
-                            if(!ConnectionHandler.handleConnectPlayerToServer(player.getName(), target, true, (Boolean success, Throwable error) -> {})) {
-                                sendError(player);
+                            if(McmeConnect.getConfig().isFixedSwitch(target)
+                                    && !(message.length > 2 && message[2].equalsIgnoreCase("return"))) {
+                                String location = McmeConnect.getConfig().getFixedSwitchTarget(target);
+                                if(!TpposHandler.handle(player.getName(),target,target,location,
+                                                        McmeConnect.message("Welcome to '"+target+"'!",
+                                                                                MessageColor.YELLOW))) {
+                                    sendError(player);
+                                }
+                            } else {
+                                if (!ConnectionHandler.handleConnectPlayerToServer(player.getName(), target, true, (Boolean success, Throwable error) -> {
+                                })) {
+                                    sendError(player);
+                                }
                             }
                         }
                     } else {

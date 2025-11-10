@@ -1,12 +1,10 @@
 package com.mcmiddleearth.connect.proxy.core;
 
+import com.google.common.base.Joiner;
 import com.mcmiddleearth.base.core.configuration.YamlConfiguration;
 
 import java.io.File;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class McmeConnectConfig {
 
@@ -94,5 +92,19 @@ public class McmeConnectConfig {
         return config;
     }
 
+    public boolean isFixedSwitch(String target) {
+        return config.getStringList("fixedSwitch").stream()
+                .anyMatch(fixed -> fixed.split(" ")[0].equalsIgnoreCase(target));
+    }
 
+    public String getFixedSwitchTarget(String target) {
+        String location =  config.getStringList("fixedSwitch").stream()
+                               .filter(fixed -> fixed.split(" ")[0].equalsIgnoreCase(target))
+                               .findFirst().orElse(null);
+        if(location != null) {
+            return Joiner.on(";").join(Arrays.copyOfRange(location.split(" "), 1, 6));
+        } else {
+            return null;
+        }
+    }
 }
