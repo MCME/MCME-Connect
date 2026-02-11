@@ -5,7 +5,7 @@ import com.mcmiddleearth.connect.bungee.YamlConfiguration;
 import com.mcmiddleearth.connect.bungee.tabList.playerItem.TabViewPlayerItem;
 import com.mcmiddleearth.connect.bungee.tabList.util.JsonTextUtil;
 import com.mcmiddleearth.connect.bungee.tabList.util.ModerationUtil;
-import com.mcmiddleearth.connect.bungee.vanish.VanishHandler;
+import com.mcmiddleearth.connect.proxy.core.handler.VanishHandler;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
 import net.luckperms.api.model.user.User;
@@ -14,7 +14,6 @@ import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.util.*;
-import java.util.logging.Logger;
 
 public class PlayerItemConfig implements IPlayerItemConfig{
 

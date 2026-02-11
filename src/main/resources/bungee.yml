@@ -1,6 +1,7 @@
 name: ${project.artifactId}
-main: com.mcmiddleearth.connect.bungee.ConnectBungeePlugin
+main: com.mcmiddleearth.connect.proxy.bungee.ConnectBungeePlugin
 version: ${project.version}
+depends: [MCME-Base]
 author: Eriol_Eandur
 
 permissions:

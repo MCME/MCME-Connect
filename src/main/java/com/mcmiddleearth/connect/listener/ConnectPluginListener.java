@@ -52,6 +52,7 @@ public class ConnectPluginListener implements PluginMessageListener {
 
     @Override
     public void onPluginMessageReceived(String channel, Player player, byte[] message) {
+//Logger.getGlobal().info("Connect Plugin Message");
         if (!channel.equals(Channel.MAIN)) {
           return;
         }
@@ -122,6 +123,7 @@ public class ConnectPluginListener implements PluginMessageListener {
             String discordMessage = in.readUTF();
             ConnectUtil.sendDiscord(discordChannel,discordMessage);
         } else if(subchannel.equals(Channel.LEGACY)) {
+//Logger.getGlobal().info("Legacy message");
             String playerName = in.readUTF();
             String target = in.readUTF();
             runAfterArrival(playerName, p -> {
@@ -130,12 +132,14 @@ public class ConnectPluginListener implements PluginMessageListener {
                         ByteArrayDataOutput out = ByteStreams.newDataOutput();
                         out.writeUTF(Channel.CONNECT);
                         out.writeUTF(target);
+//Logger.getGlobal().info("Legacy send target (1): "+target);
                         pp.sendPluginMessage(ConnectPlugin.getInstance(), "BungeeCord", out.toByteArray());
                     });
                 } else {
                     ByteArrayDataOutput out = ByteStreams.newDataOutput();
                     out.writeUTF(Channel.CONNECT);
                     out.writeUTF(target);
+//Logger.getGlobal().info("Legacy send target (2): "+target);
                     p.sendPluginMessage(ConnectPlugin.getInstance(), "BungeeCord", out.toByteArray());
                 }
             });

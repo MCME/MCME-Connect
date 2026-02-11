@@ -30,6 +30,9 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import com.mcmiddleearth.pluginutil.nms.AccessCraftBukkit;
+import github.scarsz.discordsrv.dependencies.jackson.annotation.JsonProperty;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -49,49 +52,11 @@ public class FirstJoinDateUpdater {
                     NBTTag tag = in.readTag();
                     NBTTagCompound bukkitTag = tag.getAsTagCompound().get("bukkit").getAsTagCompound();
                     NBTTagLong firstPlayedTag = bukkitTag.get("firstPlayed").getAsTagLong();
-                    invokeCraftBukkit("entity.CraftPlayer", "setFirstPlayed", 
-                                              new Class[]{long.class}, player, firstPlayedTag.getValue());
+                    AccessCraftBukkit.setPlayerFirstPlayed(player, firstPlayedTag.getValue());
                 } catch (IOException ex) {
                     Logger.getLogger(FirstJoinDateUpdater.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         }
     }
-    
-    //remove methods below after 1.13 update (included in PluginUtils 1.2
-    public static Class<?> getCraftBukkitClass(String name) throws ClassNotFoundException {
-        String version = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
-        return Class.forName("org.bukkit.craftbukkit." + version + "." + name);
-    }
-    
-    public static Object invokeCraftBukkit(String className, String methodName, Class[] argsClasses, 
-                                           Object object, Object... args) {
-        try {
-            Class clazz = getCraftBukkitClass(className);
-            return invoke(clazz,methodName, argsClasses, object, args);
-        } catch (ClassNotFoundException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-            Logger.getLogger(FirstJoinDateUpdater.class.getName()).log(Level.SEVERE, null, ex);
-            return null;
-        }
-    }
-    
-    public static Object invoke(Class<?> clazz, String methodName, Class[] argsClasses, 
-                                Object object, Object... args) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException {
-        if(argsClasses==null) {
-            argsClasses = new Class[args.length];
-            for(int i=0; i<args.length; i++) {
-                argsClasses[i] = args[i].getClass();
-            }
-        }
-        Method method;
-        try {
-            method = clazz.getMethod(methodName, argsClasses);
-        } catch (NoSuchMethodException ex) {
-            method = clazz.getDeclaredMethod(methodName, argsClasses);
-        }
-        return method.invoke(object, args);
-    }
-    
-
-    
 }

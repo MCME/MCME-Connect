@@ -1,8 +1,7 @@
 package com.mcmiddleearth.connect.log;
 
-import com.mcmiddleearth.connect.bungee.ConnectBungeePlugin;
+import com.mcmiddleearth.connect.proxy.bungee.ConnectBungeePlugin;
 import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.ChatEvent;
@@ -13,7 +12,6 @@ import net.md_5.bungee.event.EventHandler;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Logger;
 
 public class BungeeLog extends Log implements Listener {
 

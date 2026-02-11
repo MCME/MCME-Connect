@@ -5,7 +5,7 @@
  */
 package com.mcmiddleearth.connect.bungee.tabList.tabView;
 
-import java.util.Collection;
+import java.util.EnumSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -13,6 +13,7 @@ import com.mcmiddleearth.connect.bungee.tabList.playerItem.TabViewPlayerItem;
 import com.mcmiddleearth.connect.bungee.tabList.tabView.configuration.ITabViewConfig;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.protocol.packet.PlayerListHeaderFooter;
+import net.md_5.bungee.protocol.packet.PlayerListItemUpdate;
 
 /**
  *
@@ -20,6 +21,7 @@ import net.md_5.bungee.protocol.packet.PlayerListHeaderFooter;
  */
 public interface ITabView {
 
+    void handleUpdate(ProxiedPlayer vanillaRecipient, Set<TabViewPlayerItem> tabViewItems, EnumSet<PlayerListItemUpdate.Action> actions);
 
     void handleAddPlayer(ProxiedPlayer vanillaRecipient, Set<TabViewPlayerItem> items);
     

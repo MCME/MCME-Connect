@@ -1,8 +1,7 @@
 package com.mcmiddleearth.connect.bungee.tabList;
 
 import com.mcmiddleearth.connect.Permission;
-import com.mcmiddleearth.connect.bungee.ConnectBungeePlugin;
-import com.mcmiddleearth.connect.bungee.tabList.playerItem.PlayerItemManager;
+import com.mcmiddleearth.connect.proxy.bungee.ConnectBungeePlugin;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.ComponentBuilder;

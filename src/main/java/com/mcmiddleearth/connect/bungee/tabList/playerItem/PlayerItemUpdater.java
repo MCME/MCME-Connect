@@ -4,9 +4,10 @@ import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import com.mcmiddleearth.connect.Channel;
 import com.mcmiddleearth.connect.Permission;
-import com.mcmiddleearth.connect.bungee.ConnectBungeePlugin;
+import com.mcmiddleearth.connect.proxy.bungee.ConnectBungeePlugin;
 import com.mcmiddleearth.connect.bungee.tabList.TabViewCommand;
 import com.mcmiddleearth.connect.bungee.tabList.TabViewManager;
+import com.mcmiddleearth.connect.proxy.core.McmeConnect;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -15,7 +16,6 @@ import net.md_5.bungee.protocol.packet.PlayerListItem;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class PlayerItemUpdater {
@@ -35,7 +35,7 @@ public class PlayerItemUpdater {
 
                 }, 500, TimeUnit.MILLISECONDS);
             }
-        }, 10, ConnectBungeePlugin.getConfig().getInt("TabListUpdateSeconds",2), TimeUnit.SECONDS);
+        }, 10, McmeConnect.getConfig().getRawConfig().getInt("TabListUpdateSeconds",2), TimeUnit.SECONDS);
     }
 
     private static class ServerSwitchInfo {
@@ -63,7 +63,7 @@ if(TabViewCommand.showItems || TabViewCommand.showTabViews) {
                     for (TabViewPlayerItem item : itemMap.values()) {
                         ProxiedPlayer search = ProxyServer.getInstance().getPlayer(item.getUuid());
 
-                        if (search == null || !search.getServer().getInfo().getName().equals(server.getValue().getName())) {
+                        if (search == null || !search.isConnected() || !search.getServer().getInfo().getName().equals(server.getValue().getName())) {
                             PlayerListItem.Item removalItem = new PlayerListItem.Item();
                             removalItem.setUuid(item.getUuid());
                             removal.add(removalItem);
@@ -83,8 +83,8 @@ if(TabViewCommand.showItems || TabViewCommand.showTabViews) {
                     ProxiedPlayer player = ProxyServer.getInstance().getPlayer(uuid);
                     if (player != null && player.isConnected() && !player.getServer().getInfo().getName().equals(server) //get item from server where player was connected previously
                                        && player.hasPermission(Permission.SYNC_GAMEMODE)
-                                       && ConnectBungeePlugin.isGamemodeSyncEnabled(player.getServer().getInfo().getName())
-                                       && ConnectBungeePlugin.isGamemodeSyncEnabled(server)) {
+                                       && McmeConnect.getConfig().isGamemodeSyncEnabled(player.getServer().getInfo().getName())
+                                       && McmeConnect.getConfig().isGamemodeSyncEnabled(server)) {
                         ByteArrayDataOutput out = ByteStreams.newDataOutput();
                         out.writeUTF(Channel.GAMEMODE);
                         out.writeUTF(player.getUniqueId().toString());
@@ -145,7 +145,7 @@ if (TabViewCommand.showItems || TabViewCommand.showTabViews) {
                     }
                 }
             }, 500, TimeUnit.MILLISECONDS);
-        }, 10, ConnectBungeePlugin.getConfig().getInt("TabListUpdateSeconds",2), TimeUnit.SECONDS);
+        }, 10, McmeConnect.getConfig().getRawConfig().getInt("TabListUpdateSeconds",2), TimeUnit.SECONDS);
     }
 
     public void disable() {

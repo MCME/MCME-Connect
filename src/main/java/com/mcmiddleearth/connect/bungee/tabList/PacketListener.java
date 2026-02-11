@@ -9,6 +9,8 @@ import net.md_5.bungee.protocol.PacketWrapper;
 import net.md_5.bungee.protocol.Property;
 import net.md_5.bungee.protocol.packet.PlayerListHeaderFooter;
 import net.md_5.bungee.protocol.packet.PlayerListItem;
+import net.md_5.bungee.protocol.packet.PlayerListItemUpdate;
+import net.md_5.bungee.protocol.packet.PlayerListItemRemove;
 
 import java.util.List;
 import java.util.logging.Level;
@@ -59,7 +61,39 @@ public class PacketListener extends MessageToMessageDecoder<PacketWrapper> {
                         }
                         return;
                     } catch (Throwable th) {
-                        Logger.getLogger(PacketListener.class.getName()).log(Level.SEVERE, "Failed to inject packet listener", th);
+                        Logger.getLogger(PacketListener.class.getName()).log(Level.SEVERE, "Failed to inject PlayerItem packet listener", th);
+                    } finally {
+                        packetWrapper.trySingleRelease();
+                    }
+                } else if (packetWrapper.packet instanceof PlayerListItemUpdate) {
+                    try {
+//Logger.getGlobal().info("Update!");
+                        PlayerListItemUpdate playerListPacket = (PlayerListItemUpdate) packetWrapper.packet;
+                        PacketLogger.receivePacked(playerListPacket);
+                        TabViewManager.handleUpdate(player, playerListPacket);
+                        /*for(PlayerListItemUpdate.Action action: playerListPacket.getActions()) {
+                            switch (action) {
+                                case ADD_PLAYER:
+                                //printListItemPacket(component + ".add", ((PlayerListItem) packetWrapper.packet));
+                                TabViewManager.handleAddPlayerPacket(player, playerListPacket);
+                                break;
+                                case UPDATE_GAMEMODE:
+                                    //printListItemPacket(component + ".gamemode", ((PlayerListItem) packetWrapper.packet));
+                                    TabViewManager.handleUpdateGamemodePacket(player, playerListPacket);
+                                    break;
+                                case UPDATE_LATENCY:
+                                    //printListItemPacket(component + ".latency", ((PlayerListItem) packetWrapper.packet));
+                                    TabViewManager.handleUpdateLatencyPacket(player, playerListPacket);
+                                    break;
+                                case UPDATE_DISPLAY_NAME:
+                                    //printListItemPacket(component + ".display", ((PlayerListItem) packetWrapper.packet));
+                                    TabViewManager.handleUpdateDisplayNamePacket(player, playerListPacket);
+                                    break;
+                            }
+                        }*/
+                        return;
+                    } catch (Throwable th) {
+                        Logger.getLogger(PacketListener.class.getName()).log(Level.SEVERE, "Failed to inject PlayerItemUpdate packet listener", th);
                     } finally {
                         packetWrapper.trySingleRelease();
                     }
@@ -68,7 +102,16 @@ public class PacketListener extends MessageToMessageDecoder<PacketWrapper> {
                         TabViewManager.handleHeaderFooter(player,(PlayerListHeaderFooter)packetWrapper.packet);
                         return;
                     } catch (Throwable th) {
-                        Logger.getLogger(PacketListener.class.getName()).log(Level.SEVERE, "Failed to inject packet listener", th);
+                        Logger.getLogger(PacketListener.class.getName()).log(Level.SEVERE, "Failed to inject PlayerListHeaderFooter packet listener", th);
+                    } finally {
+                        packetWrapper.trySingleRelease();
+                    }
+                } else if(packetWrapper.packet instanceof PlayerListItemRemove) {
+                    try {
+                        //drop Packet as handled by PlayerItemUpdater
+                        return;
+                    } catch (Throwable th) {
+                        Logger.getLogger(PacketListener.class.getName()).log(Level.SEVERE, "Failed to inject PlayerListItemRemove packet listener", th);
                     } finally {
                         packetWrapper.trySingleRelease();
                     }

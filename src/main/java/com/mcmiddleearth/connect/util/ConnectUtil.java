@@ -23,6 +23,7 @@ import com.mcmiddleearth.connect.Channel;
 import com.mcmiddleearth.connect.ConnectPlugin;
 import github.scarsz.discordsrv.DiscordSRV;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.Guild;
+import github.scarsz.discordsrv.dependencies.jda.api.entities.Role;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.TextChannel;
 import github.scarsz.discordsrv.util.DiscordUtil;
 import org.bukkit.Location;
@@ -62,6 +63,7 @@ public class ConnectUtil {
         out.writeUTF(Channel.MESSAGE);
         out.writeUTF(server);
         out.writeUTF(recipient);
+        //todo: Create and serialize MCME-Base Message
         out.writeUTF(message);
         out.writeInt(delay);
         sender.sendPluginMessage(ConnectPlugin.getInstance(), Channel.MAIN, out.toByteArray());
@@ -106,9 +108,14 @@ public class ConnectUtil {
                 String[] split = message.split(" ");
                 for(int i = 0; i < split.length; i++) {
                     if (split[i].startsWith("@")) {
-                        String tag = DiscordUtil.convertMentionsFromNames(split[i], guild);
-                        if (tag != null && !tag.equals("")) {
-                            split[i] = tag;
+                        String mention = getRoleMention(split[i], guild);
+                        if(mention !=null) {
+                            split[i] = mention;
+                        } else {
+                            String tag = DiscordUtil.convertMentionsFromNames(split[i], guild);
+                            if (tag != null && !tag.equals("")) {
+                                split[i] = tag;
+                            }
                         }
                     }
                 }
@@ -120,6 +127,15 @@ public class ConnectUtil {
         } else {
             Logger.getLogger("ConnectPlugin").warning("ConnectPlugin: DiscordSRV plugin not found.");
         }
+    }
+
+    private static String getRoleMention(String message, Guild guild) {
+        for(Role role: guild.getRoles()) {
+            if(role.getName().equalsIgnoreCase(message.substring(1))) {
+                return role.getAsMention();
+            }
+        }
+        return null;
     }
 }
 
