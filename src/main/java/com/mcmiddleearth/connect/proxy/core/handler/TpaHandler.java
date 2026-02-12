@@ -25,6 +25,7 @@ import com.mcmiddleearth.connect.proxy.core.McmeConnect;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -34,7 +35,7 @@ import java.util.stream.Collectors;
  */
 public class TpaHandler {
     
-    private final static List<TpaRequest> requests = new ArrayList<>();
+    private final static List<TpaRequest> requests = new CopyOnWriteArrayList<>();
    
     private final static long REQUEST_PERIOD = 120000; // in milliseconds
     
@@ -46,6 +47,10 @@ public class TpaHandler {
             return;
         }
         removeRequestsForSender(sender);
+        if(requests.size() >= 100) {
+            sender.sendMessage(McmeConnect.message("Too many pending teleport requests. Please try again later.", MessageColor.RED));
+            return;
+        }
         requests.add(new TpaRequest(sender, target));
         sender.sendMessage(McmeConnect.message("Teleport request sent to ", MessageColor.GOLD)
                                 .add(McmeConnect.message(target.getName(),MessageColor.RED))
