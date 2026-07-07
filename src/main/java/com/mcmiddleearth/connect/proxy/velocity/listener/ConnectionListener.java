@@ -73,7 +73,7 @@ public class ConnectionListener {
         } else if(!event.getOriginalServer().equals(event.getResult().getServer().orElse(null))) {
             joinReason = "SERVER_DOWN_REDIRECT";
         } else {
-            joinReason = "UNKNOWN";
+            joinReason = "PLUGIN";
         }
 //McmeConnect.getLogger().info("reason: "+joinReason);
         ConnectionHandler.handleServerConnect(new VelocityMcmePlayer(event.getPlayer()), joinReason);
@@ -92,9 +92,11 @@ public class ConnectionListener {
     public void onServerConnected(ServerPostConnectEvent event) {
 //McmeConnect.getLogger().info("onServerConnected: "+event.getPlayer().getUsername());
         redirectPlayers.remove(event.getPlayer().getUniqueId());
-        ConnectionHandler.handleServerConnected(new VelocityMcmePlayer(event.getPlayer()),
+        event.getPlayer().getCurrentServer().ifPresent(serverConnection ->
+            ConnectionHandler.handleServerConnected(new VelocityMcmePlayer(event.getPlayer()),
                         new VelocityMcmeServerInfo(((ConnectVelocityPlugin)McmeConnect.getPlugin()).getProxyServer(),
-                                                    event.getPlayer().getCurrentServer().orElseThrow().getServerInfo()));
+                                                    serverConnection.getServerInfo()))
+        );
     }
 
     @Subscribe
@@ -109,10 +111,14 @@ public class ConnectionListener {
                                                             event.getServer().getServerInfo().getName(), reason);
 //McmeConnect.getLogger().warn("New message: "+kickResult.message);
         if(kickResult.redirect && !redirectPlayers.contains(event.getPlayer().getUniqueId())) {
-            event.setResult(KickedFromServerEvent.RedirectPlayer
-                    .create(((ConnectVelocityPlugin) McmeConnect.getPlugin()).getProxyServer()
-                            .getServer(kickResult.redirectServer)
-                            .orElseThrow(), ((AdventureMessage)kickResult.message).getComponent()));
+            ((ConnectVelocityPlugin) McmeConnect.getPlugin()).getProxyServer()
+                    .getServer(kickResult.redirectServer)
+                    .ifPresentOrElse(
+                        registeredServer -> event.setResult(KickedFromServerEvent.RedirectPlayer
+                            .create(registeredServer, ((AdventureMessage)kickResult.message).getComponent())),
+                        () -> event.setResult(KickedFromServerEvent.DisconnectPlayer
+                            .create(((AdventureMessage)kickResult.message).getComponent()))
+                    );
             redirectPlayers.add(event.getPlayer().getUniqueId());
         } else {
             event.setResult(KickedFromServerEvent.DisconnectPlayer

@@ -12,7 +12,6 @@ import com.mcmiddleearth.connect.bungee.tabList.tabView.ServerTabView;
 import com.mcmiddleearth.connect.bungee.tabList.tabView.configuration.IPlayerItemConfig;
 import com.mcmiddleearth.connect.bungee.tabList.tabView.configuration.PlayerItemConfig;
 import com.mcmiddleearth.connect.bungee.tabList.tabView.configuration.ViewableTabViewConfig;
-import com.mcmiddleearth.connect.proxy.core.McmeConnect;
 import net.md_5.bungee.ServerConnection;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -28,6 +27,7 @@ import net.md_5.bungee.protocol.packet.PlayerListItemUpdate;
 
 import java.io.File;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -35,10 +35,10 @@ import java.util.stream.Collectors;
 public class TabViewManager implements Listener {
 
     //Available views for each server
-    private final static Map<String, ITabView> tabViews = new HashMap<>();
-    private final static Map<String, IPlayerItemConfig> playerItemConfigs= new HashMap<>();
-    private final static Map<String, String> headers = new HashMap<>();
-    private final static Map<String, String> footers = new HashMap<>();
+    private final static Map<String, ITabView> tabViews = new ConcurrentHashMap<>();
+    private final static Map<String, IPlayerItemConfig> playerItemConfigs= new ConcurrentHashMap<>();
+    private final static Map<String, String> headers = new ConcurrentHashMap<>();
+    private final static Map<String, String> footers = new ConcurrentHashMap<>();
 
     private final static String viewConfigFileName = "views.yml";
     private final static String playerItemConfigFileName = "playerItems.yml";
