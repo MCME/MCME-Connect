@@ -18,6 +18,7 @@ import com.mcmiddleearth.connect.proxy.velocity.listener.PluginMessageListener;
 import com.mcmiddleearth.connect.proxy.velocity.listener.VanishListener;
 import com.mcmiddleearth.connect.proxy.velocity.tablist.TabListListener;
 import com.mcmiddleearth.connect.proxy.velocity.tablist.TabListService;
+import com.mcmiddleearth.connect.proxy.velocity.tablist.TabNewsCommand;
 import com.velocitypowered.api.command.CommandManager;
 import com.velocitypowered.api.command.CommandMeta;
 import com.velocitypowered.api.plugin.Plugin;
@@ -95,6 +96,9 @@ public class ConnectVelocityPlugin extends AbstractVelocityPlugin{
         List<String> servers = getProxyServer().getAllServers().stream()
                 .map(registeredServer -> registeredServer.getServerInfo().getName()).toList();
         servers.forEach(name -> registerConnectCommand(name, Permission.WORLD+"."+name));
+
+        CommandMeta tabNewsMeta = commandManager.metaBuilder("tabnews").plugin(this).build();
+        commandManager.register(tabNewsMeta, new TabNewsCommand(announcementStore, tabListService));
 
         getMcmeProxy().getConsole().sendMessage(createMessage().add("Enabled on Velocity proxy!"));
     }
