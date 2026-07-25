@@ -41,7 +41,7 @@ public class VelocityTabRenderer {
             int slot = i + 1;
             UUID id = slotId(slot);
             desired.add(id);
-            tabList.addEntry(buildEntry(id, slot, grid.get(i)));
+            tabList.addEntry(buildEntry(tabList, id, slot, grid.get(i)));
         }
 
         for (TabListEntry existing : tabList.getEntries()) {
@@ -52,12 +52,18 @@ public class VelocityTabRenderer {
         }
     }
 
-    private TabListEntry buildEntry(UUID id, int slot, TabRow row) {
+    /**
+     * Builds one entry bound to {@code tabList}. The binding is mandatory — {@code Builder.build()}
+     * throws {@code IllegalStateException} without it — and it is also why entries must never be
+     * shared between viewers (PaperMC/Velocity#1455).
+     */
+    private TabListEntry buildEntry(TabList tabList, UUID id, int slot, TabRow row) {
         List<GameProfile.Property> properties = new ArrayList<>();
         if (row.iconTexture() != null && !row.iconTexture().isEmpty()) {
             properties.add(new GameProfile.Property("textures", row.iconTexture(), ""));
         }
         return TabListEntry.builder()
+                .tabList(tabList)
                 .profile(new GameProfile(id, "slot" + slot, properties))
                 .displayName(row.displayName())
                 .latency(-1)
