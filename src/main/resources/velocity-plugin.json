@@ -1,7 +1,7 @@
 {
   "id":"mcme-connect",
   "name":"MCME-Connect",
-  "version":"2.0.0",
+  "version":"${project.version}",
   "url":"https://github.com/MCME/MCME-Connect",
   "description":"Plugin to connect MCME servers in a Velocity network",
   "authors":["Eriol_Eandur"],

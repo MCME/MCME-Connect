@@ -86,6 +86,7 @@
                 <directory>${basedir}/src/main/resources</directory>
                 <includes>
                     <include>plugin.yml</include>
+                    <include>velocity-plugin.json</include>
                     <include>views.yml</include>
                     <include>config.yml</include>
                 </includes>
