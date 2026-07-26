@@ -58,4 +58,14 @@ class AnnouncementProviderTest {
         List<TabRow> rows = provider(dir, 50, "a", "b", "c", "d", "e").rows(3);
         assertEquals(3, rows.size());
     }
+
+    @Test
+    void testRendersNothingWhenMaxRowsDisablesTheSection(@TempDir Path dir) {
+        assertTrue(provider(dir, 0, "a", "b").rows(20).isEmpty());
+    }
+
+    @Test
+    void testRendersNothingWhenRegionHasNoRoomForAnEntry(@TempDir Path dir) {
+        assertTrue(provider(dir, 5, "a", "b").rows(1).isEmpty());
+    }
 }

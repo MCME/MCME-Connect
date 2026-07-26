@@ -32,6 +32,8 @@ public class TabListService {
 
     private final long startNanos = System.nanoTime();
 
+    private volatile boolean renderFailureLogged = false;
+
     public TabListService(ProxyServer proxyServer, Logger logger,
                           ReservedPanelConfig config, AnnouncementStore store) {
         this.proxyServer = proxyServer;
@@ -55,14 +57,34 @@ public class TabListService {
     }
 
     public void applyTo(Player viewer) {
-        renderer.apply(viewer, assemble());
-        viewer.sendPlayerListHeaderAndFooter(
-                Component.text("Players in the MCME network"),
-                Component.empty());
+        applyGuarded(viewer, assemble());
     }
 
     public void applyToAll() {
-        proxyServer.getAllPlayers().forEach(this::applyTo);
+        List<TabRow> grid = assemble();
+        for (Player viewer : proxyServer.getAllPlayers()) {
+            applyGuarded(viewer, grid);
+        }
+    }
+
+    /**
+     * Renders one viewer, containing any failure to that viewer. Without this a player who
+     * disconnects mid-iteration would abort the loop and starve every viewer after them — and
+     * because the task repeats, it would do so on every tick.
+     */
+    private void applyGuarded(Player viewer, List<TabRow> grid) {
+        try {
+            renderer.apply(viewer, grid);
+            viewer.sendPlayerListHeaderAndFooter(
+                    Component.text("Players in the MCME network"),
+                    Component.empty());
+        } catch (RuntimeException e) {
+            if (!renderFailureLogged) {
+                renderFailureLogged = true;
+                logger.warn("Tab list render failed for {}; skipping this viewer: {}",
+                        viewer.getUsername(), e.toString());
+            }
+        }
     }
 
     private List<TabRow> assemble() {

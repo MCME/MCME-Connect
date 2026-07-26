@@ -67,7 +67,9 @@ public class VelocityTabRenderer {
                 .profile(new GameProfile(id, "slot" + slot, properties))
                 .displayName(row.displayName())
                 .latency(-1)
-                .gameMode(3)
+                // Survival, not spectator: the vanilla client italicises spectators' tab names,
+                // which would silently override the admin-authored styling on every row.
+                .gameMode(0)
                 .listed(true)
                 .listOrder(SlotGrid.listOrderFor(slot))
                 .showHat(false)

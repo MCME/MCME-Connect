@@ -9,6 +9,11 @@ import java.util.List;
 /**
  * Stores staff-authored announcement strings as plain text. Content only — styling is applied at
  * render time by {@link RowTemplate}, so a moderator never writes markup.
+ *
+ * <p>All accessors are synchronized: the re-assert scheduler, the join listener and the
+ * {@code /tabnews} command all reach this object from different threads. Unsynchronized reads of an
+ * {@link ArrayList} being structurally modified can observe trailing nulls, and concurrent
+ * {@link #save()} calls would interleave into the same truncating writer and corrupt the file.
  */
 public class AnnouncementStore {
 
@@ -28,12 +33,14 @@ public class AnnouncementStore {
         }
     }
 
-    /** @return a defensive copy, oldest first */
-    public List<String> list() {
+    /**
+     * @return a defensive copy, oldest first
+     */
+    public synchronized List<String> list() {
         return new ArrayList<>(announcements);
     }
 
-    public void add(String text) {
+    public synchronized void add(String text) {
         announcements.add(text);
         save();
     }
@@ -42,7 +49,7 @@ public class AnnouncementStore {
      * @param oneBasedIndex  position as shown by {@code /tabnews list}
      * @return false if out of range
      */
-    public boolean remove(int oneBasedIndex) {
+    public synchronized boolean remove(int oneBasedIndex) {
         if (oneBasedIndex < 1 || oneBasedIndex > announcements.size()) {
             return false;
         }

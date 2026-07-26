@@ -19,9 +19,13 @@ public class TabNewsCommand implements SimpleCommand {
         this.service = service;
     }
 
+    /**
+     * Gates the whole command unconditionally — never per-subcommand, which is how an auth bypass
+     * was introduced elsewhere in this codebase.
+     */
     @Override
     public boolean hasPermission(Invocation invocation) {
-        return invocation.source().hasPermission(Permission.TABVIEW);
+        return invocation.source().hasPermission(Permission.TABNEWS);
     }
 
     @Override

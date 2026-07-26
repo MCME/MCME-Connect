@@ -62,4 +62,9 @@ class TipsProviderTest {
         List<TabRow> rows = provider(new AtomicLong(5), 0, "a", "b").rows(20);
         assertEquals("a", plain(rows.get(1)));
     }
+
+    @Test
+    void testRendersNothingWhenRegionHasNoRoomForATip() {
+        assertTrue(provider(new AtomicLong(0), 30, "a", "b").rows(1).isEmpty());
+    }
 }

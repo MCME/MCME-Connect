@@ -36,7 +36,9 @@ public class TipsProvider implements TabContentProvider {
 
     @Override
     public List<TabRow> rows(int regionSize) {
-        if (tips.isEmpty() || regionSize <= 0) {
+        // Needs room for the header AND at least one tip; a lone section header spends a slot to
+        // say nothing. Reachable when announcements have consumed all but one reserved slot.
+        if (tips.isEmpty() || regionSize < 2) {
             return List.of();
         }
         List<TabRow> rows = new ArrayList<>();

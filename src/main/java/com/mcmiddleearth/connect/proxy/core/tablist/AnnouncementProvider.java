@@ -32,7 +32,10 @@ public class AnnouncementProvider implements TabContentProvider {
     @Override
     public List<TabRow> rows(int regionSize) {
         List<String> stored = store.list();
-        if (stored.isEmpty() || regionSize <= 0) {
+        // Needs room for the header AND at least one entry: a lone section header is worse than
+        // nothing, since it spends a slot to say nothing. maxRows <= 0 is how an admin disables
+        // the section.
+        if (stored.isEmpty() || regionSize < 2 || maxRows <= 0) {
             return List.of();
         }
         List<TabRow> rows = new ArrayList<>();

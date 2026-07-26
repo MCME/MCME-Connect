@@ -14,7 +14,7 @@ public class SafeContentProvider implements TabContentProvider {
     private final TabContentProvider delegate;
     private final Consumer<String> errorLogger;
 
-    private boolean alreadyLogged = false;
+    private volatile boolean alreadyLogged = false;
 
     public SafeContentProvider(String name, TabContentProvider delegate, Consumer<String> errorLogger) {
         this.name = name;

@@ -60,21 +60,31 @@ public class ConnectVelocityPlugin extends AbstractVelocityPlugin{
         getProxyServer().getEventManager().register(this, new ConnectionListener());
         getProxyServer().getEventManager().register(this, new VanishListener());
 
-        YamlConfiguration connectConfig = new YamlConfiguration(configFile);
-        ReservedPanelConfig reservedConfig =
-                ReservedPanelConfig.parse(connectConfig.getSection("reserved"));
-        AnnouncementStore announcementStore =
-                new AnnouncementStore(new File(getDataFolder(), "announcements.yml"));
-        TabListService tabListService =
-                new TabListService(getProxyServer(), logger, reservedConfig, announcementStore);
+        // Tab list setup is isolated: enable() has no caller-side try/catch, so an unreadable
+        // announcements.yml or a malformed reserved: section would otherwise abort the rest of
+        // enable() and silently leave every command below unregistered.
+        AnnouncementStore announcementStore = null;
+        TabListService tabListService = null;
+        try {
+            YamlConfiguration connectConfig = new YamlConfiguration(configFile);
+            ReservedPanelConfig reservedConfig =
+                    ReservedPanelConfig.parse(connectConfig.getSection("reserved"));
+            announcementStore = new AnnouncementStore(new File(getDataFolder(), "announcements.yml"));
+            tabListService =
+                    new TabListService(getProxyServer(), logger, reservedConfig, announcementStore);
 
-        getProxyServer().getEventManager().register(this, new TabListListener(tabListService));
+            getProxyServer().getEventManager().register(this, new TabListListener(tabListService));
 
-        int updateSeconds = Math.max(1, connectConfig.getInt("tabListUpdateSeconds", 2));
-        getProxyServer().getScheduler().buildTask(this, tabListService::applyToAll)
-                .delay(updateSeconds, TimeUnit.SECONDS)
-                .repeat(updateSeconds, TimeUnit.SECONDS)
-                .schedule();
+            int updateSeconds = Math.max(1, connectConfig.getInt("tabListUpdateSeconds", 2));
+            getProxyServer().getScheduler().buildTask(this, tabListService::applyToAll)
+                    .delay(updateSeconds, TimeUnit.SECONDS)
+                    .repeat(updateSeconds, TimeUnit.SECONDS)
+                    .schedule();
+        } catch (RuntimeException e) {
+            announcementStore = null;
+            tabListService = null;
+            logger.error("Tab list disabled: could not initialise it from config", e);
+        }
 
         CommandManager commandManager = getProxyServer().getCommandManager();
         CommandMeta commandMeta = commandManager.metaBuilder("reboot").plugin(this).build();
