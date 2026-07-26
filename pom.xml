@@ -87,8 +87,6 @@
                 <includes>
                     <include>plugin.yml</include>
                     <include>views.yml</include>
-                    <include>playerItems.yml</include>
-                    <include>headerFooter.yml</include>
                     <include>config.yml</include>
                 </includes>
             </resource>
