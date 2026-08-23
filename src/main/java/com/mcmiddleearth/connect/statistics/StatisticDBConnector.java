@@ -20,8 +20,6 @@ import com.mcmiddleearth.connect.ConnectPlugin;
 
 import java.sql.*;
 import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -63,8 +61,6 @@ public class StatisticDBConnector {
 
     private PreparedStatement selectPlayerId;
 
-
-    private ExecutorService executor = Executors.newSingleThreadExecutor();
 
     private BukkitTask keepAliveTask;
     private boolean connected;
@@ -359,9 +355,10 @@ public class StatisticDBConnector {
                                         player.setStatistic(stat, value);
                                     }
                                 }
-                                result.close();
                             } catch (SQLException ex) {
                                 Logger.getLogger(StatisticDBConnector.class.getName()).log(Level.SEVERE, null, ex);
+                            } finally {
+                                try { result.close(); } catch (SQLException ignored) {}
                             }
                         }
                     }.runTask(ConnectPlugin.getInstance());
@@ -412,9 +409,10 @@ public class StatisticDBConnector {
                                             }
                                         }
                                     } while(matResult.next());
-                                    matResult.close();
                                 } catch (SQLException ex) {
                                     Logger.getLogger(StatisticDBConnector.class.getName()).log(Level.SEVERE, null, ex);
+                                } finally {
+                                    try { matResult.close(); } catch (SQLException ignored) {}
                                 }
                             }
                         }.runTask(ConnectPlugin.getInstance());
@@ -439,9 +437,10 @@ public class StatisticDBConnector {
                                             }
                                         }
                                     } while(entityResult.next());
-                                    entityResult.close();
                                 } catch (SQLException ex) {
                                     Logger.getLogger(StatisticDBConnector.class.getName()).log(Level.SEVERE, null, ex);
+                                } finally {
+                                    try { entityResult.close(); } catch (SQLException ignored) {}
                                 }
                             }
                         }.runTask(ConnectPlugin.getInstance());
@@ -558,21 +557,36 @@ public class StatisticDBConnector {
     }
 
     private synchronized void updateMatStat(int id, Statistic stat, Material mat, int value) throws SQLException {
-        String statement = "UPDATE mcmeconnect_statistic_material SET " + getName(stat)
-                + " = " + value + " WHERE id = " + id + " AND material = '" + mat.name() + "'";
-        dbConnection.createStatement().execute(statement);
+        String column = getName(stat);
+        String sql = "UPDATE mcmeconnect_statistic_material SET " + column
+                + " = ? WHERE id = ? AND material = ?";
+        try (PreparedStatement ps = dbConnection.prepareStatement(sql)) {
+            ps.setInt(1, value);
+            ps.setInt(2, id);
+            ps.setString(3, mat.name());
+            ps.executeUpdate();
+        }
     }
 
     private synchronized void insertMatStat(int id, Statistic stat, Material mat, int value) throws SQLException {
-        String statement = "INSERT INTO mcmeconnect_statistic_material (id, material, "+getName(stat)
-                +") VALUES (" + id + ", '"+ mat.name()+"', "+ value + ")";
-        dbConnection.createStatement().execute(statement);
+        String column = getName(stat);
+        String sql = "INSERT INTO mcmeconnect_statistic_material (id, material, " + column
+                + ") VALUES (?, ?, ?)";
+        try (PreparedStatement ps = dbConnection.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            ps.setString(2, mat.name());
+            ps.setInt(3, value);
+            ps.executeUpdate();
+        }
     }
 
     private synchronized void deleteMatStat(int id, String mat) throws SQLException {
-        String statement = "DELETE FROM mcmeconnect_statistic_material "
-                +"WHERE id = "+id+" AND material = '"+ mat + "'";
-        dbConnection.createStatement().execute(statement);
+        String sql = "DELETE FROM mcmeconnect_statistic_material WHERE id = ? AND material = ?";
+        try (PreparedStatement ps = dbConnection.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            ps.setString(2, mat);
+            ps.executeUpdate();
+        }
     }
 
     private synchronized void saveEntityStatsSync(Player player, Statistic stat,
@@ -603,15 +617,27 @@ public class StatisticDBConnector {
     }
 
     private synchronized void updateEntityStat(int id, Statistic stat, EntityType entity, int value) throws SQLException {
-        String statement = "UPDATE mcmeconnect_statistic_entity SET " + stat.name()
-                + " = " + value + " WHERE id = " + id + " AND entity = '" + entity.name() + "'";
-        dbConnection.createStatement().execute(statement);
+        String column = stat.name();
+        String sql = "UPDATE mcmeconnect_statistic_entity SET " + column
+                + " = ? WHERE id = ? AND entity = ?";
+        try (PreparedStatement ps = dbConnection.prepareStatement(sql)) {
+            ps.setInt(1, value);
+            ps.setInt(2, id);
+            ps.setString(3, entity.name());
+            ps.executeUpdate();
+        }
     }
 
     private synchronized void insertEntityStat(int id, Statistic stat, EntityType entity, int value) throws SQLException {
-        String statement = "INSERT INTO mcmeconnect_statistic_entity (id, entity, " + stat.name()
-                + ") VALUES (" + id + ", '" + entity.name() + "', " + value + ")";
-        dbConnection.createStatement().execute(statement);
+        String column = stat.name();
+        String sql = "INSERT INTO mcmeconnect_statistic_entity (id, entity, " + column
+                + ") VALUES (?, ?, ?)";
+        try (PreparedStatement ps = dbConnection.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            ps.setString(2, entity.name());
+            ps.setInt(3, value);
+            ps.executeUpdate();
+        }
     }
 
     private synchronized int getPlayerId(UUID uuid) throws SQLException {

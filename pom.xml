@@ -8,9 +8,11 @@
     <packaging>jar</packaging>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <!-- Build with JDK 25 (to reference paper-api 26.1.2 / mcme-base 2.0.0, both Java-25 bytecode),
+             but emit Java 21 bytecode: maven-shade-plugin 3.5.3's ASM can't read major-version 69.
+             Connect runs fine on the Java 25 server (forward compatible). -->
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
-        <bungeecord.version>1.21-R0.1-SNAPSHOT</bungeecord.version>
     </properties>
     <build>
         <plugins>
@@ -21,6 +23,13 @@
                 <configuration>
                     <source>21</source>
                     <target>21</target>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>com.velocitypowered</groupId>
+                            <artifactId>velocity-api</artifactId>
+                            <version>4.1.0-SNAPSHOT</version>
+                        </path>
+                    </annotationProcessorPaths>
                 </configuration>
             </plugin>
             <plugin>
@@ -75,13 +84,22 @@
                     <include>views.yml</include>
                     <include>playerItems.yml</include>
                     <include>headerFooter.yml</include>
-                    <include>bungee.yml</include>
                     <include>config.yml</include>
                 </includes>
             </resource>
         </resources>
     </build>
     <repositories>
+        <!-- In-project file repo for deps unavailable from remote repos (see libs/README.md).
+             Currently hosts com.github.mryurihi:tbnbt:0.1.4, whose upstream source was deleted. -->
+        <repository>
+            <id>in-project-libs</id>
+            <url>file://${project.basedir}/libs</url>
+        </repository>
+        <repository>
+            <id>papermc</id>
+            <url>https://repo.papermc.io/repository/maven-public/</url>
+        </repository>
         <repository>
             <id>cubekrowd-repo</id>
             <url>https://mavenrepo.cubekrowd.net/artifactory/repo/</url>
@@ -112,7 +130,7 @@
         <dependency>
             <groupId>io.papermc.paper</groupId>
             <artifactId>paper-api</artifactId>
-            <version>1.21.4-R0.1-SNAPSHOT</version>
+            <version>[26.2.build,)</version>
             <scope>provided</scope>
             <exclusions>
                 <exclusion>
@@ -186,58 +204,11 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <dependency>
-            <groupId>net.md-5</groupId>
-            <artifactId>bungeecord-api</artifactId>
-            <version>${bungeecord.version}</version>
-            <scope>provided</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>net.md-5</groupId>
-                    <artifactId>brigadier</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>net.md-5</groupId>
-            <artifactId>bungeecord-proxy</artifactId>
-            <version>${bungeecord.version}</version>
-            <scope>provided</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>net.md-5</groupId>
-                    <artifactId>brigadier</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>net.md-5</groupId>
-            <artifactId>bungeecord-event</artifactId>
-            <version>${bungeecord.version}</version>
-            <scope>provided</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>net.md-5</groupId>
-                    <artifactId>brigadier</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>net.md-5</groupId>
-            <artifactId>bungeecord-protocol</artifactId>
-            <version>${bungeecord.version}</version>
-            <scope>provided</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>net.md-5</groupId>
-                    <artifactId>brigadier</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
+        <!-- BungeeCord deps removed with the Bungee layer (Velocity-only network; Waterfall discontinued). -->
         <dependency>
             <groupId>com.velocitypowered</groupId>
             <artifactId>velocity-api</artifactId>
-            <version>3.4.0-SNAPSHOT</version>
+            <version>4.1.0-SNAPSHOT</version>
             <scope>provided</scope>
             <exclusions>
                 <exclusion>
@@ -279,7 +250,7 @@
         <dependency>
             <groupId>com.mcmiddleearth</groupId>
             <artifactId>mcme-base</artifactId>
-            <version>1.1-SNAPSHOT</version>
+            <version>2.0.0</version>
             <scope>provided</scope>
             <exclusions>
                 <exclusion>

@@ -17,11 +17,14 @@ disableMVTP:
 serverWatchdog: true
 connectDelay: 200
 premiumVanish: true
+# Base path for restorestats feature (leave empty to disable)
+# restorestatsBasePath: /media/ssd1/bungee-mcme/
 tabListUpdateSeconds: 2
 myWarp:
   enabled: true
-  user: mywarp
-  password: mywarp
+  # Configure database credentials before enabling
+  user: changeme
+  password: changeme
   dbName: mywarp
   ip: localhost
   port: 3306
@@ -31,9 +34,10 @@ themedbuildWorld: themedbuilds
 syncStatistic: true
 discordChannel: Global
 database:
-  dbName: development
-  user: development
-  password: development
+  dbName: changeme
+  # Configure database credentials before enabling syncStatistic
+  user: changeme
+  password: changeme
   ip: localhost
   port: 3306
   

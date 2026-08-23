@@ -60,7 +60,7 @@ public class RestartScheduler {
                         if (day.equals(restartDays.get(i))) {
                             LocalDateTime restart = restartTimes.get(i).atDate(LocalDate.now());
                             if (now.isBefore(restart.minusMinutes(9))
-                                    && now.isAfter(restart.minusMinutes(10))) {
+                                    && now.isAfter(restart.minusMinutes(11))) {
                                 restartScheduled = true;
                                 Bukkit.broadcastMessage(ChatColor.BOLD + "Server will restart in 10 minutes.");
                                 runLater(() -> Bukkit.broadcastMessage(ChatColor.BOLD + "Server will restart in 5 minutes."), 300);
@@ -86,17 +86,21 @@ public class RestartScheduler {
             for (String line : restarts) {
                 String[] split = line.split(" ");
                 if (split.length > 1) {
-                    if (split[0].equalsIgnoreCase("all")) {
-                        LocalTime time = LocalTime.parse(split[1]);
-                        for (DayOfWeek day : DayOfWeek.values()) {
+                    try {
+                        if (split[0].equalsIgnoreCase("all")) {
+                            LocalTime time = LocalTime.parse(split[1]);
+                            for (DayOfWeek day : DayOfWeek.values()) {
+                                restartDays.add(day);
+                                restartTimes.add(time);
+                            }
+                        } else {
+                            DayOfWeek day = DayOfWeek.valueOf(split[0].toUpperCase());
+                            LocalTime time = LocalTime.parse(split[1]);
                             restartDays.add(day);
                             restartTimes.add(time);
                         }
-                    } else {
-                        DayOfWeek day = DayOfWeek.valueOf(split[0]);
-                        LocalTime time = LocalTime.parse(split[1]);
-                        restartDays.add(day);
-                        restartTimes.add(time);
+                    } catch(IllegalArgumentException | java.time.format.DateTimeParseException e) {
+                        ConnectPlugin.getInstance().getLogger().warning("Invalid restart schedule entry: '" + line + "' - " + e.getMessage());
                     }
                 }
             }
