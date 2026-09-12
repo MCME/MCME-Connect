@@ -8,7 +8,7 @@
     <packaging>jar</packaging>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <!-- Build with JDK 25 (to reference paper-api 26.1.2 / mcme-base 2.0.0, both Java-25 bytecode),
+        <!-- Build with JDK 25 (to reference paper-api 26.2 / mcme-base 2.0.1, both Java-25 bytecode),
              but emit Java 21 bytecode: maven-shade-plugin 3.5.3's ASM can't read major-version 69.
              Connect runs fine on the Java 25 server (forward compatible). -->
         <maven.compiler.source>21</maven.compiler.source>
@@ -86,7 +86,6 @@
                 <directory>${basedir}/src/main/resources</directory>
                 <includes>
                     <include>plugin.yml</include>
-                    <include>velocity-plugin.json</include>
                     <include>views.yml</include>
                     <include>config.yml</include>
                 </includes>
@@ -134,7 +133,9 @@
         <dependency>
             <groupId>io.papermc.paper</groupId>
             <artifactId>paper-api</artifactId>
-            <version>[26.2.build,)</version>
+            <!-- Pinned to a concrete build. The open-ended range [26.2.build,) started resolving to
+                 26.3 pre-release builds once Paper published them; bump this deliberately. -->
+            <version>26.2.build.123-stable</version>
             <scope>provided</scope>
             <exclusions>
                 <exclusion>

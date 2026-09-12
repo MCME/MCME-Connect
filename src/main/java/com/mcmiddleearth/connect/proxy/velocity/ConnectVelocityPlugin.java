@@ -21,6 +21,7 @@ import com.mcmiddleearth.connect.proxy.velocity.tablist.TabListService;
 import com.mcmiddleearth.connect.proxy.velocity.tablist.TabNewsCommand;
 import com.velocitypowered.api.command.CommandManager;
 import com.velocitypowered.api.command.CommandMeta;
+import com.velocitypowered.api.plugin.Dependency;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
@@ -32,9 +33,12 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+// velocity-plugin.json is generated from this annotation at compile time (annotation processor
+// path in pom.xml), so keep version in sync with the pom.
 @Plugin(id = "mcmeconnect", name = "MCME-Connect", version = "2.0.0",
         url = "https://github.com/MCME/MCME-Connect", description = "Plugin to connect MCME servers in a Velocity network",
-        authors = {"Eriol_Eandur"})
+        authors = {"Eriol_Eandur"},
+        dependencies = {@Dependency(id = "mcme-base")})
 public class ConnectVelocityPlugin extends AbstractVelocityPlugin{
 
     private final Logger logger;
