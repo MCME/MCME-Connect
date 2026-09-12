@@ -1,7 +1,7 @@
 name: ${project.artifactId}
 main: com.mcmiddleearth.connect.ConnectPlugin
 version: ${project.version}
-description: Connecting MCME servers in a BungeeCord
+description: Connects MCME servers across the Velocity network
 load: POSTWORLD
 api-version: 1.20
 depend: [MCME-Base]

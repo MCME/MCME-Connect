@@ -1,4 +1,4 @@
-#bungee
+# proxy (Velocity) settings
 
 # synchronization of gamemode between servers, defaults to false
 syncGamemode:
@@ -29,7 +29,7 @@ myWarp:
   ip: localhost
   port: 3306
   
-#spigot
+# backend (Paper) settings
 themedbuildWorld: themedbuilds
 syncStatistic: true
 discordChannel: Global
