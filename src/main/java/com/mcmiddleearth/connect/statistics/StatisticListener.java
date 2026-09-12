@@ -39,14 +39,19 @@ public class StatisticListener implements Listener {
         new BukkitRunnable() {
             @Override
             public void run() {
-                ConnectPlugin.getStatisticStorage().loadStaticstic(event.getPlayer(),player -> 
-                    ConnectPlugin.getStatisticStorage().saveStatistic(player));
+                if(ConnectPlugin.getStatisticStorage() == null) return;
+                ConnectPlugin.getStatisticStorage().loadStaticstic(event.getPlayer(),player -> {
+                    if(ConnectPlugin.getStatisticStorage() != null) {
+                        ConnectPlugin.getStatisticStorage().saveStatistic(player);
+                    }
+                });
             }
         }.runTaskLater(ConnectPlugin.getInstance(), 80);
     }
     
     @EventHandler(priority = EventPriority.MONITOR)
     public void onStatisticIncrease(PlayerStatisticIncrementEvent event) {
+        if(ConnectPlugin.getStatisticStorage() == null) return;
         Statistic stat = event.getStatistic();
         switch(stat.getType()) {
             case BLOCK:
@@ -66,7 +71,9 @@ public class StatisticListener implements Listener {
     
     @EventHandler(priority=EventPriority.NORMAL)
     public void onQuit(PlayerQuitEvent event) {
-        ConnectPlugin.getStatisticStorage().saveStatistic(event.getPlayer());
+        if(ConnectPlugin.getStatisticStorage() != null) {
+            ConnectPlugin.getStatisticStorage().saveStatistic(event.getPlayer());
+        }
     }
     
 }

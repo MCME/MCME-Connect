@@ -22,10 +22,9 @@ import com.mcmiddleearth.connect.Permission;
 import com.mcmiddleearth.connect.proxy.core.McmeConnect;
 
 import java.io.*;
-import java.util.HashSet;
-import java.util.Scanner;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  *
@@ -35,7 +34,7 @@ public class VanishHandler {
     
     private static boolean pvSupport;
     
-    private static final Set<UUID> vanishedPlayers = new HashSet<>();
+    private static final Set<UUID> vanishedPlayers = ConcurrentHashMap.newKeySet();
     
     private static final File vanishFile = new File(McmeConnect.getProxyPlugin().getDataFolder(),"vanished.uid");
     
@@ -103,28 +102,35 @@ public class VanishHandler {
     }
     
     public static void saveVanished() {
-        if(!vanishFile.exists()) {
-            try {
-                vanishFile.createNewFile();
-            } catch (IOException ex) {
-                McmeConnect.getProxyPlugin().getMcmeLogger().error( "IOException", ex);
-            }
-        }
-        try(PrintWriter out = new PrintWriter(new FileWriter(vanishFile))) {
-            vanishedPlayers.forEach(uuid -> out.println(uuid.toString()));
+        java.nio.file.Path tempFile = vanishFile.toPath().resolveSibling(vanishFile.getName() + ".tmp");
+        try {
+            java.util.List<String> lines = new java.util.ArrayList<>();
+            vanishedPlayers.forEach(uuid -> lines.add(uuid.toString()));
+            java.nio.file.Files.write(tempFile, lines);
+            java.nio.file.Files.move(tempFile, vanishFile.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING,
+                    java.nio.file.StandardCopyOption.ATOMIC_MOVE);
         } catch (IOException ex) {
-            McmeConnect.getProxyPlugin().getMcmeLogger().error( "IOException", ex);
+            McmeConnect.getProxyPlugin().getMcmeLogger().error("IOException", ex);
+            try {
+                java.nio.file.Files.deleteIfExists(tempFile);
+            } catch (IOException ignored) {}
         }
     }
     
     public static void loadVanished() {
         vanishedPlayers.clear();
-        try(Scanner scanner = new Scanner(vanishFile)) {
-            while(scanner.hasNext()) {
-                vanishedPlayers.add(UUID.fromString(scanner.nextLine()));
-            }
-        } catch (FileNotFoundException ex) {
+        if(!vanishFile.exists()) {
             McmeConnect.getProxyPlugin().getMcmeLogger().warn("No vanished player file found.");
+            return;
+        }
+        try {
+            java.nio.file.Files.readAllLines(vanishFile.toPath()).forEach(line -> {
+                if(!line.trim().isEmpty()) {
+                    vanishedPlayers.add(UUID.fromString(line.trim()));
+                }
+            });
+        } catch (IOException ex) {
+            McmeConnect.getProxyPlugin().getMcmeLogger().error("IOException", ex);
         }
     }
 

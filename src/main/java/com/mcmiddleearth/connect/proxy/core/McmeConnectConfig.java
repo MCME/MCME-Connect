@@ -18,6 +18,7 @@ public class McmeConnectConfig {
     private final String legacyRedirectFrom;
     private final String legacyRedirectTo;
     private final Set<String> noMVTP = new HashSet<>();
+    private final String restorestatsBasePath;
 
     public static final String FILE_NAME = "config.yml";
 
@@ -34,6 +35,7 @@ public class McmeConnectConfig {
         isServerWatchdogEnabled = config.getBoolean("serverWatchdog", true);
         noMVTP.addAll(config.getStringList("disableMVTP"));
         connectDelay = config.getInt("connectDelay",2000);
+        restorestatsBasePath = config.getString("restorestatsBasePath", "");
     }
 
     public boolean isGamemodeSyncEnabled(String server) {
@@ -106,5 +108,9 @@ public class McmeConnectConfig {
         } else {
             return null;
         }
+    }
+
+    public String getRestorestatsBasePath() {
+        return restorestatsBasePath;
     }
 }

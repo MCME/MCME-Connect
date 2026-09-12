@@ -29,6 +29,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashSet;
@@ -45,18 +46,30 @@ public class RestorestatsHandler {
 
     private static final Set<UUID> blacklist = new HashSet<>();
     
-    //private static String bungeeBase = "/home/devserver/dev-bungee/";
-    private static final String bungeeBase = "/media/ssd1/bungee-mcme/";
-    
-    private static final String backupFolder = bungeeBase+"oldplayerstats-data/backupOfRestoredPlayerdata";
-    private static final String newplayerServerFolder = bungeeBase+"servers-mcme/newplayer/newplayer";
-    private static final String restoreFolder = bungeeBase+"oldplayerstats-data";
-    
-    private static final String serverPlayerStats = bungeeBase+"servers-mcme/"+"<server>/<world>/stats";
+    private static String getBasePath() {
+        String path = McmeConnect.getConfig().getRestorestatsBasePath();
+        if(path.isEmpty()) {
+            McmeConnect.getLogger().warn("restorestatsBasePath is not configured in config.yml. Restorestats feature is disabled.");
+            return null;
+        }
+        if(!path.endsWith("/")) {
+            path = path + "/";
+        }
+        return path;
+    }
     
     public static void handle(McmeProxyPlayer player, String[] message) {
         boolean joinOnly = message.length>1 && message[1].equalsIgnoreCase("joinDateOnly");
         boolean restoreAll = message.length>1 && message[1].equalsIgnoreCase("allStats");
+        String bungeeBase = getBasePath();
+        if(bungeeBase == null) {
+            player.sendMessage(McmeConnect.errorMessage("Restorestats feature is not configured. Please contact an admin."));
+            return;
+        }
+        String backupFolder = bungeeBase + "oldplayerstats-data/backupOfRestoredPlayerdata";
+        String newplayerServerFolder = bungeeBase + "servers-mcme/newplayer/newplayer";
+        String restoreFolder = bungeeBase + "oldplayerstats-data";
+        String serverPlayerStats = bungeeBase + "servers-mcme/" + "<server>/<world>/stats";
         if(!joinOnly && !restoreAll) {
             player.sendMessage(McmeConnect.infoMessage(
                     "This command will reset your playerstats to the values you had at Nov 2nd 2019 when the MCME Bungee network was implemented. "
@@ -132,21 +145,29 @@ public class RestorestatsHandler {
             try (Connection dbConnection = DriverManager.getConnection(
                     "jdbc:mysql://"+dbIp+":"+port+"/"+dbName,
                     dbUser, dbPassword)) {
-                ResultSet result = dbConnection.createStatement()
-                        .executeQuery("SELECT id FROM mcmeconnect_statistic "
-                                + "WHERE uuid = '"+player.getUniqueId().toString()+"'");
-                if(result.first()) {
-                    int id = result.getInt(1);
-                    result.close();
-                    dbConnection.createStatement()
-                            .execute("DELETE FROM mcmeconnect_statistic "
-                                    + "WHERE uuid = '"+player.getUniqueId().toString()+"'");
-                    dbConnection.createStatement()
-                            .execute("DELETE FROM mcmeconnect_statistic_entity "
-                                    + "WHERE id = "+id);
-                    dbConnection.createStatement()
-                            .execute("DELETE FROM mcmeconnect_statistic_material "
-                                    + "WHERE id = "+id);
+                try (PreparedStatement selectStmt = dbConnection.prepareStatement(
+                        "SELECT id FROM mcmeconnect_statistic WHERE uuid = ?")) {
+                    selectStmt.setString(1, player.getUniqueId().toString());
+                    ResultSet result = selectStmt.executeQuery();
+                    if(result.first()) {
+                        int id = result.getInt(1);
+                        result.close();
+                        try (PreparedStatement deleteStats = dbConnection.prepareStatement(
+                                "DELETE FROM mcmeconnect_statistic WHERE uuid = ?")) {
+                            deleteStats.setString(1, player.getUniqueId().toString());
+                            deleteStats.executeUpdate();
+                        }
+                        try (PreparedStatement deleteEntity = dbConnection.prepareStatement(
+                                "DELETE FROM mcmeconnect_statistic_entity WHERE id = ?")) {
+                            deleteEntity.setInt(1, id);
+                            deleteEntity.executeUpdate();
+                        }
+                        try (PreparedStatement deleteMat = dbConnection.prepareStatement(
+                                "DELETE FROM mcmeconnect_statistic_material WHERE id = ?")) {
+                            deleteMat.setInt(1, id);
+                            deleteMat.executeUpdate();
+                        }
+                    }
                 }
             }
         } catch (SQLException ex) {

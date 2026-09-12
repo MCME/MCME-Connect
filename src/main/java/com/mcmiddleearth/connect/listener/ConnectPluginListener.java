@@ -96,10 +96,15 @@ public class ConnectPluginListener implements PluginMessageListener {
             if(recipient.equals(Channel.ALL)) {
                 players.addAll(Bukkit.getOnlinePlayers());
             } else {
-                players.add(Bukkit.getPlayer(recipient));
+                Player target = Bukkit.getPlayer(recipient);
+                if(target != null) {
+                    players.add(target);
+                }
             }
             players.forEach(p -> {
-                p.sendTitle(title, subtitle, intro, show, extro);
+                if(p != null) {
+                    p.sendTitle(title, subtitle, intro, show, extro);
+                }
             });
         } else if (subchannel.equals(Channel.COMMAND)) {
             String recipient = in.readUTF();
@@ -115,7 +120,9 @@ public class ConnectPluginListener implements PluginMessageListener {
                     spawn = ((MultiverseCore)Bukkit.getPluginManager().getPlugin("Multiverse-Core"))
                         .getMVWorldManager().getMVWorld(p.getWorld().getName())
                         .getSpawnLocation().clone();
-                } catch (NullPointerException ex) {}
+                } catch (NullPointerException ex) {
+                    Logger.getLogger("ConnectPluginListener").warning("Failed to get Multiverse spawn location: " + ex.getMessage());
+                }
                 p.teleport(spawn);//.add(0.5,0,0.5));
             });
         } else if(subchannel.equals(Channel.DISCORD)) {
@@ -191,6 +198,7 @@ public class ConnectPluginListener implements PluginMessageListener {
         } else if(subchannel.equals(Channel.GAMEMODE)) {
             Player p = Bukkit.getPlayer(UUID.fromString(in.readUTF()));
             short gm = in.readShort();
+            if(p == null) return;
 //Logger.getLogger("ConnectPluginListener").info("receiveGamemode: "+p.getName()+" "+gm+" ");
             switch(gm) {
                 case 0:

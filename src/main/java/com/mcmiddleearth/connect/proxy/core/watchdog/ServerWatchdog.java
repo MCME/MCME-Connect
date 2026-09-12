@@ -22,8 +22,8 @@ import com.mcmiddleearth.base.core.taskScheduling.Task;
 import com.mcmiddleearth.connect.Permission;
 import com.mcmiddleearth.connect.proxy.core.McmeConnect;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -34,9 +34,9 @@ public class ServerWatchdog {
 
     Task watchdog;
 
-    List<String> downList = new ArrayList<>();
-    
-    List<String> upList = new ArrayList<>();
+    List<String> downList = new CopyOnWriteArrayList<>();
+
+    List<String> upList = new CopyOnWriteArrayList<>();
     
     
     public ServerWatchdog() {

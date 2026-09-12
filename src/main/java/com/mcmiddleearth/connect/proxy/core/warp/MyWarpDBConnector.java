@@ -243,23 +243,32 @@ public class MyWarpDBConnector {
         if(!worldFile.exists()) {
             return;
         }
-        try(Scanner scanner = new Scanner(worldFile)) {
-            worldUUID.clear();
-            while(scanner.hasNext()) {
-                String[] line = scanner.nextLine().split(";");
-                worldUUID.put(line[0], line[1]);
-            }
-        } catch (FileNotFoundException ex) {
-            McmeConnect.getProxyPlugin().getMcmeLogger().error("FileNotFoundException", ex);
-
+        worldUUID.clear();
+        try {
+            java.nio.file.Files.readAllLines(worldFile.toPath()).forEach(entry -> {
+                String[] parts = entry.split(";");
+                if(parts.length >= 2) {
+                    worldUUID.put(parts[0], parts[1]);
+                }
+            });
+        } catch (IOException ex) {
+            McmeConnect.getProxyPlugin().getMcmeLogger().error("IOException", ex);
         }
     }
     
     private void saveWorldUUIDs() {
-        try(PrintWriter fw = new PrintWriter(new FileWriter(worldFile))) {
-            worldUUID.forEach((key, value) -> fw.println(key + ";" + value));
+        java.nio.file.Path tempFile = worldFile.toPath().resolveSibling(worldFile.getName() + ".tmp");
+        try {
+            java.util.List<String> lines = new java.util.ArrayList<>();
+            worldUUID.forEach((key, value) -> lines.add(key + ";" + value));
+            java.nio.file.Files.write(tempFile, lines);
+            java.nio.file.Files.move(tempFile, worldFile.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING,
+                    java.nio.file.StandardCopyOption.ATOMIC_MOVE);
         } catch (IOException ex) {
             McmeConnect.getProxyPlugin().getMcmeLogger().error("IOException", ex);
+            try {
+                java.nio.file.Files.deleteIfExists(tempFile);
+            } catch (IOException ignored) {}
         }
     }
 

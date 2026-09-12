@@ -28,6 +28,7 @@ import com.mcmiddleearth.connect.Permission;
 import com.mcmiddleearth.connect.proxy.core.McmeConnect;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -36,15 +37,18 @@ import java.util.concurrent.TimeUnit;
  */
 public class ConnectionHandler {
 
-    private static final Map<UUID, String> connectReasons = new HashMap<>();
+    private static final Map<UUID, String> connectReasons = new ConcurrentHashMap<>();
 
     private static final ArrayList<UUID> welcomedPlayers = new ArrayList<>();
 
     public static boolean handleConnectPlayerToServer(String sender, String server, boolean welcomeMsg, Callback<Boolean> callback) {
 //McmeConnect.getLogger().info("ConnectionHandler");
         McmeProxyPlayer source = McmeConnect.getProxy().getPlayer(sender);
+        if(source == null) {
+            return false;
+        }
         McmeServerInfo target = McmeConnect.getProxy().getServerInfo(server);
-        if(target!=null && !source.getServerInfo().getName().equals(server)) {
+        if(target!=null && source.getServerInfo() != null && !source.getServerInfo().getName().equals(server)) {
             if(welcomeMsg) {
                 ChatMessageHandler.handle(server, sender, McmeConnect.message("Welcome to '"+server+"'!",
                                                                                 MessageColor.YELLOW),
@@ -65,17 +69,19 @@ public class ConnectionHandler {
                 .forEach(p -> p.sendMessage(McmeConnect.message(player.getName()+" joined the game.",
                                                                 MessageColor.YELLOW)));
         McmeConnect.getProxyPlugin().getTask( () -> {
-            Iterator<McmeProxyPlayer> it = McmeConnect.getProxy().getPlayers().iterator();
-            if(it.hasNext()) {
-                McmeProxyPlayer other = it.next();
-                if(other.getServerInfo()==null) {
-                    return;
+            McmeProxyPlayer messenger = null;
+            for(McmeProxyPlayer p : McmeConnect.getProxy().getPlayers()) {
+                if(p.getServerInfo() != null) {
+                    messenger = p;
+                    break;
                 }
+            }
+            if(messenger != null) {
                 ByteArrayDataOutput out = ByteStreams.newDataOutput();
                 out.writeUTF(Channel.DISCORD);
                 out.writeUTF("Global");
                 out.writeUTF(":bangbang: **"+player.getName()+" joined the game.**");
-                other.getServerInfo().sendPluginMessage(Channel.MAIN, out.toByteArray(),true);
+                messenger.getServerInfo().sendPluginMessage(Channel.MAIN, out.toByteArray(),true);
             }
         }).schedule(McmeConnect.getConfig().getConnectDelay(), TimeUnit.MILLISECONDS);
     }
@@ -116,13 +122,12 @@ public class ConnectionHandler {
     public static void handleServerConnected(McmeProxyPlayer player, McmeServerInfo destination) {
         McmeConnect.getProxyPlugin().getTask( () -> {
             McmeConnect.setPlayerServer(player, destination.getName());
-            String reason = connectReasons.get(player.getUniqueId());
+            String reason = connectReasons.remove(player.getUniqueId());
             if(reason!=null) {
 //McmeConnect.getLogger().info("ConnectReason: "+reason);
                 if(reason.equals("JOIN_PROXY")) {
                     LegacyPlayerHandler.handle(player, destination.getName());
                 }
-                connectReasons.remove(player.getUniqueId());
                 ByteArrayDataOutput out = ByteStreams.newDataOutput();
                 out.writeUTF(Channel.JOIN);
                 out.writeUTF(player.getName());

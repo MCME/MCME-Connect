@@ -64,12 +64,12 @@ public class RestartHandler {
         }
         if(servers.size()>0) {
             String next = servers.get(0);
-            while(servers.remove(next));
+            servers.removeAll(List.of(next));
             if(next.equals("proxy")) {
                 if(servers.size()>0) {
                     servers.add(next);
                     next = servers.get(0);
-                    while(servers.remove(next));
+                    servers.removeAll(List.of(next));
                 } else {
                     restartProxy(shutdown);
                     return;

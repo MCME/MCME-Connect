@@ -6,8 +6,6 @@ import com.mcmiddleearth.base.core.message.Message;
 import com.mcmiddleearth.base.core.player.McmeProxyPlayer;
 import com.mcmiddleearth.base.core.server.McmeServerInfo;
 import com.mcmiddleearth.connect.Channel;
-import com.mcmiddleearth.connect.bungee.tabList.TabViewManager;
-import com.mcmiddleearth.connect.bungee.tabList.playerItem.PlayerItemManager;
 import com.mcmiddleearth.connect.proxy.core.McmeConnect;
 
 import java.util.UUID;
@@ -19,6 +17,10 @@ public class PluginMessageHandler {
                                               McmeProxyPlayer messageReceiver,
                                               byte[] data) {
         if(channel.equals(Channel.MAIN)) {
+            if(messageSender == null) {
+                McmeConnect.getLogger().warn("Rejected plugin message on channel " + channel + " from non-server source");
+                return true;
+            }
             ByteArrayDataInput in = ByteStreams.newDataInput(data);
             String subchannel = in.readUTF();
             switch (subchannel) {
@@ -71,11 +73,18 @@ public class PluginMessageHandler {
                     break;
                 }
                 case Channel.RESTART:
+                {
                     boolean shutdown = in.readBoolean();
                     String player = in.readUTF();
                     String[] servers = in.readUTF().split(" ");
-                    RestartHandler.handle(McmeConnect.getProxy().getPlayer(player), servers, shutdown);
+                    McmeProxyPlayer restartPlayer = McmeConnect.getProxy().getPlayer(player);
+                    if(restartPlayer != null && restartPlayer.hasPermission("mcmeconnect.restart")) {
+                        RestartHandler.handle(restartPlayer, servers, shutdown);
+                    } else {
+                        McmeConnect.getLogger().warn("Rejected RESTART request from player " + player + " - insufficient permissions");
+                    }
                     break;
+                }
                 case Channel.SERVER_INFO:
                     String server = messageSender.getName();
                     McmeConnect.getServerInformation(server).updateFromPluginMessage(in);
@@ -89,8 +98,9 @@ public class PluginMessageHandler {
                     }
                     break;
                 case Channel.PLAYER:
-                    McmeServerInfo info = messageReceiver.getServerInfo();
+                    //McmeServerInfo info = messageReceiver.getServerInfo();
                     //PlayerItemManager.sendAllPlayerList(info);
+                    break;
                 default:
                     break;
             }
