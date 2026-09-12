@@ -4,6 +4,8 @@
 .mtj.tmp/
 *.class
 *.jar
+# Exception: the vendored in-project Maven repository (see libs/README.md)
+!libs/**/*.jar
 *.war
 *.ear
 *.nar
