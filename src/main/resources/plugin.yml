@@ -5,7 +5,7 @@ description: Connects MCME servers across the Velocity network
 load: POSTWORLD
 api-version: 1.20
 depend: [MCME-Base]
-softdepend: [PremiumVanish, DiscordSRV]
+softdepend: [PremiumVanish, DiscordSRV, PluginUtils]
 
 commands:
     restart:

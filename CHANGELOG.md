@@ -29,6 +29,9 @@ MCME-Base 2.0.1-SNAPSHOT on the proxy and on every backend.
   processor path in the pom). It now declares the dependency on `mcme-base`, so Velocity always
   loads MCME-Base first instead of relying on directory order.
 - Default database credentials are `changeme` placeholders instead of real-looking values.
+- PluginUtils dependency moved from 1.9.0 (unpublished, built against Paper 1.21.4 NMS) to
+  2.0.2 from JitPack, built for Paper 26.2. `plugin.yml` now soft-depends on PluginUtils so it
+  loads first when present.
 - A malformed `reserved:` section or `announcements.yml` disables the tab list panel and logs the
   cause instead of aborting the rest of plugin start-up.
 
@@ -37,6 +40,8 @@ MCME-Base 2.0.1-SNAPSHOT on the proxy and on every backend.
   and the BungeeCord dependencies are gone.
 - The obsolete Bungee tab-view resources (`views.yml`, `playerItems.yml`, `headerFooter.yml`,
   `tabList.yml`). `views.yml` was still being packaged although nothing read it.
+- Unused dependencies on SuperVanish, LuckPerms and SnakeYAML, and the dead CubeKrowd and
+  Multiverse repository entries.
 
 ### Fixed
 - SQL injection: queries that include player-supplied values in the statistics, restorestats and
@@ -59,6 +64,9 @@ MCME-Base 2.0.1-SNAPSHOT on the proxy and on every backend.
   a fresh clone builds.
 - Paper API pinned to a concrete 26.2 build. The open-ended `[26.2.build,)` range had started
   resolving to 26.3 pre-release builds.
+- Dependencies resolve through the MCME Maven repository (`repo.mcmiddleearth.com`,
+  Reposilite) with the upstream repositories as fallbacks. GitHub Actions builds and tests every
+  push and turns a `v*` tag into a GitHub Release.
 
 ### Upgrade notes
 - Deploy MCME-Base 2.0.1-SNAPSHOT (built from the MCME-Base repository) before this version. The

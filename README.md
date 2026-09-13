@@ -23,7 +23,7 @@ BungeeCord/Waterfall support was removed in 3.0.0. The network runs on Velocity 
 | Velocity | 4.1.0 line (compiled against `velocity-api 4.1.0-SNAPSHOT`) |
 | Java at runtime | 25, as run on the network; the jar itself is Java 21 bytecode |
 | MCME-Base | 2.0.1-SNAPSHOT or newer, on the proxy and on every backend |
-| Backend, optional | PremiumVanish or SuperVanish, DiscordSRV, LuckPerms, EssentialsX, Multiverse-Core; PluginUtils for first-join date sync |
+| Backend, optional | PremiumVanish, DiscordSRV, Multiverse-Core, EssentialsX (AFK status in the tab list); PluginUtils 2.0.2 or newer for first-join date sync |
 | Proxy, optional | a MyWarp database for `/warp` |
 
 ## Building
@@ -31,27 +31,22 @@ BungeeCord/Waterfall support was removed in 3.0.0. The network runs on Velocity 
 The build needs **JDK 25** because the Paper and MCME-Base APIs are Java 25 bytecode, but it emits
 Java 21 bytecode (see the comment in `pom.xml`).
 
-1. MCME-Base is not on a public Maven repository. Build and install it first:
+```bash
+mvn clean verify
+```
 
-   ```bash
-   git clone https://github.com/MCME/MCME-Base.git && cd MCME-Base && mvn install
-   ```
+This runs the unit tests and produces the shaded `target/MCME-Connect-<version>.jar`.
 
-2. Build Connect:
-
-   ```bash
-   mvn clean verify
-   ```
-
-   This runs the unit tests and produces the shaded `target/MCME-Connect-<version>.jar`.
-
-   Maven prints an error line about `dependencies.dependency.systemPath` for
-   `org.bukkit:craftbukkit:jar` while reading the published PluginUtils 1.9.0 POM. It is
-   harmless: Maven marks that POM invalid, skips its transitive dependencies, and the build
-   still succeeds.
+Dependencies, MCME-Base included, resolve from the MCME Maven repository at
+`https://repo.mcmiddleearth.com` (deployment in the private [q220/maven-repo](https://github.com/q220/maven-repo)):
+`releases` and `snapshots` hold the MCME libraries, `mirror` caches every upstream repository the
+build uses, and the upstreams stay in the pom as fallbacks. Nothing needs a local `mvn install`.
 
 `libs/` is an in-project Maven repository for the vendored `tbnbt` library, whose upstream source
 was deleted; see `libs/README.md`.
+
+GitHub Actions builds and tests every push and pull request and uploads the jar as a workflow
+artifact.
 
 ## Configuration
 
@@ -72,6 +67,9 @@ worth knowing:
 
 1. Set the new version in `pom.xml` **and** in the `@Plugin` annotation of
    `ConnectVelocityPlugin`. The Velocity descriptor (`velocity-plugin.json`) is generated from that
-   annotation at compile time, so the two must match.
-2. Add a section to `CHANGELOG.md`.
-3. Run `mvn clean verify`, tag the commit `vX.Y.Z`, and attach the shaded jar to a GitHub release.
+   annotation at compile time, so the two must match. Update `minecraft.version` in the pom if the
+   target Minecraft version changed.
+2. Add a section to `CHANGELOG.md` headed `## [X.Y.Z] - YYYY-MM-DD`.
+3. Push a tag `vX.Y.Z` on the release commit. GitHub Actions checks the tag against the pom
+   version, builds and tests, and creates the GitHub Release "version X.Y.Z for mc <minecraft.version>"
+   with the shaded jar, its SHA-256 and the CHANGELOG section as notes.
