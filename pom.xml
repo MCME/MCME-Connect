@@ -115,12 +115,6 @@
             <id>mcme-mirror</id>
             <url>https://repo.mcmiddleearth.com/mirror</url>
         </repository>
-        <!-- In-project file repo for the vendored tbnbt (see libs/README.md). Retired once tbnbt
-             is published to mcme-releases. -->
-        <repository>
-            <id>in-project-libs</id>
-            <url>file://${project.basedir}/libs</url>
-        </repository>
         <!-- Upstream fallbacks, consulted only when the mirror cannot serve an artifact. -->
         <repository>
             <id>papermc</id>
@@ -238,7 +232,7 @@
         <dependency>
             <groupId>com.mcmiddleearth</groupId>
             <artifactId>mcme-base</artifactId>
-            <version>2.0.1-SNAPSHOT</version>
+            <version>2.0.1</version>
             <scope>provided</scope>
             <exclusions>
                 <exclusion>

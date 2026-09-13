@@ -22,7 +22,7 @@ BungeeCord/Waterfall support was removed in 3.0.0. The network runs on Velocity 
 | Paper | 26.2 (compiled against `paper-api 26.2.build.123-stable`) |
 | Velocity | 4.1.0 line (compiled against `velocity-api 4.1.0-SNAPSHOT`) |
 | Java at runtime | 25, as run on the network; the jar itself is Java 21 bytecode |
-| MCME-Base | 2.0.1-SNAPSHOT or newer, on the proxy and on every backend |
+| MCME-Base | 2.0.1 or newer, on the proxy and on every backend |
 | Backend, optional | PremiumVanish, DiscordSRV, Multiverse-Core, EssentialsX (AFK status in the tab list); PluginUtils 2.0.2 or newer for first-join date sync |
 | Proxy, optional | a MyWarp database for `/warp` |
 
@@ -41,9 +41,6 @@ Dependencies, MCME-Base included, resolve from the MCME Maven repository at
 `https://repo.mcmiddleearth.com` (deployment in the private [q220/maven-repo](https://github.com/q220/maven-repo)):
 `releases` and `snapshots` hold the MCME libraries, `mirror` caches every upstream repository the
 build uses, and the upstreams stay in the pom as fallbacks. Nothing needs a local `mvn install`.
-
-`libs/` is an in-project Maven repository for the vendored `tbnbt` library, whose upstream source
-was deleted; see `libs/README.md`.
 
 GitHub Actions builds and tests every push and pull request and uploads the jar as a workflow
 artifact.

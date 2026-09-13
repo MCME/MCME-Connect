@@ -9,7 +9,7 @@ All notable changes to MCME-Connect are documented here. The format follows
 
 Release for the Minecraft 26.2 network update. Runs on Paper 26.2 and a Velocity proxy from the
 4.1.0 line on the network's Java 25 servers (the jar is Java 21 bytecode), and requires
-MCME-Base 2.0.1-SNAPSHOT on the proxy and on every backend.
+MCME-Base 2.0.1 on the proxy and on every backend.
 
 ### Added
 - Tab list reserved panel on the proxy (slots 41-60): a staff-managed **Announcements** section
@@ -23,7 +23,7 @@ MCME-Base 2.0.1-SNAPSHOT on the proxy and on every backend.
 
 ### Changed
 - **Migrated to Minecraft 26.2.** Compiles against `paper-api 26.2.build.123-stable`,
-  `velocity-api 4.1.0-SNAPSHOT` and MCME-Base 2.0.1-SNAPSHOT, with JDK 25, emitting Java 21
+  `velocity-api 4.1.0-SNAPSHOT` and MCME-Base 2.0.1, with JDK 25, emitting Java 21
   bytecode.
 - The Velocity descriptor is generated from the `@Plugin` annotation at compile time (annotation
   processor path in the pom). It now declares the dependency on `mcme-base`, so Velocity always
@@ -59,9 +59,8 @@ MCME-Base 2.0.1-SNAPSHOT on the proxy and on every backend.
   aborts the update for everyone else.
 
 ### Build
-- `tbnbt 0.1.4`, whose upstream repository was deleted, is vendored in `libs/` as an in-project
-  Maven repository. The jar is now tracked in git (it was matched by the `*.jar` ignore rule), so
-  a fresh clone builds.
+- `tbnbt 0.1.4`, whose upstream repository was deleted, is served from `repo.mcmiddleearth.com`
+  (`releases`); the temporary in-project `libs/` repository is gone.
 - Paper API pinned to a concrete 26.2 build. The open-ended `[26.2.build,)` range had started
   resolving to 26.3 pre-release builds.
 - Dependencies resolve through the MCME Maven repository (`repo.mcmiddleearth.com`,
@@ -69,8 +68,8 @@ MCME-Base 2.0.1-SNAPSHOT on the proxy and on every backend.
   push and turns a `v*` tag into a GitHub Release.
 
 ### Upgrade notes
-- Deploy MCME-Base 2.0.1-SNAPSHOT (built from the MCME-Base repository) before this version. The
-  code also compiles against the released 2.0.0, but 2.0.1 carries a `YamlConfiguration`
+- Deploy MCME-Base 2.0.1 (GitHub Release of MCME-Base, or `repo.mcmiddleearth.com`) before this
+  version. The code also compiles against 2.0.0, but 2.0.1 carries a `YamlConfiguration`
   file-handle fix the proxy relies on.
 - The proxy data directory stays `plugins/mcmeconnect/`; existing `config.yml` and
   `playerServers.yml` are picked up unchanged. Copy the `reserved:` section from the default
