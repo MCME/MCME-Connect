@@ -4,11 +4,13 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.mcmiddleearth</groupId>
     <artifactId>MCME-Connect</artifactId>
-    <version>2.0.1-SNAPSHOT</version>
+    <version>3.0.0</version>
     <packaging>jar</packaging>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <!-- Build with JDK 25 (to reference paper-api 26.1.2 / mcme-base 2.0.0, both Java-25 bytecode),
+        <!-- Minecraft version this release targets; used for the GitHub Release title. -->
+        <minecraft.version>26.2</minecraft.version>
+        <!-- Build with JDK 25 (to reference paper-api 26.2 / mcme-base 2.0.1, both Java-25 bytecode),
              but emit Java 21 bytecode: maven-shade-plugin 3.5.3's ASM can't read major-version 69.
              Connect runs fine on the Java 25 server (forward compatible). -->
         <maven.compiler.source>21</maven.compiler.source>
@@ -74,6 +76,11 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.2.5</version>
+            </plugin>
         </plugins>
         <resources>
             <resource>
@@ -81,56 +88,62 @@
                 <directory>${basedir}/src/main/resources</directory>
                 <includes>
                     <include>plugin.yml</include>
-                    <include>views.yml</include>
-                    <include>playerItems.yml</include>
-                    <include>headerFooter.yml</include>
                     <include>config.yml</include>
                 </includes>
             </resource>
         </resources>
     </build>
     <repositories>
-        <!-- In-project file repo for deps unavailable from remote repos (see libs/README.md).
-             Currently hosts com.github.mryurihi:tbnbt:0.1.4, whose upstream source was deleted. -->
+        <!-- The MCME repository (deployment: https://github.com/q220/maven-repo, private): releases and snapshots of
+             MCME libraries plus a caching mirror of every upstream below. Listed first so builds
+             keep working when an upstream is down or breaks its certificate. -->
         <repository>
-            <id>in-project-libs</id>
-            <url>file://${project.basedir}/libs</url>
+            <id>mcme-releases</id>
+            <url>https://repo.mcmiddleearth.com/releases</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
         </repository>
+        <repository>
+            <id>mcme-snapshots</id>
+            <url>https://repo.mcmiddleearth.com/snapshots</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+        </repository>
+        <repository>
+            <id>mcme-mirror</id>
+            <url>https://repo.mcmiddleearth.com/mirror</url>
+        </repository>
+        <!-- Upstream fallbacks, consulted only when the mirror cannot serve an artifact. -->
         <repository>
             <id>papermc</id>
             <url>https://repo.papermc.io/repository/maven-public/</url>
-        </repository>
-        <repository>
-            <id>cubekrowd-repo</id>
-            <url>https://mavenrepo.cubekrowd.net/artifactory/repo/</url>
-        </repository>
-        <repository>
-            <id>multiverse</id>
-            <url>https://repo.onarandombox.com/content/repositories/multiverse/</url>
-        </repository>
-        <repository>
-            <id>Scarsz-Nexus</id>
-            <url>https://nexus.scarsz.me/content/groups/public/</url>
-        </repository>
-        <repository>
-            <id>essentials-releases</id>
-            <url>https://repo.essentialsx.net/releases/</url>
         </repository>
         <repository>
             <id>jitpack.io</id>
             <url>https://jitpack.io</url>
         </repository>
         <repository>
-            <id>minecraft-libraries</id>
-            <name>Minecraft Libraries</name>
-            <url>https://libraries.minecraft.net</url>
+            <id>Scarsz-Nexus</id>
+            <url>https://nexus.scarsz.me/content/groups/public/</url>
+        </repository>
+        <repository>
+            <id>onarandombox</id>
+            <url>https://repo.onarandombox.com/content/groups/public/</url>
+        </repository>
+        <repository>
+            <id>essentials-releases</id>
+            <url>https://repo.essentialsx.net/releases/</url>
         </repository>
     </repositories>
     <dependencies>
         <dependency>
             <groupId>io.papermc.paper</groupId>
             <artifactId>paper-api</artifactId>
-            <version>[26.2.build,)</version>
+            <!-- Pinned to a concrete build. The open-ended range [26.2.build,) started resolving to
+                 26.3 pre-release builds once Paper published them; bump this deliberately. -->
+            <version>26.2.build.123-stable</version>
             <scope>provided</scope>
             <exclusions>
                 <exclusion>
@@ -139,33 +152,32 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <!-- Only AccessCraftBukkit.setPlayerFirstPlayed is used (first-join date sync). 2.x is
+             built for Paper 26.2 and published on JitPack from the pluginutils-26.2 branch. -->
         <dependency>
-            <groupId>com.mcmiddleearth</groupId>
+            <groupId>com.github.MCME</groupId>
             <artifactId>PluginUtils</artifactId>
-            <version>1.9.0</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>net.md-5</groupId>
-                    <artifactId>brigadier</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>com.github.LeonMangler</groupId>
-            <artifactId>SuperVanish</artifactId>
-            <version>6.2.6-4</version>
+            <version>2.0.2</version>
             <scope>provided</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>net.md-5</groupId>
-                    <artifactId>brigadier</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.onarandombox.multiversecore</groupId>
             <artifactId>Multiverse-Core</artifactId>
             <version>4.3.1</version>
+            <scope>provided</scope>
+            <!-- Only its own classes are referenced; its POM would drag a surefire runtime in. -->
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!-- AfkListener mirrors the EssentialsX AFK state into the tab list. -->
+        <dependency>
+            <groupId>net.essentialsx</groupId>
+            <artifactId>EssentialsX</artifactId>
+            <version>2.19.0</version>
             <scope>provided</scope>
             <exclusions>
                 <exclusion>
@@ -180,30 +192,6 @@
             <version>2.9.18-2</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>net.luckperms</groupId>
-            <artifactId>api</artifactId>
-            <version>5.4</version>
-            <scope>provided</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>net.md-5</groupId>
-                    <artifactId>brigadier</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>net.essentialsx</groupId>
-            <artifactId>EssentialsX</artifactId>
-            <version>2.19.0</version>
-            <scope>provided</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>net.md-5</groupId>
-                    <artifactId>brigadier</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
         <!-- BungeeCord deps removed with the Bungee layer (Velocity-only network; Waterfall discontinued). -->
         <dependency>
             <groupId>com.velocitypowered</groupId>
@@ -216,12 +204,6 @@
                     <artifactId>brigadier</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.yaml</groupId>
-            <artifactId>snakeyaml</artifactId>
-            <version>2.0</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.discordsrv</groupId>
@@ -250,7 +232,7 @@
         <dependency>
             <groupId>com.mcmiddleearth</groupId>
             <artifactId>mcme-base</artifactId>
-            <version>2.0.0</version>
+            <version>2.0.1</version>
             <scope>provided</scope>
             <exclusions>
                 <exclusion>
@@ -263,6 +245,12 @@
             <groupId>com.mysql</groupId>
             <artifactId>mysql-connector-j</artifactId>
             <version>9.1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>5.10.2</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

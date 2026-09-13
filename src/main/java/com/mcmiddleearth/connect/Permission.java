@@ -32,6 +32,9 @@ public class Permission {
     public static final String RESTART      = "mcmeconnect.reboot";
     public static final String RELOAD       = "mcmeconnect.reload";
     public static final String TABVIEW      = "mcmeconnect.tablist";
+    // Deliberately separate from TABVIEW: TABVIEW gates the player-facing /tablist view switch and
+    // is granted broadly, so reusing it here would let any player write to the network-wide tab list.
+    public static final String TABNEWS      = "mcmeconnect.tabnews";
     public static final String SYNC_GAMEMODE= "mcmeconnect.syncGamemode";
     public static final String STOP         = "mcmeconnect.stop";
     public static final String IGNORE_DISABLED_MVTP     = "mcmeconnect.ignoreDisabledMVTP";

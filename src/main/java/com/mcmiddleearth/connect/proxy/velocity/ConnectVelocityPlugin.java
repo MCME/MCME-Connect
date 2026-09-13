@@ -1,20 +1,27 @@
 package com.mcmiddleearth.connect.proxy.velocity;
 
 import com.google.inject.Inject;
+import com.mcmiddleearth.base.core.configuration.YamlConfiguration;
 import com.mcmiddleearth.base.core.message.Message;
 import com.mcmiddleearth.base.velocity.AbstractVelocityPlugin;
 import com.mcmiddleearth.connect.Channel;
 import com.mcmiddleearth.connect.Permission;
 import com.mcmiddleearth.connect.proxy.core.McmeConnect;
 import com.mcmiddleearth.connect.proxy.core.McmeConnectConfig;
+import com.mcmiddleearth.connect.proxy.core.tablist.AnnouncementStore;
+import com.mcmiddleearth.connect.proxy.core.tablist.ReservedPanelConfig;
 import com.mcmiddleearth.connect.proxy.velocity.command.ConnectCommand;
 import com.mcmiddleearth.connect.proxy.velocity.command.RebootCommand;
 import com.mcmiddleearth.connect.proxy.velocity.listener.CommandListener;
 import com.mcmiddleearth.connect.proxy.velocity.listener.ConnectionListener;
 import com.mcmiddleearth.connect.proxy.velocity.listener.PluginMessageListener;
 import com.mcmiddleearth.connect.proxy.velocity.listener.VanishListener;
+import com.mcmiddleearth.connect.proxy.velocity.tablist.TabListListener;
+import com.mcmiddleearth.connect.proxy.velocity.tablist.TabListService;
+import com.mcmiddleearth.connect.proxy.velocity.tablist.TabNewsCommand;
 import com.velocitypowered.api.command.CommandManager;
 import com.velocitypowered.api.command.CommandMeta;
+import com.velocitypowered.api.plugin.Dependency;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
@@ -24,15 +31,22 @@ import org.slf4j.Logger;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
-@Plugin(id = "mcmeconnect", name = "MCME-Connect", version = "2.0.0",
+// velocity-plugin.json is generated from this annotation at compile time (annotation processor
+// path in pom.xml), so keep version in sync with the pom.
+@Plugin(id = "mcmeconnect", name = "MCME-Connect", version = "3.0.0",
         url = "https://github.com/MCME/MCME-Connect", description = "Plugin to connect MCME servers in a Velocity network",
-        authors = {"Eriol_Eandur"})
+        authors = {"Eriol_Eandur"},
+        dependencies = {@Dependency(id = "mcme-base")})
 public class ConnectVelocityPlugin extends AbstractVelocityPlugin{
+
+    private final Logger logger;
 
     @Inject
     public ConnectVelocityPlugin(Logger logger, ProxyServer proxyServer, @DataDirectory Path dataDirectory) {
         super(logger, proxyServer, dataDirectory);
+        this.logger = logger;
         McmeConnect.setLogger(getMcmeLogger());
     }
 
@@ -49,6 +63,32 @@ public class ConnectVelocityPlugin extends AbstractVelocityPlugin{
         getProxyServer().getEventManager().register(this, new CommandListener());
         getProxyServer().getEventManager().register(this, new ConnectionListener());
         getProxyServer().getEventManager().register(this, new VanishListener());
+
+        // Tab list setup is isolated: enable() has no caller-side try/catch, so an unreadable
+        // announcements.yml or a malformed reserved: section would otherwise abort the rest of
+        // enable() and silently leave every command below unregistered.
+        AnnouncementStore announcementStore = null;
+        TabListService tabListService = null;
+        try {
+            YamlConfiguration connectConfig = new YamlConfiguration(configFile);
+            ReservedPanelConfig reservedConfig =
+                    ReservedPanelConfig.parse(connectConfig.getSection("reserved"));
+            announcementStore = new AnnouncementStore(new File(getDataFolder(), "announcements.yml"));
+            tabListService =
+                    new TabListService(getProxyServer(), logger, reservedConfig, announcementStore);
+
+            getProxyServer().getEventManager().register(this, new TabListListener(tabListService));
+
+            int updateSeconds = Math.max(1, connectConfig.getInt("tabListUpdateSeconds", 2));
+            getProxyServer().getScheduler().buildTask(this, tabListService::applyToAll)
+                    .delay(updateSeconds, TimeUnit.SECONDS)
+                    .repeat(updateSeconds, TimeUnit.SECONDS)
+                    .schedule();
+        } catch (RuntimeException e) {
+            announcementStore = null;
+            tabListService = null;
+            logger.error("Tab list disabled: could not initialise it from config", e);
+        }
 
         CommandManager commandManager = getProxyServer().getCommandManager();
         CommandMeta commandMeta = commandManager.metaBuilder("reboot").plugin(this).build();
@@ -70,6 +110,9 @@ public class ConnectVelocityPlugin extends AbstractVelocityPlugin{
         List<String> servers = getProxyServer().getAllServers().stream()
                 .map(registeredServer -> registeredServer.getServerInfo().getName()).toList();
         servers.forEach(name -> registerConnectCommand(name, Permission.WORLD+"."+name));
+
+        CommandMeta tabNewsMeta = commandManager.metaBuilder("tabnews").plugin(this).build();
+        commandManager.register(tabNewsMeta, new TabNewsCommand(announcementStore, tabListService));
 
         getMcmeProxy().getConsole().sendMessage(createMessage().add("Enabled on Velocity proxy!"));
     }
