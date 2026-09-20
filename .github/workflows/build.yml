@@ -5,6 +5,9 @@ on:
     branches: ['**']
     tags: ['v*']
   pull_request:
+  # Deploying to the Maven repo is a deliberate act, reachable from the Actions tab
+  # ("Run workflow") rather than riding along with every push.
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -25,6 +28,11 @@ jobs:
           distribution: temurin
           java-version: '25'
           cache: maven
+          # Writes a settings.xml <server id="mcme"> whose credentials are read from these
+          # env var names at deploy time; matches <distributionManagement> in the pom.
+          server-id: mcme
+          server-username: MCME_MAVEN_NAME
+          server-password: MCME_MAVEN_SECRET
 
       - name: Reject version ranges in pom.xml
         run: |
@@ -56,6 +64,16 @@ jobs:
             echo "::error::tag $GITHUB_REF_NAME does not match pom version ${{ steps.version.outputs.version }}"
             exit 1
           fi
+
+      # Publishes com.mcmiddleearth:MCME-Connect to repo.mcmiddleearth.com - releases or
+      # snapshots is chosen by the pom version suffix. Deliberately NOT run on ordinary
+      # pushes: trigger it manually, or by pushing a v* tag.
+      - name: Deploy to repo.mcmiddleearth.com
+        if: github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/v')
+        env:
+          MCME_MAVEN_NAME: ${{ secrets.MCME_MAVEN_NAME }}
+          MCME_MAVEN_SECRET: ${{ secrets.MCME_MAVEN_SECRET }}
+        run: mvn -B -ntp deploy -DskipTests
 
       - name: Extract release notes from CHANGELOG.md
         if: startsWith(github.ref, 'refs/tags/v')

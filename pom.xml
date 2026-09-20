@@ -93,6 +93,19 @@
             </resource>
         </resources>
     </build>
+    <!-- Publish to MCME's own Reposilite so downstream plugins (MCME-Architect consumes
+         PlayerConnectEvent) can resolve a real released artifact instead of a hand-installed
+         ~/.m2 snapshot. The <id> must match the server id configured in CI. -->
+    <distributionManagement>
+        <repository>
+            <id>mcme</id>
+            <url>https://repo.mcmiddleearth.com/releases</url>
+        </repository>
+        <snapshotRepository>
+            <id>mcme</id>
+            <url>https://repo.mcmiddleearth.com/snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
     <repositories>
         <!-- The MCME repository (deployment: https://github.com/q220/maven-repo, private): releases and snapshots of
              MCME libraries plus a caching mirror of every upstream below. Listed first so builds
@@ -155,7 +168,13 @@
         <!-- Only AccessCraftBukkit.setPlayerFirstPlayed is used (first-join date sync). 2.x is
              built for Paper 26.2 and published on JitPack from the pluginutils-26.2 branch. -->
         <dependency>
-            <groupId>com.github.MCME</groupId>
+            <!-- MCME's own groupId via repo.mcmiddleearth.com, not JitPack's com.github.MCME.
+                 JitPack derives the groupId from the GitHub org, so consuming it that way gave
+                 this library two coordinates; Maven does not compare artifacts across groupIds,
+                 so anything pulling both ends up with two PluginUtils on the classpath and no
+                 version conflict resolution between them. One coordinate keeps that honest.
+                 The jitpack.io repository below is still required - PremiumVanishAPI needs it. -->
+            <groupId>com.mcmiddleearth</groupId>
             <artifactId>PluginUtils</artifactId>
             <version>2.0.2</version>
             <scope>provided</scope>
