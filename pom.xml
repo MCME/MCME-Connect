@@ -161,11 +161,15 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.onarandombox.multiversecore</groupId>
-            <artifactId>Multiverse-Core</artifactId>
-            <version>4.3.1</version>
+            <groupId>org.mvplugins.multiverse.core</groupId>
+            <artifactId>multiverse-core</artifactId>
+            <version>5.8.1</version>
             <scope>provided</scope>
-            <!-- Only its own classes are referenced; its POM would drag a surefire runtime in. -->
+            <!-- Multiverse 5 renamed com.onarandombox.MultiverseCore -> org.mvplugins.multiverse.core.
+                 Only its own classes are referenced, and the vavr types that appear in its API
+                 signatures are shaded into the same jar (org.mvplugins.multiverse.external.vavr),
+                 so this jar alone is a complete compile classpath - do not add io.vavr separately.
+                 Its POM would otherwise drag a surefire runtime in. -->
             <exclusions>
                 <exclusion>
                     <groupId>*</groupId>
