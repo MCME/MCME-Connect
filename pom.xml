@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.mcmiddleearth</groupId>
     <artifactId>MCME-Connect</artifactId>
-    <version>3.0.2</version>
+    <version>3.0.3</version>
     <packaging>jar</packaging>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -112,6 +112,13 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.2.5</version>
+                <configuration>
+                    <systemPropertyVariables>
+                        <!-- So a test can check the @Plugin annotation's hardcoded version
+                             against this pom. They drifted once: 3.0.2's jar declared 3.0.1. -->
+                        <project.version>${project.version}</project.version>
+                    </systemPropertyVariables>
+                </configuration>
             </plugin>
         </plugins>
         <resources>
