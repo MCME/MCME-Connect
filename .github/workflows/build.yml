@@ -49,12 +49,18 @@ jobs:
         run: |
           echo "version=$(mvn -q -ntp org.apache.maven.plugins:maven-help-plugin:3.5.2:evaluate -Dexpression=project.version -DforceStdout)" >> "$GITHUB_OUTPUT"
           echo "minecraft=$(mvn -q -ntp org.apache.maven.plugins:maven-help-plugin:3.5.2:evaluate -Dexpression=minecraft.version -DforceStdout)" >> "$GITHUB_OUTPUT"
+          # Resolve the built jar by glob rather than rebuilding its name here. finalName carries
+          # the build type and commit id, so the file is not simply artifactId-version.jar. The
+          # glob cannot match shade's "original-" backup, which does not start with MCME-Connect-.
+          jar=$(ls target/MCME-Connect-*.jar | head -n1)
+          echo "jar=$jar" >> "$GITHUB_OUTPUT"
+          echo "jarname=$(basename "$jar" .jar)" >> "$GITHUB_OUTPUT"
 
       - name: Upload jar
         uses: actions/upload-artifact@v7
         with:
-          name: MCME-Connect-${{ steps.version.outputs.version }}
-          path: target/MCME-Connect-${{ steps.version.outputs.version }}.jar
+          name: ${{ steps.version.outputs.jarname }}
+          path: ${{ steps.version.outputs.jar }}
           if-no-files-found: error
 
       - name: Check that the tag matches the pom version
@@ -89,7 +95,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          jar="target/MCME-Connect-${{ steps.version.outputs.version }}.jar"
+          jar="${{ steps.version.outputs.jar }}"
           sha256sum "$jar" > "$jar.sha256"
           gh release create "$GITHUB_REF_NAME" "$jar" "$jar.sha256" \
             --title "version ${GITHUB_REF_NAME#v} for mc ${{ steps.version.outputs.minecraft }}" \
