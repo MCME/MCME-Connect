@@ -66,7 +66,11 @@ public class VelocityTabRenderer {
                 .tabList(tabList)
                 .profile(new GameProfile(id, "slot" + slot, properties))
                 .displayName(row.displayName())
-                .latency(-1)
+                // 0, not -1. The design nominated -1 and left the choice to dev verification;
+                // production answered it on 2026-09-21 by rendering the red "no connection" cross
+                // on all sixty rows. Player rows will carry the player's real ping once the roster
+                // lands; every non-player row stays at 0.
+                .latency(0)
                 // Survival, not spectator: the vanilla client italicises spectators' tab names,
                 // which would silently override the admin-authored styling on every row.
                 .gameMode(0)
