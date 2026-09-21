@@ -36,7 +36,7 @@ import java.util.concurrent.TimeUnit;
 
 // velocity-plugin.json is generated from this annotation at compile time (annotation processor
 // path in pom.xml), so keep version in sync with the pom.
-@Plugin(id = "mcmeconnect", name = "MCME-Connect", version = "3.0.0",
+@Plugin(id = "mcmeconnect", name = "MCME-Connect", version = "3.0.1",
         url = "https://github.com/MCME/MCME-Connect", description = "Plugin to connect MCME servers in a Velocity network",
         authors = {"Eriol_Eandur"},
         dependencies = {@Dependency(id = "mcme-base")})

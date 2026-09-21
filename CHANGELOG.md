@@ -5,6 +5,43 @@ All notable changes to MCME-Connect are documented here. The format follows
 
 ## [Unreleased]
 
+## [3.0.1] - 2026-09-21
+
+Bug-fix release for the Velocity 4 / Paper 26.2 network. 3.0.0 was prepared but never tagged,
+released or published, so this is the first MCME-Connect artifact published to
+repo.mcmiddleearth.com.
+
+### Fixed
+
+- `/warp` and `/to` are no longer taken from MCME-Warps. The legacy MyWarp cross-server bridge was
+  registered unconditionally, and Velocity replaces an existing alias without complaint, so Connect
+  claimed both commands on every start and players were forwarded to their backend where EssentialsX
+  answered. Registration is now gated on `myWarp.enabled` **and** the alias not already being owned.
+  The `null` permission compounded it: `ConnectCommand.hasPermission` returns true when the
+  permission is null, so the aliases were also stripped of their permission check, which is why
+  `mcmewarps.cmd.warp` was never evaluated.
+- `WarpHandler.handle` and `updateCache` tolerate a missing MyWarp connector instead of throwing, so
+  `myWarp.enabled: false` is now actually a safe setting.
+- The Multiverse `NoClassDefFoundError` flood on player arrival, roughly 120 warnings a minute for
+  as long as anyone was online. Multiverse 5 renamed its packages, and the surrounding
+  `catch (NullPointerException)` could never catch an `Error`. What turned one failure into a flood
+  was `runAfterArrival` invoking the callback before `cancel()`, leaving the repeating task
+  scheduled; it now cancels first and catches `Throwable`.
+
+### Changed
+
+- Multiverse dependency moved to `org.mvplugins.multiverse.core:multiverse-core:5.8.1`, and
+  `Multiverse-Core` is declared as a softdepend, which it never was.
+- PluginUtils resolves from `com.mcmiddleearth` on repo.mcmiddleearth.com rather than JitPack's
+  `com.github.MCME`, so one coordinate describes one library.
+- Jars are named `{PluginName}-{A.B.C}-{TYPE}-{commit}`. Two Connect jars have been in production
+  that both declare version 2.0.1, one registering `/warp` and one not.
+
+### Added
+
+- `distributionManagement` and a gated CI deploy step, so releases publish to
+  repo.mcmiddleearth.com. Previously CI built and cut a GitHub release but never ran `mvn deploy`.
+
 ## [3.0.0] - 2026-09-13
 
 Release for the Minecraft 26.2 network update. Runs on Paper 26.2 and a Velocity proxy from the
@@ -80,6 +117,7 @@ MCME-Base 2.0.1 on the proxy and on every backend.
 
 Last release for Minecraft 1.13, published as tag `v1.1`. Earlier history lives in git.
 
-[Unreleased]: https://github.com/MCME/MCME-Connect/compare/v3.0.0...HEAD
+[Unreleased]: https://github.com/MCME/MCME-Connect/compare/v3.0.1...HEAD
+[3.0.1]: https://github.com/MCME/MCME-Connect/compare/v3.0.0...v3.0.1
 [3.0.0]: https://github.com/MCME/MCME-Connect/compare/v1.1...v3.0.0
 [1.1.5]: https://github.com/MCME/MCME-Connect/releases/tag/v1.1
