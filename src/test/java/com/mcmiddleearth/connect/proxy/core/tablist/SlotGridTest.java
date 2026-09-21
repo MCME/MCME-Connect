@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class SlotGridTest {
 
@@ -63,5 +64,20 @@ class SlotGridTest {
         assertEquals(60, SlotGrid.listOrderFor(1));
         assertEquals(59, SlotGrid.listOrderFor(2));
         assertEquals(1, SlotGrid.listOrderFor(60));
+    }
+
+    /**
+     * What production saw on 2026-09-21. Connect 3.0.1 enabled the tab list unconditionally, phase
+     * 1a passes no roster, and a config predating the reserved section yields no panel rows either,
+     * so the grid is 60 blanks. VelocityTabRenderer still sends all 60 as entries at latency -1,
+     * which the client draws as three columns of no-ping rows - and its cleanup pass removes the
+     * real players. Hence the config gate: this state must never be reachable by default.
+     */
+    @Test
+    void testAGridWithNoContentIsSixtyBlankRows() {
+        List<TabRow> grid = new SlotGrid().assemble(List.of(), List.of());
+        assertEquals(SlotGrid.TOTAL_SLOTS, grid.size());
+        assertTrue(grid.stream().allMatch(row -> row.equals(TabRow.blank())),
+                "every slot blank means a viewer sees empty rows and no players");
     }
 }

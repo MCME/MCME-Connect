@@ -72,19 +72,26 @@ public class ConnectVelocityPlugin extends AbstractVelocityPlugin{
         TabListService tabListService = null;
         try {
             YamlConfiguration connectConfig = new YamlConfiguration(configFile);
-            ReservedPanelConfig reservedConfig =
-                    ReservedPanelConfig.parse(connectConfig.getSection("reserved"));
-            announcementStore = new AnnouncementStore(new File(getDataFolder(), "announcements.yml"));
-            tabListService =
-                    new TabListService(getProxyServer(), logger, reservedConfig, announcementStore);
+            // Opt-in, and an absent key means off. The phase 1a grid always passes an empty
+            // roster, and VelocityTabRenderer removes every entry that is not one of its own 60
+            // slots - real players included, along with anything another tab plugin wrote. On by
+            // default it does not merely look unfinished: it empties the player list.
+            if (connectConfig.getBoolean("tabList.enabled", false)) {
+                ReservedPanelConfig reservedConfig =
+                        ReservedPanelConfig.parse(connectConfig.getSection("reserved"));
+                announcementStore = new AnnouncementStore(new File(getDataFolder(), "announcements.yml"));
+                tabListService =
+                        new TabListService(getProxyServer(), logger, reservedConfig, announcementStore);
 
-            getProxyServer().getEventManager().register(this, new TabListListener(tabListService));
+                getProxyServer().getEventManager().register(this, new TabListListener(tabListService));
 
-            int updateSeconds = Math.max(1, connectConfig.getInt("tabListUpdateSeconds", 2));
-            getProxyServer().getScheduler().buildTask(this, tabListService::applyToAll)
-                    .delay(updateSeconds, TimeUnit.SECONDS)
-                    .repeat(updateSeconds, TimeUnit.SECONDS)
-                    .schedule();
+                int updateSeconds = Math.max(1, connectConfig.getInt("tabListUpdateSeconds", 2));
+                getProxyServer().getScheduler().buildTask(this, tabListService::applyToAll)
+                        .delay(updateSeconds, TimeUnit.SECONDS)
+                        .repeat(updateSeconds, TimeUnit.SECONDS)
+                        .schedule();
+                logger.info("Tab list enabled: Connect now owns the player list.");
+            }
         } catch (RuntimeException e) {
             announcementStore = null;
             tabListService = null;
@@ -112,8 +119,12 @@ public class ConnectVelocityPlugin extends AbstractVelocityPlugin{
                 .map(registeredServer -> registeredServer.getServerInfo().getName()).toList();
         servers.forEach(name -> registerConnectCommand(name, Permission.WORLD+"."+name));
 
-        CommandMeta tabNewsMeta = commandManager.metaBuilder("tabnews").plugin(this).build();
-        commandManager.register(tabNewsMeta, new TabNewsCommand(announcementStore, tabListService));
+        // Only when the tab list actually came up. Both collaborators are null when it is switched
+        // off or failed to initialise, and registering anyway turns every /tabnews into an NPE.
+        if (announcementStore != null && tabListService != null) {
+            CommandMeta tabNewsMeta = commandManager.metaBuilder("tabnews").plugin(this).build();
+            commandManager.register(tabNewsMeta, new TabNewsCommand(announcementStore, tabListService));
+        }
 
         getMcmeProxy().getConsole().sendMessage(createMessage().add("Enabled on Velocity proxy!"));
     }

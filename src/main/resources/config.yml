@@ -19,6 +19,12 @@ connectDelay: 200
 premiumVanish: true
 # Base path for restorestats feature (leave empty to disable)
 # restorestatsBasePath: /media/ssd1/bungee-mcme/
+# Tab list. When enabled, Connect's renderer owns the whole player list: it draws a fixed 60-slot
+# grid and removes every entry it did not place itself - real players included, and any row written
+# by another tab plugin. The player roster is NOT implemented yet, so enabling this today shows the
+# reserved panel below and nothing else. Leave it off unless you mean to hand Connect the tab list.
+tabList:
+  enabled: false
 tabListUpdateSeconds: 2
 myWarp:
   enabled: true
