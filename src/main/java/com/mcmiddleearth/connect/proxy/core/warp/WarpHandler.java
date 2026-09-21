@@ -44,6 +44,24 @@ public class WarpHandler {
     }
     
     
+    /**
+     * Whether Connect should claim /warp and /to for the legacy MyWarp cross-server bridge.
+     * <p>
+     * Both conditions matter. The bridge is useless without its database connector, which
+     * {@code McmeConnect} only builds when {@code myWarp.enabled} is set - registering the
+     * commands anyway exposes a command with nothing behind it. And Velocity's CommandManager
+     * <em>silently replaces</em> an existing alias, so registering over a plugin that already
+     * owns /warp - MCME-Warps does - takes the command away from it with no warning at all.
+     * Players then get forwarded to their backend, where EssentialsX answers instead.
+     *
+     * @param myWarpEnabled          value of the {@code myWarp.enabled} config flag
+     * @param aliasAlreadyRegistered whether any of the aliases is already owned on this proxy
+     * @return true only when the bridge is wanted and nothing else owns the command
+     */
+    public static boolean shouldRegisterWarpCommands(boolean myWarpEnabled, boolean aliasAlreadyRegistered) {
+        return myWarpEnabled && !aliasAlreadyRegistered;
+    }
+
     /** 
      * Handles cross server warping.
      * @param player sender of the warp command
@@ -51,6 +69,11 @@ public class WarpHandler {
      * @return true if the warp command was or will be handled.
      */
     public static boolean handle(McmeProxyPlayer player, String[] message) {
+        if(McmeConnect.getMyWarpConnector() == null) {
+            // myWarp.enabled is off, so there is no connector to ask. Decline and let the
+            // command fall through rather than throwing.
+            return false;
+        }
         StringBuilder warpName = new StringBuilder(message[1]);
         for(int i = 2; i<message.length;i++) {
             warpName.append(" ").append(message[i]);
@@ -87,6 +110,9 @@ public class WarpHandler {
     }
 
     public static void updateCache() {
+        if(McmeConnect.getMyWarpConnector() == null) {
+            return;
+        }
         cache = McmeConnect.getMyWarpConnector().getWarps();
     }
 

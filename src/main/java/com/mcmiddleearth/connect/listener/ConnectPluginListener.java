@@ -26,7 +26,7 @@ import com.mcmiddleearth.connect.restart.RestartHandler;
 import com.mcmiddleearth.connect.tabList.ConnectedPlayer;
 import com.mcmiddleearth.connect.tabList.PlayerList;
 import com.mcmiddleearth.connect.util.ConnectUtil;
-import com.onarandombox.MultiverseCore.MultiverseCore;
+import com.mcmiddleearth.connect.util.MultiverseSpawn;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.messaging.PluginMessageListener;
@@ -36,6 +36,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.UUID;
 import java.util.function.Consumer;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -114,17 +115,7 @@ public class ConnectPluginListener implements PluginMessageListener {
             });
         } else if (subchannel.equals(Channel.SPAWN)) {
             String name = in.readUTF();
-            runAfterArrival(name, p -> {
-                Location spawn = p.getWorld().getSpawnLocation().clone();
-                try {
-                    spawn = ((MultiverseCore)Bukkit.getPluginManager().getPlugin("Multiverse-Core"))
-                        .getMVWorldManager().getMVWorld(p.getWorld().getName())
-                        .getSpawnLocation().clone();
-                } catch (NullPointerException ex) {
-                    Logger.getLogger("ConnectPluginListener").warning("Failed to get Multiverse spawn location: " + ex.getMessage());
-                }
-                p.teleport(spawn);//.add(0.5,0,0.5));
-            });
+            runAfterArrival(name, p -> p.teleport(MultiverseSpawn.of(p.getWorld())));
         } else if(subchannel.equals(Channel.DISCORD)) {
             String discordChannel = in.readUTF();
             String discordMessage = in.readUTF();
@@ -231,9 +222,19 @@ public class ConnectPluginListener implements PluginMessageListener {
                     } else {
                         counter--;
                     }
-                } else {
+                    return;
+                }
+                // The player has arrived, so this task is finished either way. Cancel
+                // *before* invoking the callback: a throwable escaping the callback is
+                // logged by Bukkit ("Task #N generated an exception") but leaves the
+                // repeating task scheduled, so it re-fires and re-throws every 10 ticks
+                // for the rest of the session.
+                cancel();
+                try {
                     callback.accept(source);
-                    cancel();
+                } catch (Throwable ex) {
+                    Logger.getLogger("ConnectPluginListener").log(Level.WARNING,
+                            "Failed to run arrival action for player " + playerName, ex);
                 }
             }
         }.runTaskTimer(ConnectPlugin.getInstance(), 1, 10);

@@ -5,6 +5,9 @@ on:
     branches: ['**']
     tags: ['v*']
   pull_request:
+  # Deploying to the Maven repo is a deliberate act, reachable from the Actions tab
+  # ("Run workflow") rather than riding along with every push.
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -25,6 +28,11 @@ jobs:
           distribution: temurin
           java-version: '25'
           cache: maven
+          # Writes a settings.xml <server id="mcme"> whose credentials are read from these
+          # env var names at deploy time; matches <distributionManagement> in the pom.
+          server-id: mcme
+          server-username: MCME_MAVEN_NAME
+          server-password: MCME_MAVEN_SECRET
 
       - name: Reject version ranges in pom.xml
         run: |
@@ -41,12 +49,18 @@ jobs:
         run: |
           echo "version=$(mvn -q -ntp org.apache.maven.plugins:maven-help-plugin:3.5.2:evaluate -Dexpression=project.version -DforceStdout)" >> "$GITHUB_OUTPUT"
           echo "minecraft=$(mvn -q -ntp org.apache.maven.plugins:maven-help-plugin:3.5.2:evaluate -Dexpression=minecraft.version -DforceStdout)" >> "$GITHUB_OUTPUT"
+          # Resolve the built jar by glob rather than rebuilding its name here. finalName carries
+          # the build type and commit id, so the file is not simply artifactId-version.jar. The
+          # glob cannot match shade's "original-" backup, which does not start with MCME-Connect-.
+          jar=$(ls target/MCME-Connect-*.jar | head -n1)
+          echo "jar=$jar" >> "$GITHUB_OUTPUT"
+          echo "jarname=$(basename "$jar" .jar)" >> "$GITHUB_OUTPUT"
 
       - name: Upload jar
         uses: actions/upload-artifact@v7
         with:
-          name: MCME-Connect-${{ steps.version.outputs.version }}
-          path: target/MCME-Connect-${{ steps.version.outputs.version }}.jar
+          name: ${{ steps.version.outputs.jarname }}
+          path: ${{ steps.version.outputs.jar }}
           if-no-files-found: error
 
       - name: Check that the tag matches the pom version
@@ -56,6 +70,16 @@ jobs:
             echo "::error::tag $GITHUB_REF_NAME does not match pom version ${{ steps.version.outputs.version }}"
             exit 1
           fi
+
+      # Publishes com.mcmiddleearth:MCME-Connect to repo.mcmiddleearth.com - releases or
+      # snapshots is chosen by the pom version suffix. Deliberately NOT run on ordinary
+      # pushes: trigger it manually, or by pushing a v* tag.
+      - name: Deploy to repo.mcmiddleearth.com
+        if: github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/v')
+        env:
+          MCME_MAVEN_NAME: ${{ secrets.MCME_MAVEN_NAME }}
+          MCME_MAVEN_SECRET: ${{ secrets.MCME_MAVEN_SECRET }}
+        run: mvn -B -ntp deploy -DskipTests
 
       - name: Extract release notes from CHANGELOG.md
         if: startsWith(github.ref, 'refs/tags/v')
@@ -71,7 +95,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          jar="target/MCME-Connect-${{ steps.version.outputs.version }}.jar"
+          jar="${{ steps.version.outputs.jar }}"
           sha256sum "$jar" > "$jar.sha256"
           gh release create "$GITHUB_REF_NAME" "$jar" "$jar.sha256" \
             --title "version ${GITHUB_REF_NAME#v} for mc ${{ steps.version.outputs.minecraft }}" \

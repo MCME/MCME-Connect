@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.mcmiddleearth</groupId>
     <artifactId>MCME-Connect</artifactId>
-    <version>3.0.0</version>
+    <version>3.0.1</version>
     <packaging>jar</packaging>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -13,11 +13,43 @@
         <!-- Build with JDK 25 (to reference paper-api 26.2 / mcme-base 2.0.1, both Java-25 bytecode),
              but emit Java 21 bytecode: maven-shade-plugin 3.5.3's ASM can't read major-version 69.
              Connect runs fine on the Java 25 server (forward compatible). -->
+        <!-- Build kind for the jar name: RELEASE | SNAPSHOT | DEV. Override with -Dbuild.type=DEV.
+             Do NOT declare git.commit.id.abbrev here: Maven interpolates finalName during model
+             building, before the git plugin runs, so a declared value would win and the commit
+             would never reach the file name. -->
+        <build.type>RELEASE</build.type>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
     </properties>
     <build>
+        <!-- MCME jar naming: {PluginName}-{A.B.C}-{SNAPSHOT|DEV|RELEASE}-{commit id}.
+             Two MCME-Connect jars have been in production that both declare version 2.0.1 in
+             velocity-plugin.json - one registering /warp and one not - which made them
+             indistinguishable from the proxy plugin list. The commit id ends that. -->
+        <finalName>${project.artifactId}-${project.version}-${build.type}-${git.commit.id.abbrev}</finalName>
         <plugins>
+            <plugin>
+                <groupId>io.github.git-commit-id</groupId>
+                <artifactId>git-commit-id-maven-plugin</artifactId>
+                <version>9.0.1</version>
+                <executions>
+                    <execution>
+                        <id>resolve-git-commit</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>revision</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <abbrevLength>7</abbrevLength>
+                    <generateGitPropertiesFile>false</generateGitPropertiesFile>
+                    <failOnNoGitDirectory>false</failOnNoGitDirectory>
+                    <includeOnlyProperties>
+                        <includeOnlyProperty>^git.commit.id.abbrev$</includeOnlyProperty>
+                    </includeOnlyProperties>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -93,6 +125,19 @@
             </resource>
         </resources>
     </build>
+    <!-- Publish to MCME's own Reposilite so downstream plugins (MCME-Architect consumes
+         PlayerConnectEvent) can resolve a real released artifact instead of a hand-installed
+         ~/.m2 snapshot. The <id> must match the server id configured in CI. -->
+    <distributionManagement>
+        <repository>
+            <id>mcme</id>
+            <url>https://repo.mcmiddleearth.com/releases</url>
+        </repository>
+        <snapshotRepository>
+            <id>mcme</id>
+            <url>https://repo.mcmiddleearth.com/snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
     <repositories>
         <!-- The MCME repository (deployment: https://github.com/q220/maven-repo, private): releases and snapshots of
              MCME libraries plus a caching mirror of every upstream below. Listed first so builds
@@ -155,17 +200,27 @@
         <!-- Only AccessCraftBukkit.setPlayerFirstPlayed is used (first-join date sync). 2.x is
              built for Paper 26.2 and published on JitPack from the pluginutils-26.2 branch. -->
         <dependency>
-            <groupId>com.github.MCME</groupId>
+            <!-- MCME's own groupId via repo.mcmiddleearth.com, not JitPack's com.github.MCME.
+                 JitPack derives the groupId from the GitHub org, so consuming it that way gave
+                 this library two coordinates; Maven does not compare artifacts across groupIds,
+                 so anything pulling both ends up with two PluginUtils on the classpath and no
+                 version conflict resolution between them. One coordinate keeps that honest.
+                 The jitpack.io repository below is still required - PremiumVanishAPI needs it. -->
+            <groupId>com.mcmiddleearth</groupId>
             <artifactId>PluginUtils</artifactId>
             <version>2.0.2</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.onarandombox.multiversecore</groupId>
-            <artifactId>Multiverse-Core</artifactId>
-            <version>4.3.1</version>
+            <groupId>org.mvplugins.multiverse.core</groupId>
+            <artifactId>multiverse-core</artifactId>
+            <version>5.8.1</version>
             <scope>provided</scope>
-            <!-- Only its own classes are referenced; its POM would drag a surefire runtime in. -->
+            <!-- Multiverse 5 renamed com.onarandombox.MultiverseCore -> org.mvplugins.multiverse.core.
+                 Only its own classes are referenced, and the vavr types that appear in its API
+                 signatures are shaded into the same jar (org.mvplugins.multiverse.external.vavr),
+                 so this jar alone is a complete compile classpath - do not add io.vavr separately.
+                 Its POM would otherwise drag a surefire runtime in. -->
             <exclusions>
                 <exclusion>
                     <groupId>*</groupId>
