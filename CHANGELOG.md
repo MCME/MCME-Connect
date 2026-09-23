@@ -5,6 +5,57 @@ All notable changes to MCME-Connect are documented here. The format follows
 
 ## [Unreleased]
 
+## [3.0.3] - 2026-09-23
+
+Removes the Velocity tab list that 3.0.1 switched on unconditionally. 3.0.2, which put it behind a
+flag instead, was prepared but never tagged, released or published, so this release follows 3.0.1
+directly.
+
+### Removed
+
+- The Velocity tab list, which on 3.0.1 replaced the whole player list with 60 blank rows. It
+  started unconditionally, the player rows were never implemented, and its renderer removed every
+  entry it did not place, real players and other tab plugins' rows included. Without a roster it
+  could only do harm, so it is out of the jar rather than behind a flag. The Paper-side AFK and
+  player tracking in `com.mcmiddleearth.connect.tabList` stays; despite the package name it is
+  unrelated to the proxy renderer.
+- With it went `/tabnews`, the `mcmeconnect.tabnews` permission and the `tabList`,
+  `tabListUpdateSeconds` and `reserved:` settings. Leftovers in the proxy's `config.yml`,
+  `announcements.yml` in `plugins/mcmeconnect/` and grants of the permission are ignored and can be
+  deleted.
+
+### Fixed
+
+- The version Velocity sees can no longer drift from the pom. `@Plugin`'s version is a literal
+  that Maven cannot substitute, so a 3.0.2 build still called itself 3.0.1. A test now compares the
+  generated `velocity-plugin.json` with the pom version and fails the build when they differ.
+- Release checksums name only the jar. The `.sha256` asset recorded the build path,
+  `target/MCME-Connect-...jar`, so `sha256sum -c` run next to the downloaded jar failed with
+  `FAILED open or read`. 3.0.1's checksum was published with this defect and has since been
+  replaced; its hash was always correct.
+- The release workflow checks for the version's `CHANGELOG.md` section before it deploys. A `v*`
+  tag without one used to publish to repo.mcmiddleearth.com first and fail afterwards with no
+  GitHub release, and since the releases repository refuses to redeploy a version, re-running the
+  job could not finish it.
+
+## [3.0.2] - 2026-09-21
+
+Prepared as a hotfix for the 3.0.1 tab list, but never tagged, released or published: 3.0.3
+removes the tab list instead.
+
+### Fixed
+
+- The Velocity tab list is opt-in and defaults to off. On 3.0.1 it replaced the player list with
+  60 blank rows and no players, and that was the feature working as written. `enable()` started it
+  unconditionally; the grid was always handed an empty roster, because the player rows were never
+  implemented; production's `config.yml` predates the `reserved:` section, so the panel was empty
+  too; all 60 slots were sent at latency -1, which the client draws as a no-ping cross; and the
+  renderer's cleanup pass removed every entry it did not place, real players and any other tab
+  plugin's rows included. It now requires `tabList.enabled: true`. An absent key means off, so an
+  untouched `config.yml` cannot reach that state.
+- `/tabnews` is only registered when the tab list actually started. Registering it regardless
+  made every `/tabnews` an NPE after a failed initialisation.
+
 ## [3.0.1] - 2026-09-21
 
 Bug-fix release for the Velocity 4 / Paper 26.2 network. 3.0.0 was prepared but never tagged,
@@ -117,7 +168,9 @@ MCME-Base 2.0.1 on the proxy and on every backend.
 
 Last release for Minecraft 1.13, published as tag `v1.1`. Earlier history lives in git.
 
-[Unreleased]: https://github.com/MCME/MCME-Connect/compare/v3.0.1...HEAD
-[3.0.1]: https://github.com/MCME/MCME-Connect/compare/v3.0.0...v3.0.1
-[3.0.0]: https://github.com/MCME/MCME-Connect/compare/v1.1...v3.0.0
+[Unreleased]: https://github.com/MCME/MCME-Connect/compare/v3.0.3...HEAD
+[3.0.3]: https://github.com/MCME/MCME-Connect/compare/v3.0.1...v3.0.3
+[3.0.2]: https://github.com/MCME/MCME-Connect/compare/v3.0.1...dd44ef9
+[3.0.1]: https://github.com/MCME/MCME-Connect/compare/f4ae071...v3.0.1
+[3.0.0]: https://github.com/MCME/MCME-Connect/compare/v1.1...f4ae071
 [1.1.5]: https://github.com/MCME/MCME-Connect/releases/tag/v1.1
