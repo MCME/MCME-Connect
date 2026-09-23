@@ -63,11 +63,23 @@ jobs:
           path: ${{ steps.version.outputs.jar }}
           if-no-files-found: error
 
+      # Tag checks, deliberately ahead of the deploy: the releases repository refuses to redeploy
+      # a version (409), so a check failing after publishing would leave the artifact on
+      # repo.mcmiddleearth.com with no GitHub release, and a re-run would stop at the deploy.
       - name: Check that the tag matches the pom version
         if: startsWith(github.ref, 'refs/tags/v')
         run: |
           if [ "v${{ steps.version.outputs.version }}" != "$GITHUB_REF_NAME" ]; then
             echo "::error::tag $GITHUB_REF_NAME does not match pom version ${{ steps.version.outputs.version }}"
+            exit 1
+          fi
+
+      - name: Extract release notes from CHANGELOG.md
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          awk -v ver="${GITHUB_REF_NAME#v}" '/^## \[/{p = ($2 == "[" ver "]")} p' CHANGELOG.md > release-notes.md
+          if [ ! -s release-notes.md ]; then
+            echo "::error::CHANGELOG.md has no section for ${GITHUB_REF_NAME#v}"
             exit 1
           fi
 
@@ -81,22 +93,13 @@ jobs:
           MCME_MAVEN_SECRET: ${{ secrets.MCME_MAVEN_SECRET }}
         run: mvn -B -ntp deploy -DskipTests
 
-      - name: Extract release notes from CHANGELOG.md
-        if: startsWith(github.ref, 'refs/tags/v')
-        run: |
-          awk -v ver="${GITHUB_REF_NAME#v}" '/^## \[/{p = ($2 == "[" ver "]")} p' CHANGELOG.md > release-notes.md
-          if [ ! -s release-notes.md ]; then
-            echo "::error::CHANGELOG.md has no section for ${GITHUB_REF_NAME#v}"
-            exit 1
-          fi
-
       - name: GitHub release
         if: startsWith(github.ref, 'refs/tags/v')
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           jar="${{ steps.version.outputs.jar }}"
-          sha256sum "$jar" > "$jar.sha256"
+          (cd target && sha256sum "$(basename "$jar")" > "$(basename "$jar").sha256")
           gh release create "$GITHUB_REF_NAME" "$jar" "$jar.sha256" \
             --title "version ${GITHUB_REF_NAME#v} for mc ${{ steps.version.outputs.minecraft }}" \
             --notes-file release-notes.md

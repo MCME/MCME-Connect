@@ -19,7 +19,6 @@ connectDelay: 200
 premiumVanish: true
 # Base path for restorestats feature (leave empty to disable)
 # restorestatsBasePath: /media/ssd1/bungee-mcme/
-tabListUpdateSeconds: 2
 myWarp:
   enabled: true
   # Configure database credentials before enabling
@@ -67,21 +66,3 @@ scheduledRestarts: []
 
 # for synchronization of first joined date create in plugin data folder a 
 # symlink to playerdata folder of first join server.
-
-# Tab list reserved panel (slots 41-60). Icons are base64 skin textures; leave blank for default.
-reserved:
-  announcements:
-    icon: ""
-    header: "<gold>Announcements"
-    template: "<white><text>"
-    maxRows: 6
-  tips:
-    icon: ""
-    header: "<gold>Tips"
-    template: "<gray><text>"
-    windowSize: 2
-    rotateSeconds: 30
-    entries:
-      - "/warp list shows every public warp"
-      - "Report griefing with /modreq"
-      - "F3 + H shows advanced item tooltips"
