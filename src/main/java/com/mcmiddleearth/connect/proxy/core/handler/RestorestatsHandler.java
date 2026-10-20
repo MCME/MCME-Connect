@@ -141,7 +141,11 @@ public class RestorestatsHandler {
             String dbName = (String) config.get("dbName");
             String dbIp = (String) config.get("ip");
             int port = (Integer) config.get("port");
-            //MySQLDataSource dataBase = new MySQLDataSource(dbIp,port,dbName);
+            // Load the MySQL driver shaded into this jar before asking DriverManager for a connection.
+            // DriverManager's automatic discovery may not see drivers inside Velocity plugin jars, and
+            // loading the class registers it for this plugin's class loader. Until 3.1.0 the MyWarp
+            // bridge loaded it as a side effect.
+            Class.forName("com.mysql.cj.jdbc.Driver");
             try (Connection dbConnection = DriverManager.getConnection(
                     "jdbc:mysql://"+dbIp+":"+port+"/"+dbName,
                     dbUser, dbPassword)) {
@@ -170,8 +174,8 @@ public class RestorestatsHandler {
                     }
                 }
             }
-        } catch (SQLException ex) {
-            McmeConnect.getProxyPlugin().getMcmeLogger().error( "SQLException", ex);
+        } catch (SQLException | ClassNotFoundException ex) {
+            McmeConnect.getProxyPlugin().getMcmeLogger().error("Could not reset statistics in the database", ex);
         }
         
     }
