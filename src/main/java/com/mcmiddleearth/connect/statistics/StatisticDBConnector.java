@@ -598,8 +598,13 @@ public class StatisticDBConnector {
                 selectPlayerEntityStats.setString(2, entity.name());
                 ResultSet result = selectPlayerEntityStats.executeQuery();
                 if(result.next()) {
+                    // Only ever raise a stored count, like the general and block/item statistics do:
+                    // a server that has not loaded the player's network values yet must not lower them.
+                    int saved = result.getInt(stat.name());
                     result.close();
-                    updateEntityStat(id, stat, entity, value);
+                    if(saved < value) {
+                        updateEntityStat(id, stat, entity, value);
+                    }
                 } else {
                     result.close();
                     insertEntityStat(id, stat, entity, value);
