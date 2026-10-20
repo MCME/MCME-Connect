@@ -14,7 +14,6 @@ public class McmeConnectConfig {
     private final boolean legacyRedirectEnabled;
     private final boolean isPVsupported;
     private final boolean isServerWatchdogEnabled;
-    private final boolean isMyWarpEnabled;
     private final String legacyRedirectFrom;
     private final String legacyRedirectTo;
     private final Set<String> noMVTP = new HashSet<>();
@@ -30,8 +29,6 @@ public class McmeConnectConfig {
         legacyRedirectFrom = config.getString("legacyRedirect.from","newplayerworld");
         legacyRedirectTo = config.getString("legacyRedirect.to","world");
         isPVsupported = config.getBoolean("premiumVanish", false);
-        isMyWarpEnabled = config.getKeys().contains("myWarp") && config.getSection("myWarp").containsKey("enabled") ?
-                          (Boolean) config.getSection("myWarp").get("enabled") : false;
         isServerWatchdogEnabled = config.getBoolean("serverWatchdog", true);
         noMVTP.addAll(config.getStringList("disableMVTP"));
         connectDelay = config.getInt("connectDelay",2000);
@@ -70,10 +67,6 @@ public class McmeConnectConfig {
         return isServerWatchdogEnabled;
     }
 
-    public boolean isMyWarpEnabled() {
-        return isMyWarpEnabled;
-    }
-
     public String getThemedbuildWorld() {
         return config.getString("themedbuildWorld", "themedbuilds");
     }
@@ -84,10 +77,6 @@ public class McmeConnectConfig {
 
     public List<String> getScheduledRestarts() {
         return config.getStringList("scheduledRestarts");
-    }
-
-    public Map<String, Object> getMyWarpSection() {
-        return config.getSection("myWarp");
     }
 
     public YamlConfiguration getRawConfig() {

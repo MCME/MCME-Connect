@@ -7,7 +7,6 @@ import com.mcmiddleearth.connect.Channel;
 import com.mcmiddleearth.connect.Permission;
 import com.mcmiddleearth.connect.proxy.core.McmeConnect;
 import com.mcmiddleearth.connect.proxy.core.McmeConnectConfig;
-import com.mcmiddleearth.connect.proxy.core.warp.WarpHandler;
 import com.mcmiddleearth.connect.proxy.velocity.command.ConnectCommand;
 import com.mcmiddleearth.connect.proxy.velocity.command.RebootCommand;
 import com.mcmiddleearth.connect.proxy.velocity.listener.CommandListener;
@@ -35,12 +34,9 @@ import java.util.List;
         dependencies = {@Dependency(id = "mcme-base")})
 public class ConnectVelocityPlugin extends AbstractVelocityPlugin{
 
-    private final Logger logger;
-
     @Inject
     public ConnectVelocityPlugin(Logger logger, ProxyServer proxyServer, @DataDirectory Path dataDirectory) {
         super(logger, proxyServer, dataDirectory);
-        this.logger = logger;
         McmeConnect.setLogger(getMcmeLogger());
     }
 
@@ -71,7 +67,6 @@ public class ConnectVelocityPlugin extends AbstractVelocityPlugin{
         registerConnectCommand("theme", null);
         registerConnectCommand("survival", Permission.SURVIVAL);
         registerConnectCommand("mvtp", null,"switch");
-        registerMyWarpBridgeCommands();
         registerConnectCommand("stop", Permission.STOP);
         registerConnectCommand("restorestats", null);
 
@@ -85,31 +80,6 @@ public class ConnectVelocityPlugin extends AbstractVelocityPlugin{
     @Override
     public void disable() {
         McmeConnect.disable();
-    }
-
-    /**
-     * Registers the legacy MyWarp cross-server bridge on /warp and /to, but only when it is
-     * both wanted and free to take. See {@link WarpHandler#shouldRegisterWarpCommands}.
-     * <p>
-     * This used to be an unconditional {@code registerConnectCommand("warp", null, "to")}. Because
-     * Velocity replaces an existing alias without complaint, and Connect enables after
-     * mcme-warps-velocity, that quietly took /warp and /to away from MCME-Warps on every start.
-     * The null permission made it worse: {@code ConnectCommand.hasPermission} returns true when
-     * the permission is null, so the commands were also stripped of their permission check and
-     * mcmewarps.cmd.warp was never evaluated.
-     */
-    private void registerMyWarpBridgeCommands() {
-        CommandManager commandManager = getProxyServer().getCommandManager();
-        boolean aliasAlreadyRegistered = commandManager.hasCommand("warp") || commandManager.hasCommand("to");
-        boolean myWarpEnabled = McmeConnect.getConfig().isMyWarpEnabled();
-        if(!WarpHandler.shouldRegisterWarpCommands(myWarpEnabled, aliasAlreadyRegistered)) {
-            logger.info("Not registering the MyWarp bridge on /warp and /to ({}).",
-                    aliasAlreadyRegistered
-                            ? "another plugin already owns the command - leaving it alone"
-                            : "myWarp.enabled is false");
-            return;
-        }
-        registerConnectCommand("warp", null, "to");
     }
 
     private void registerConnectCommand(String command, String permission, String... aliases) {

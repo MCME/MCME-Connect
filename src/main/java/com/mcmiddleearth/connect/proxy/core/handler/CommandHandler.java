@@ -9,7 +9,6 @@ import com.mcmiddleearth.base.core.server.McmeServerInfo;
 import com.mcmiddleearth.connect.Channel;
 import com.mcmiddleearth.connect.Permission;
 import com.mcmiddleearth.connect.proxy.core.McmeConnect;
-import com.mcmiddleearth.connect.proxy.core.warp.WarpHandler;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -226,13 +225,6 @@ public class CommandHandler {
                 }
                 return true;
             }
-        } else if(WarpHandler.isWarpCommand(message)) {
-            if(!isMvtpAllowed(player)) {
-                player.sendMessage(McmeConnect.errorMessage("/warp isn't allowed here."));
-                return true;
-            } else {
-                return WarpHandler.handle(player, message);
-            }
         } else if(message[0].equalsIgnoreCase("/reboot")) {
             if(!player.hasPermission(Permission.RESTART)) {
                 player.sendMessage(McmeConnect.errorMessage("You are not allowed to use that command."));
@@ -301,11 +293,6 @@ public class CommandHandler {
                                 .forEach(suggestions::add);
                     } else {
                         suggestions.addAll(servers);
-                    }
-                    break;
-                case "/warp":
-                    if(args.length == 2 && !WarpHandler.matchesSubcommand(args[1])) {
-                        suggestions.addAll(WarpHandler.getSuggestions(args[1],sender));
                     }
                     break;
                 case "/vote":

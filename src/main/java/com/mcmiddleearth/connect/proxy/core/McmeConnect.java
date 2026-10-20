@@ -12,7 +12,6 @@ import com.mcmiddleearth.base.core.server.McmeBackend;
 import com.mcmiddleearth.base.core.server.McmeProxy;
 import com.mcmiddleearth.base.core.taskScheduling.Task;
 import com.mcmiddleearth.connect.proxy.core.handler.*;
-import com.mcmiddleearth.connect.proxy.core.warp.MyWarpDBConnector;
 import com.mcmiddleearth.connect.proxy.core.watchdog.ServerWatchdog;
 
 import java.io.File;
@@ -30,10 +29,6 @@ public class McmeConnect {
     private static final Map<String, ServerInformation> serverInformation = new HashMap<>();
 
     private static ServerWatchdog watcher;
-
-    private static MyWarpDBConnector myWarpConnector;
-
-    private static boolean myWarpEnabled;
 
     private static RestartScheduler restartScheduler;
     private static Task tpaCleanupScheduler;
@@ -88,9 +83,6 @@ public class McmeConnect {
         if(VanishHandler.isPvSupport()) {
             VanishHandler.loadVanished();
         }
-        if(McmeConnect.getConfig().isMyWarpEnabled()) {
-            myWarpConnector = new MyWarpDBConnector(McmeConnect.getConfig().getMyWarpSection());
-        }
     }
 
     public static McmeBackendPlugin getBackendPlugin() {
@@ -103,7 +95,6 @@ public class McmeConnect {
 
     public static void disable() {
         watcher.stopWatchdog();
-        myWarpConnector.disconnect();
         restartScheduler.cancel();
         tpaCleanupScheduler.cancel();
         tpahereCleanupScheduler.cancel();
@@ -123,10 +114,6 @@ public class McmeConnect {
 
     public static McmeLogger getLogger() {
         return logger;
-    }
-
-    public static MyWarpDBConnector getMyWarpConnector() {
-        return myWarpConnector;
     }
 
     public static ServerInformation getServerInformation(String name) {

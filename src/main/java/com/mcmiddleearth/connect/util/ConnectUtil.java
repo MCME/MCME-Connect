@@ -30,7 +30,6 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import java.util.Arrays;
-import java.util.UUID;
 import java.util.logging.Logger;
 
 /**
@@ -81,14 +80,6 @@ public class ConnectUtil {
         out.writeInt(show);
         out.writeInt(extro);
         out.writeInt(delay);
-        sender.sendPluginMessage(ConnectPlugin.getInstance(), Channel.MAIN, out.toByteArray());
-    }
-
-    public static void sendWorldUUID(Player sender, UUID uid, String name) {
-        ByteArrayDataOutput out = ByteStreams.newDataOutput();
-        out.writeUTF(Channel.WORLD_UUID);
-        out.writeUTF(uid.toString());
-        out.writeUTF(name);
         sender.sendPluginMessage(ConnectPlugin.getInstance(), Channel.MAIN, out.toByteArray());
     }
 

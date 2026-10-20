@@ -65,13 +65,6 @@ public class PluginMessageHandler {
                     TitleHandler.handle(server,recipient, title, subtitle, intro, show, extro, delay);
                     break;
                 }
-                case Channel.WORLD_UUID:
-                {
-                    String uuid = in.readUTF();
-                    String worldName = in.readUTF();
-                    McmeConnect.getMyWarpConnector().addWorldUUID(uuid, worldName);
-                    break;
-                }
                 case Channel.RESTART:
                 {
                     boolean shutdown = in.readBoolean();
@@ -102,6 +95,8 @@ public class PluginMessageHandler {
                     //PlayerItemManager.sendAllPlayerList(info);
                     break;
                 default:
+                    // Subchannels this proxy no longer handles land here and are ignored. Backends
+                    // still on 3.0.3 or older send world_uuid on every join until they restart.
                     break;
             }
             return true;
