@@ -8,8 +8,6 @@ import com.mcmiddleearth.base.core.server.McmeServerInfo;
 import com.mcmiddleearth.connect.Channel;
 import com.mcmiddleearth.connect.proxy.core.McmeConnect;
 
-import java.util.UUID;
-
 public class PluginMessageHandler {
 
     public static boolean handlePluginMessage(String channel,
@@ -82,21 +80,9 @@ public class PluginMessageHandler {
                     String server = messageSender.getName();
                     McmeConnect.getServerInformation(server).updateFromPluginMessage(in);
                     break;
-                case Channel.AFK:
-                    String uuid = in.readUTF();
-                    boolean afk = in.readBoolean();
-                    McmeProxyPlayer afkPlayer = McmeConnect.getProxy().getPlayer(UUID.fromString(uuid));
-                    if(afkPlayer!=null) {
-                        //TabViewManager.handleUpdateAfk(afkPlayer, afk);
-                    }
-                    break;
-                case Channel.PLAYER:
-                    //McmeServerInfo info = messageReceiver.getServerInfo();
-                    //PlayerItemManager.sendAllPlayerList(info);
-                    break;
                 default:
                     // Subchannels this proxy no longer handles land here and are ignored. Backends
-                    // still on 3.0.3 or older send world_uuid on every join until they restart.
+                    // still on 3.0.3 or older send world_uuid, afk and player until they restart.
                     break;
             }
             return true;

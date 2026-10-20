@@ -184,10 +184,6 @@
             <id>onarandombox</id>
             <url>https://repo.onarandombox.com/content/groups/public/</url>
         </repository>
-        <repository>
-            <id>essentials-releases</id>
-            <url>https://repo.essentialsx.net/releases/</url>
-        </repository>
     </repositories>
     <dependencies>
         <dependency>
@@ -232,19 +228,6 @@
                 <exclusion>
                     <groupId>*</groupId>
                     <artifactId>*</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <!-- AfkListener mirrors the EssentialsX AFK state into the tab list. -->
-        <dependency>
-            <groupId>net.essentialsx</groupId>
-            <artifactId>EssentialsX</artifactId>
-            <version>2.19.0</version>
-            <scope>provided</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>net.md-5</groupId>
-                    <artifactId>brigadier</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>

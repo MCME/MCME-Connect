@@ -15,9 +15,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * Pins how the proxy treats subchannels it no longer handles. Each backend keeps the Connect jar
  * it started with, so after a proxy upgrade the backends still on 3.0.3 or older go on sending
- * {@code world_uuid} until they restart. The proxy must accept and ignore those messages. It used
- * to reach the MyWarp bridge, and with {@code myWarp.enabled: false} it threw a NullPointerException
- * on every player join.
+ * {@code world_uuid}, {@code afk} and {@code player} until they restart. The proxy must accept
+ * and ignore those messages. {@code world_uuid} used to reach the MyWarp bridge, and with
+ * {@code myWarp.enabled: false} it threw a NullPointerException on every player join.
  */
 class PluginMessageHandlerTest {
 
@@ -36,6 +36,20 @@ class PluginMessageHandlerTest {
             out.writeUTF(UUID.randomUUID().toString());
             out.writeUTF("world");
         });
+    }
+
+    @Test
+    void ignoresAfkFromOlderBackends() {
+        assertIgnored(out -> {
+            out.writeUTF("afk");
+            out.writeUTF(UUID.randomUUID().toString());
+            out.writeBoolean(true);
+        });
+    }
+
+    @Test
+    void ignoresPlayerListRequestsFromOlderBackends() {
+        assertIgnored(out -> out.writeUTF("player"));
     }
 
     private static void assertIgnored(Consumer<ByteArrayDataOutput> writer) {
