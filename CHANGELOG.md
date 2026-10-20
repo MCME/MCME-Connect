@@ -5,6 +5,13 @@ All notable changes to MCME-Connect are documented here. The format follows
 
 ## [Unreleased]
 
+## [3.1.0] - 2026-10-20
+
+Clean-up release for the Velocity 4 / Paper 26.2 network. It removes the legacy MyWarp bridge
+and the dead backend relay left over from the BungeeCord tab view. It fixes a
+`NullPointerException` the proxy threw on every player join when `myWarp.enabled` was false,
+and two smaller database issues.
+
 ### Changed
 
 - Compiles against `velocity-api 4.2.0` instead of the 4.1.0 snapshot. The generated plugin
@@ -27,6 +34,11 @@ All notable changes to MCME-Connect are documented here. The format follows
 - With `myWarp.enabled: false`, the proxy threw a `NullPointerException` on every player join.
   Backends sent a world UUID that only the MyWarp bridge used, and the proxy passed it to a
   connector that did not exist. Backends no longer send it.
+- `/restorestats` loads the MySQL driver itself. It used to work only because the MyWarp bridge
+  happened to load the driver first, and Velocity's automatic driver discovery may not find a
+  driver inside a plugin jar.
+- Creature kill and death counts can no longer be lowered by a server that has not loaded the
+  player's stored values yet. Like the other statistics, they are now only ever raised.
 
 ### Upgrade notes
 
@@ -196,7 +208,8 @@ MCME-Base 2.0.1 on the proxy and on every backend.
 
 Last release for Minecraft 1.13, published as tag `v1.1`. Earlier history lives in git.
 
-[Unreleased]: https://github.com/MCME/MCME-Connect/compare/v3.0.3...HEAD
+[Unreleased]: https://github.com/MCME/MCME-Connect/compare/v3.1.0...HEAD
+[3.1.0]: https://github.com/MCME/MCME-Connect/compare/v3.0.3...v3.1.0
 [3.0.3]: https://github.com/MCME/MCME-Connect/compare/v3.0.1...v3.0.3
 [3.0.2]: https://github.com/MCME/MCME-Connect/compare/v3.0.1...dd44ef9
 [3.0.1]: https://github.com/MCME/MCME-Connect/compare/f4ae071...v3.0.1
