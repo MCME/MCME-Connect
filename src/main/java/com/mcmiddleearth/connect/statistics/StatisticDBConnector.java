@@ -19,6 +19,8 @@ package com.mcmiddleearth.connect.statistics;
 import com.mcmiddleearth.connect.ConnectPlugin;
 
 import java.sql.*;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.logging.Level;
@@ -341,117 +343,65 @@ public class StatisticDBConnector {
     }
 
     private synchronized void loadStatisticSync(Player player) {
-            try {
-                selectPlayerStats.setString(1, player.getUniqueId().toString());
-                ResultSet result = selectPlayerStats.executeQuery();
-                if(result.next()) {
-                    new BukkitRunnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                for(Statistic stat : Statistic.values()) {
-                                    if(stat.getType().equals(Statistic.Type.UNTYPED)) {
-                                        int value = result.getInt(stat.name());
-                                        player.setStatistic(stat, value);
-                                    }
-                                }
-                            } catch (SQLException ex) {
-                                Logger.getLogger(StatisticDBConnector.class.getName()).log(Level.SEVERE, null, ex);
-                            } finally {
-                                try { result.close(); } catch (SQLException ignored) {}
-                            }
-                        }
-                    }.runTask(ConnectPlugin.getInstance());
-                } else {
-                    result.close();
+        Logger log = Logger.getLogger(StatisticDBConnector.class.getName());
+        try {
+            // Everything is read here, on the database thread, and every result is closed before the
+            // main thread gets the values. The prepared statements are shared and re-running one closes
+            // its previous result, so the main thread must never read a ResultSet itself.
+            Map<Statistic, Integer> general = Map.of();
+            selectPlayerStats.setString(1, player.getUniqueId().toString());
+            try (ResultSet result = selectPlayerStats.executeQuery()) {
+                if (result.next()) {
+                    general = StatisticSnapshot.readGeneral(result);
                 }
-                int id = getPlayerId(player.getUniqueId());
-                if(id>=0) {
-                    selectPlayerAllMatStats.setInt(1, id);
-                    ResultSet matResult = selectPlayerAllMatStats.executeQuery();
-                    if(matResult.next()) {
-                        new BukkitRunnable() {
-                            @Override
-                            public void run() {
-                                try {
-                                    do {
-                                        Material mat;
-                                        boolean save = false;
-                                        try {
-                                            mat = Material.valueOf(matResult.getString("material"));
-                                        } catch(IllegalArgumentException ex) {
-                                            try {
-                                                mat = mappingOf(matResult.getString("material"));
-                                                save = true;
-                                            } catch (IllegalArgumentException ex2) {
-                                                mat = null;
-                                            }
-                                        }
-                                        if(mat != null) {
-                                            for(Statistic stat : Statistic.values()) {
-                                                if(stat.getType().equals(Statistic.Type.BLOCK)
-                                                        ||stat.getType().equals(Statistic.Type.ITEM)) {
-                                                    int value = matResult.getInt(getName(stat));
-                                                    if(value > 0) {
-                                                        try {
-                                                            player.setStatistic(stat, mat, value);
-                                                            if(save) {
-                                                                saveMaterialStatsSync(player, stat, mat, value);
-                                                            }
-                                                        } catch(IllegalArgumentException ex) {
-                                                            Logger.getLogger(StatisticDBConnector.class.getName()).log(Level.WARNING, null, ex);
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                            if(save) {
-                                                deleteMatStat(id, matResult.getString("material"));
-                                            }
-                                        }
-                                    } while(matResult.next());
-                                } catch (SQLException ex) {
-                                    Logger.getLogger(StatisticDBConnector.class.getName()).log(Level.SEVERE, null, ex);
-                                } finally {
-                                    try { matResult.close(); } catch (SQLException ignored) {}
-                                }
-                            }
-                        }.runTask(ConnectPlugin.getInstance());
-                    } else {
-                        result.close();
-                    }
-                    selectPlayerAllEntityStats.setInt(1, id);
-                    ResultSet entityResult = selectPlayerAllEntityStats.executeQuery();
-                    if(entityResult.next()) {
-                        new BukkitRunnable() {
-                            @Override
-                            public void run() {
-                                try {
-                                    do {
-                                        EntityType entity = EntityType.valueOf(entityResult.getString("entity"));
-                                        for(Statistic stat : Statistic.values()) {
-                                            if(stat.getType().equals(Statistic.Type.ENTITY)) {
-                                                int value = entityResult.getInt(stat.name());
-                                                if(value>0) {
-                                                    player.setStatistic(stat, entity, value);   
-                                                }
-                                            }
-                                        }
-                                    } while(entityResult.next());
-                                } catch (SQLException ex) {
-                                    Logger.getLogger(StatisticDBConnector.class.getName()).log(Level.SEVERE, null, ex);
-                                } finally {
-                                    try { entityResult.close(); } catch (SQLException ignored) {}
-                                }
-                            }
-                        }.runTask(ConnectPlugin.getInstance());
-                    } else {
-                        result.close();
-                    }
-                }
-            } catch (SQLException ex) {
-                Logger.getLogger(StatisticDBConnector.class.getName()).log(Level.SEVERE, null, ex);
-                connected = false;
             }
+            List<StatisticSnapshot.MaterialValue> materials = List.of();
+            StatisticSnapshot.EntityRows entities = StatisticSnapshot.EntityRows.NONE;
+            int id = getPlayerId(player.getUniqueId());
+            if (id >= 0) {
+                StatisticSnapshot.MaterialRows materialRows;
+                selectPlayerAllMatStats.setInt(1, id);
+                try (ResultSet matResult = selectPlayerAllMatStats.executeQuery()) {
+                    materialRows = StatisticSnapshot.readMaterials(matResult);
+                }
+                selectPlayerAllEntityStats.setInt(1, id);
+                try (ResultSet entityResult = selectPlayerAllEntityStats.executeQuery()) {
+                    entities = StatisticSnapshot.readEntities(entityResult);
+                }
+                moveRenamedMaterials(player, id, materialRows, log);
+                materials = materialRows.values();
+            }
+            StatisticSnapshot snapshot = new StatisticSnapshot(general, materials, entities);
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    if (player.isOnline()) {
+                        snapshot.applyTo(player, log);
+                    }
+                }
+            }.runTask(ConnectPlugin.getInstance());
+        } catch (SQLException ex) {
+            log.log(Level.SEVERE, "Could not load statistics for " + player.getName(), ex);
+            connected = false;
+        }
+    }
+
+    /**
+     * Rows stored under an older material name with a _BLOCK or _ITEM suffix move to the current name.
+     * A failure here is logged and does not stop the loaded values from being applied.
+     */
+    private synchronized void moveRenamedMaterials(Player player, int id,
+                                                   StatisticSnapshot.MaterialRows rows, Logger log) {
+        try {
+            for (StatisticSnapshot.MaterialValue moved : rows.renamedValues()) {
+                saveMaterialStatsSync(player, moved.statistic(), moved.material(), moved.value());
+            }
+            for (String oldName : rows.renamedRows()) {
+                deleteMatStat(id, oldName);
+            }
+        } catch (SQLException ex) {
+            log.log(Level.WARNING, "Could not move renamed material statistics for " + player.getName(), ex);
+        }
     }
 
     public void loadStatistic(Player p) {
@@ -657,22 +607,7 @@ public class StatisticDBConnector {
     }
     
     public String getName(Statistic stat) throws IllegalArgumentException{
-        return (stat.name().equals("DROP")?"DROP_":stat.name());
+        return StatisticSnapshot.materialColumn(stat);
     }
 
-    private Material mappingOf(String name) {
-        String[] split = name.split("_");
-        String result = "";
-        if(   split[split.length-1].equals("BLOCK")
-           || split[split.length-1].equals("ITEM")) {
-            for(int i = 0; i<split.length-1; i++) {
-                if(!result.equals("")) {
-                    result = result+"_";
-                }
-                result = result + split[i];
-            }
-            return Material.valueOf(result);
-        }
-        return null;
-    }
 }
