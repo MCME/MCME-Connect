@@ -8,8 +8,9 @@ All notable changes to MCME-Connect are documented here. The format follows
 ## [3.1.0] - 2026-10-20
 
 Clean-up release for the Velocity 4 / Paper 26.2 network. It removes the legacy MyWarp bridge
-and the dead backend relay left over from the BungeeCord tab view, and fixes a
-`NullPointerException` the proxy threw on every player join when `myWarp.enabled` was false.
+and the dead backend relay left over from the BungeeCord tab view. It fixes a
+`NullPointerException` the proxy threw on every player join when `myWarp.enabled` was false,
+and two smaller database issues.
 
 ### Changed
 
@@ -33,6 +34,11 @@ and the dead backend relay left over from the BungeeCord tab view, and fixes a
 - With `myWarp.enabled: false`, the proxy threw a `NullPointerException` on every player join.
   Backends sent a world UUID that only the MyWarp bridge used, and the proxy passed it to a
   connector that did not exist. Backends no longer send it.
+- `/restorestats` loads the MySQL driver itself. It used to work only because the MyWarp bridge
+  happened to load the driver first, and Velocity's automatic driver discovery may not find a
+  driver inside a plugin jar.
+- Creature kill and death counts can no longer be lowered by a server that has not loaded the
+  player's stored values yet. Like the other statistics, they are now only ever raised.
 
 ### Upgrade notes
 
