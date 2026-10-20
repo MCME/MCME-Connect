@@ -5,6 +5,12 @@ All notable changes to MCME-Connect are documented here. The format follows
 
 ## [Unreleased]
 
+## [3.1.0] - 2026-10-20
+
+Clean-up release for the Velocity 4 / Paper 26.2 network. It removes the legacy MyWarp bridge
+and the dead backend relay left over from the BungeeCord tab view, and fixes a
+`NullPointerException` the proxy threw on every player join when `myWarp.enabled` was false.
+
 ### Changed
 
 - Compiles against `velocity-api 4.2.0` instead of the 4.1.0 snapshot. The generated plugin
@@ -196,7 +202,8 @@ MCME-Base 2.0.1 on the proxy and on every backend.
 
 Last release for Minecraft 1.13, published as tag `v1.1`. Earlier history lives in git.
 
-[Unreleased]: https://github.com/MCME/MCME-Connect/compare/v3.0.3...HEAD
+[Unreleased]: https://github.com/MCME/MCME-Connect/compare/v3.1.0...HEAD
+[3.1.0]: https://github.com/MCME/MCME-Connect/compare/v3.0.3...v3.1.0
 [3.0.3]: https://github.com/MCME/MCME-Connect/compare/v3.0.1...v3.0.3
 [3.0.2]: https://github.com/MCME/MCME-Connect/compare/v3.0.1...dd44ef9
 [3.0.1]: https://github.com/MCME/MCME-Connect/compare/f4ae071...v3.0.1
