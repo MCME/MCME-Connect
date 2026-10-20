@@ -5,6 +5,34 @@ All notable changes to MCME-Connect are documented here. The format follows
 
 ## [Unreleased]
 
+### Changed
+
+- Compiles against `velocity-api 4.2.0` instead of the 4.1.0 snapshot. The generated plugin
+  descriptor is unchanged.
+
+### Removed
+
+- The legacy MyWarp bridge on the proxy. MCME-Warps serves `/warp` and `/to`, so Connect no
+  longer registers them, no longer opens the MyWarp database and no longer reads the `myWarp:`
+  settings. A leftover `myWarp:` section in the proxy's `config.yml` is ignored and can be
+  deleted.
+- The backend relay that reported EssentialsX AFK changes and requested the network player list.
+  The proxy has ignored both since the BungeeCord layer was removed. EssentialsX is no longer a
+  dependency.
+- Unused files from the BungeeCord era in the repository root, and the unpackaged copy of
+  `startserver.sh`.
+
+### Fixed
+
+- With `myWarp.enabled: false`, the proxy threw a `NullPointerException` on every player join.
+  Backends sent a world UUID that only the MyWarp bridge used, and the proxy passed it to a
+  connector that did not exist. Backends no longer send it.
+
+### Upgrade notes
+
+- The proxy and the backends can be updated in any order. The proxy ignores the `world_uuid`,
+  `afk` and `player` messages that backends on 3.0.3 keep sending until they restart.
+
 ## [3.0.3] - 2026-09-23
 
 Removes the Velocity tab list that 3.0.1 switched on unconditionally. 3.0.2, which put it behind a

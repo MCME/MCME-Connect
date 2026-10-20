@@ -34,13 +34,10 @@ public class Channel {
     public static final String COMMAND    = "command";
     public static final String SPAWN    = "spawn";
     public static final String DISCORD  = "Discord";
-    public static final String WORLD_UUID  = "world_uuid";
     public static final String LEGACY      = "legacy";
     public static final String RESTART     = "restart";
     public static final String JOIN     = "join";
-    public static final String AFK     = "afk";
     public static final String SERVER_INFO  = "server_info";
-    public static final String PLAYER   = "player";
     public static final String GAMEMODE   = "gamemode";
 
 }

@@ -23,8 +23,6 @@ import com.mcmiddleearth.connect.Channel;
 import com.mcmiddleearth.connect.ConnectPlugin;
 import com.mcmiddleearth.connect.events.PlayerConnectEvent;
 import com.mcmiddleearth.connect.restart.RestartHandler;
-import com.mcmiddleearth.connect.tabList.ConnectedPlayer;
-import com.mcmiddleearth.connect.tabList.PlayerList;
 import com.mcmiddleearth.connect.util.ConnectUtil;
 import com.mcmiddleearth.connect.util.MultiverseSpawn;
 import org.bukkit.*;
@@ -174,18 +172,6 @@ public class ConnectPluginListener implements PluginMessageListener {
                 Bukkit.getServer().getPluginManager()
                       .callEvent(new PlayerConnectEvent(arrivingPlayer,PlayerConnectEvent.ConnectReason.valueOf(reason)));
             });
-        } else if(subchannel.equals(Channel.PLAYER)) {
-            boolean remove = in.readBoolean();
-            UUID uuid = UUID.fromString(in.readUTF());
-            String name = in.readUTF();
-            String displayName = in.readUTF();
-            ConnectedPlayer connectedPlayer = new ConnectedPlayer(uuid,name);
-            connectedPlayer.setDisplayName(displayName);
-            if(!remove) {
-                PlayerList.addPlayer(connectedPlayer);
-            } else {
-                PlayerList.removePlayer(connectedPlayer);
-            }
         } else if(subchannel.equals(Channel.GAMEMODE)) {
             Player p = Bukkit.getPlayer(UUID.fromString(in.readUTF()));
             short gm = in.readShort();

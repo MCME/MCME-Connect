@@ -5,10 +5,10 @@ two roles and is deployed unchanged to the proxy and to every backend:
 
 - **Velocity proxy plugin** (`com.mcmiddleearth.connect.proxy.velocity.ConnectVelocityPlugin`):
   network-wide teleports (`/tp`, `/tphere`, `/tpa`, `/tpahere`, `/tpaccept`, `/tpdeny`,
-  `/tpacancel`), server switching (`/mvtp`, `/warp`, `/theme`, `/survival` and one `/<server>`
-  command per registered server), vanish awareness, chat and Discord message relaying, restart
-  orchestration (`/reboot`, `/stop`), the server watchdog, MyWarp lookups, `/restorestats`, and
-  the tab list reserved panel with `/tabnews`.
+  `/tpacancel`), server switching (`/mvtp`, `/theme`, `/survival` and one `/<server>` command
+  per registered server), vanish awareness, chat and Discord message relaying, restart
+  orchestration (`/reboot`, `/stop`), the server watchdog and `/restorestats`. Warps belong to
+  MCME-Warps, and TAB draws the tab list.
 - **Paper backend plugin** (`com.mcmiddleearth.connect.ConnectPlugin`): the backend half of the
   plugin-message protocol, statistics sync to MySQL, first-join date sync, scheduled restarts,
   `/restart` and `/stop`.
@@ -20,11 +20,10 @@ BungeeCord/Waterfall support was removed in 3.0.0. The network runs on Velocity 
 | Component | Version |
 |-----------|---------|
 | Paper | 26.2 (compiled against `paper-api 26.2.build.123-stable`) |
-| Velocity | 4.1.0 line (compiled against `velocity-api 4.1.0-SNAPSHOT`) |
+| Velocity | 4.2 or newer (compiled against `velocity-api 4.2.0`) |
 | Java at runtime | 25, as run on the network; the jar itself is Java 21 bytecode |
 | MCME-Base | 2.0.1 or newer, on the proxy and on every backend |
-| Backend, optional | PremiumVanish, DiscordSRV, Multiverse-Core, EssentialsX (AFK status in the tab list); PluginUtils 2.0.2 or newer for first-join date sync |
-| Proxy, optional | a MyWarp database for `/warp` |
+| Backend, optional | PremiumVanish, DiscordSRV, Multiverse-Core; PluginUtils 2.0.2 or newer for first-join date sync |
 
 ## Building
 
@@ -35,7 +34,9 @@ Java 21 bytecode (see the comment in `pom.xml`).
 mvn clean verify
 ```
 
-This runs the unit tests and produces the shaded `target/MCME-Connect-<version>.jar`.
+This runs the unit tests and produces the shaded jar,
+`target/MCME-Connect-<version>-<TYPE>-<commit>.jar`. `TYPE` is `RELEASE` unless the build passes
+`-Dbuild.type`, and `commit` is the short hash of the commit it was built from.
 
 Dependencies, MCME-Base included, resolve from the MCME Maven repository at
 `https://repo.mcmiddleearth.com` (deployment in the private [q220/maven-repo](https://github.com/q220/maven-repo)):
@@ -50,13 +51,9 @@ artifact.
 `config.yml` holds a proxy section and a backend section; each side reads its own keys. Points
 worth knowing:
 
-- Database credentials ship as `changeme` placeholders. Set them before enabling `myWarp` on the
-  proxy or `syncStatistic` on a backend.
+- Database credentials ship as `changeme` placeholders. Set them before enabling `syncStatistic`
+  on a backend or using `/restorestats` on the proxy.
 - `restorestatsBasePath` enables `/restorestats`; leave it empty or unset to disable the feature.
-- `reserved:` configures the tab list reserved panel (slots 41-60): an **Announcements** section
-  managed in game with `/tabnews add|remove|list`, and a **Tips** section that rotates through the
-  configured entries. Announcements are stored in `announcements.yml` in the proxy plugin
-  directory, `plugins/mcmeconnect/`. `/tabnews` requires `mcmeconnect.tabnews`.
 - Scheduled restarts and `/restart` rely on a start script that restarts the server while
   `plugins/MCME-Connect/restart.nfo` exists; an example loop is in the comments of `config.yml`.
 
@@ -68,5 +65,6 @@ worth knowing:
    target Minecraft version changed.
 2. Add a section to `CHANGELOG.md` headed `## [X.Y.Z] - YYYY-MM-DD`.
 3. Push a tag `vX.Y.Z` on the release commit. GitHub Actions checks the tag against the pom
-   version, builds and tests, and creates the GitHub Release "version X.Y.Z for mc <minecraft.version>"
-   with the shaded jar, its SHA-256 and the CHANGELOG section as notes.
+   version and the changelog, builds and tests, publishes the jar to `repo.mcmiddleearth.com`,
+   and creates the GitHub Release "version X.Y.Z for mc <minecraft.version>" with the shaded jar,
+   its SHA-256 and the CHANGELOG section as notes.
