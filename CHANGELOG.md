@@ -5,6 +5,28 @@ All notable changes to MCME-Connect are documented here. The format follows
 
 ## [Unreleased]
 
+## [3.1.1] - 2026-10-20
+
+Fixes the statistics sync on the backends. The proxy behaves exactly as in 3.1.0, and the same jar
+still goes to the proxy and to every backend.
+
+### Fixed
+
+- A player's statistics could fail to load when they joined a busy server. The backend logged
+  `Operation not allowed after ResultSet closed`, or a `NullPointerException` inside the MySQL
+  driver. The database thread handed its query results to the main thread, and by the time the
+  main thread read them, another player's load or a save had re-run the same shared query and
+  closed them. That player's general statistics, such as play time, then stayed at the server's
+  old copy for the session, and progress made in that session could be missing from the network
+  totals. The database thread now copies every value before handing over.
+- A creature statistic stored under an entity name the server no longer knows is skipped with a
+  warning, instead of aborting the rest of that player's creature statistics.
+
+### Changed
+
+- Statistics stored under an older material name with a `_BLOCK` or `_ITEM` suffix are moved to
+  the current name on the database thread instead of the main thread.
+
 ## [3.1.0] - 2026-10-20
 
 Clean-up release for the Velocity 4 / Paper 26.2 network. It removes the legacy MyWarp bridge
@@ -208,7 +230,8 @@ MCME-Base 2.0.1 on the proxy and on every backend.
 
 Last release for Minecraft 1.13, published as tag `v1.1`. Earlier history lives in git.
 
-[Unreleased]: https://github.com/MCME/MCME-Connect/compare/v3.1.0...HEAD
+[Unreleased]: https://github.com/MCME/MCME-Connect/compare/v3.1.1...HEAD
+[3.1.1]: https://github.com/MCME/MCME-Connect/compare/v3.1.0...v3.1.1
 [3.1.0]: https://github.com/MCME/MCME-Connect/compare/v3.0.3...v3.1.0
 [3.0.3]: https://github.com/MCME/MCME-Connect/compare/v3.0.1...v3.0.3
 [3.0.2]: https://github.com/MCME/MCME-Connect/compare/v3.0.1...dd44ef9
